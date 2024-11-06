@@ -1,3 +1,5 @@
+import math
+
 class Vec:
     def __init__(self, x=0, y=0):
         self.x = x
@@ -17,6 +19,8 @@ class Vec:
 
     def __add__(self, other):
         return Vec(self.x + other.x, self.y + other.y)
+    def __neg__(self):
+        return Vec(-self.x,-self.y)
 
     def __getitem__(self,item):
         if item == 0: return self.x
@@ -30,12 +34,25 @@ class Vec:
     def __repr__(self):
         return self.__str__()
 
+    @staticmethod
+    def make_from_angle(angle,magnitude=1):
+        return Vec(math.cos(angle),math.sin(angle))*magnitude
+
     def tuple(self,force_int=False):
         if force_int: return (int(self.x),int(self.y))
         else: return (self.x,self.y)
 
     def length(self):
         return ((self.x)**2+(self.y)**2)**0.5
+
+    def normalize(self):
+        length = self.length()
+        if length != 0:
+            self.x /= length
+            self.y /= length
+    def normalized(self):
+        self.normalize()
+        return self
 
 
 class Rect:

@@ -11,7 +11,11 @@ class Projectile:
         self.vel = Vec(math.cos(angle) * speed, math.sin(angle) * speed)
         self.radius = 0.1
         self.move_drag = 0.9
-        self.time_to_live = 100
+        self.hits_to_live = 1
+
+        self.col = 'grey'
+        self.damage = 1
+        self.knockback = 0.1
 
     def get_hitbox(self):
         return CircleHitbox(self.x, self.y, self.radius)
@@ -27,10 +31,14 @@ class Projectile:
         self.y += self.vel[1] * delta_time
 
     def get_dead(self):
-        return self.vel.length() < 0.05
+        return self.vel.length() < 0.05 or self.hits_to_live <= 0
+
+    def detect_hit(self,entity):
+        if self.get_hitbox().Get_Collide(entity.get_hitbox()) and self.team!=entity.team and not self.get_dead():
+            entity.take_hit(self)
+            self.hits_to_live -= 1
 
 
 class Bullet(Projectile):
     def __init__(self, x, y, angle, speed, team):
         super().__init__(x, y, angle, speed, team)
-        self.col = 'grey'

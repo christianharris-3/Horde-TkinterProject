@@ -6,8 +6,8 @@ from src.Game import Game
 class Main:
     def __init__(self):
         self.done = False
-        self.window_width = 600
-        self.window_height = 600
+        self.window_width = 1200
+        self.window_height = 1000
 
         self.window = tk.Tk()
         self.window.geometry(f'{self.window_width}x{self.window_height}')

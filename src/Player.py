@@ -1,12 +1,13 @@
 from src.Entity import Entity
-from PIL import Image
+import tkinter as tk
+from PIL import Image, ImageTk, ImageDraw
 from src.Utiles import Coords, Vec
 from src.Projectiles import Bullet
 import math
 
 
 class Player(Entity):
-    def __init__(self, x, y, control_map):
+    def __init__(self, x, y, control_map,screen_width, screen_height):
         super().__init__(x, y)
         self.team = 'Player'
 
@@ -17,7 +18,17 @@ class Player(Entity):
         self.weapon_image_base = Image.open('Sprites/Pistol.png').convert("RGBA").resize(
             Coords.world_to_pixel_coords((self.radius, self.radius)).tuple(True), resample=Image.Resampling.BOX)
 
+        self.hurt_image = 0
+        self.hurt_frames_counter = 0
+        self.screen_resize(screen_width, screen_height)
+
         self.buttons_down = []
+
+    def screen_resize(self,w,h):
+        hurt_image = Image.new("RGBA", (w, h), (255, 0, 0, 0))
+        drawer = ImageDraw.Draw(hurt_image)
+        drawer.rectangle((0, 0, w, h), (255, 0, 0, 100))
+        self.hurt_image = ImageTk.PhotoImage(hurt_image)
 
     def get_image(self):
         img_s = 140
@@ -46,6 +57,19 @@ class Player(Entity):
                     weapon_img)
 
         return image, Vec(self.x, self.y)
+
+    def draw_ui(self,screen):
+        screen.create_rectangle(10, 10, 210, 60, fill="#444444", outline="#444444",tag="game_image")
+        screen.create_rectangle(12, 12, 12 + (196 * self.health / self.max_health), 58,
+                                     fill="#ff0000", outline="#ff0000",tag="game_image")
+
+        self.hurt_frames_counter-=1
+        if self.hurt_frames_counter>=0:
+            hurt_image = Image.new("RGBA", (screen.winfo_width(), screen.winfo_height()), (255, 0, 0, 0))
+            drawer = ImageDraw.Draw(hurt_image)
+            drawer.rectangle((0, 0, screen.winfo_width(), screen.winfo_height()), (255, 0, 0, 100))
+            self.hurt_image = ImageTk.PhotoImage(hurt_image)
+            screen.create_image(0,0,anchor=tk.NW,image=self.hurt_image,tag="game_image")
 
     def control(self, inp, mpos):
 
