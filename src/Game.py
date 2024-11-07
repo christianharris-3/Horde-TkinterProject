@@ -14,7 +14,7 @@ class Game:
         self.screen_height = screen_height
 
         self.screen = tk.Canvas(self.window, width=self.screen_width, height=self.screen_height, bg="green")
-        self.screen.pack()
+        self.screen.place(x=0,y=0)
 
         self.control_map = {'Left': {'Key': 'a', 'continuous': True},
                             'Right': {'Key': 'd', 'continuous': True},
@@ -40,7 +40,7 @@ class Game:
         self.enemy_img = 0
         self.world_mpos = Vec()
 
-        self.debug_info = True
+        self.debug_info = False
         self.fps = 0
         self.window.bind('<F3>', self.toggle_debug)
 
@@ -54,6 +54,7 @@ class Game:
         self.player.physics(delta_time)
         if self.player.get_dead():
             self.player_dead = True
+            return True
 
         # Enemy Physics, AI control and deletion
         rem = []
@@ -83,6 +84,8 @@ class Game:
 
         # Camera movement
         self.camera_physics(delta_time)
+
+        return False
 
     def render_frame(self):
         self.screen.delete('game_image')
@@ -148,5 +151,4 @@ class Game:
         self.player.screen_resize(self.screen_width, self.screen_height)
 
     def toggle_debug(self, event):
-        print('togglething')
         self.debug_info = not self.debug_info
