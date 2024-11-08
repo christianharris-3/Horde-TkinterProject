@@ -71,7 +71,7 @@ class Hitbox:
                  2: 'Circle',
                  3: 'Point',
                  4: 'List'}
-    units_per_colgrid = 1
+    units_per_colgrid = 8
     big_num = 10000
 
     def set_x(self, x):
@@ -98,7 +98,6 @@ class Hitbox:
 
     def calc_colcodes(self):
         self.colcodes = []
-        return
         top_left = self.get_top_left() // Hitbox.units_per_colgrid
         bottom_right = self.get_bottom_right() // Hitbox.units_per_colgrid
 
@@ -290,7 +289,7 @@ class ListHitbox:
 
 # Class used to convert between Pixel positions/sizes to a custom scaled Coordinate system
 class Coords:
-    scale_factor = 40
+    scale_factor = 80
     @staticmethod
     def pixel_to_world(pixels):
         return pixels/Coords.scale_factor

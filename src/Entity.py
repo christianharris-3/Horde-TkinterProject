@@ -1,5 +1,6 @@
 from src.Utiles import CircleHitbox, Vec
 
+
 class Entity:
     def __init__(self, x, y):
         self.team = 'Neutral'
@@ -7,44 +8,65 @@ class Entity:
         self.y = y
         self.vel = Vec()
         self.angle = 0
-        self.radius = 1
-        self.move_acceleration = 0.02
         self.move_drag = 0.9
         self.target_move = Vec()
         self.i_frames = 0
 
-        self.max_health = 20
-        self.health = self.max_health
         self.knockback_resistance = 0.5
 
     def get_hitbox(self):
         return CircleHitbox(self.x, self.y, self.radius)
 
-    def physics(self, delta_time):
+    def physics(self, delta_time, tilemap_collision_hash):
         self.target_move.normalize()
         self.vel += self.target_move * self.move_acceleration * delta_time
         self.vel *= self.move_drag ** delta_time
+
         self.x += self.vel[0] * delta_time
+        if self.tilemap_collision(tilemap_collision_hash):
+            self.x -= self.vel[0] * delta_time
+
         self.y += self.vel[1] * delta_time
+        if self.tilemap_collision(tilemap_collision_hash):
+            self.y -= self.vel[1] * delta_time
 
-        self.i_frames-=delta_time/60
+        self.i_frames -= delta_time / 60
 
-    def entity_collision(self,entities,shake_camera):
-        for e in entities:
-            if not(e is self):
-                if self.get_hitbox().Get_Collide(e.get_hitbox()):
-                    self.vel+=Vec(self.x-e.x,self.y-e.y).normalized()/100
-                    if self.team == "Enemy" and e.team == "Player":
-                        e.take_damage(1)
-                        if e.team == "Player":
-                            shake_camera()
+    def entity_collision(self, collision_hash, shake_camera):
+        ownhitbox = self.get_hitbox()
+        for code in ownhitbox.colcodes:
+            if code in collision_hash:
+                for e in collision_hash[code]:
+                    if not (e is self) and ownhitbox.Get_Collide(e.get_hitbox()):
+                        self.vel += Vec(self.x - e.x, self.y - e.y).normalized() / 100
+                        if self.team == "Enemy" and e.team == "Player":
+                            e.take_damage(self.damage)
+                            if e.team == "Player":
+                                shake_camera()
+    def tilemap_collision(self, collision_hash):
+        ownhitbox = self.get_hitbox()
+        for code in ownhitbox.colcodes:
+            if code in collision_hash:
+                for t in collision_hash[code]:
+                    if ownhitbox.Get_Collide(t.get_hitbox()):
+                        return True
+        return False
+
+        # for e in entities:
+        #     if not(e is self):
+        #         if self.get_hitbox().Get_Collide(e.get_hitbox()):
+        #             self.vel+=Vec(self.x-e.x,self.y-e.y).normalized()/100
+        #             if self.team == "Enemy" and e.team == "Player":
+        #                 e.take_damage(1)
+        #                 if e.team == "Player":
+        #                     shake_camera()
 
     def take_hit(self, projectile):
-        self.vel += Vec.make_from_angle(projectile.angle,projectile.knockback*self.knockback_resistance)
+        self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
         self.take_damage(projectile.damage)
 
-    def take_damage(self,damage):
-        if self.i_frames<0:
+    def take_damage(self, damage):
+        if self.i_frames < 0:
             self.health -= damage
             self.i_frames = 0.3
             self.hurt_frames_counter = 3

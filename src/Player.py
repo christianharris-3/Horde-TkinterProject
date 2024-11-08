@@ -10,6 +10,10 @@ class Player(Entity):
     def __init__(self, x, y, control_map,screen_width, screen_height):
         super().__init__(x, y)
         self.team = 'Player'
+        self.radius = 0.45
+        self.move_acceleration = 0.01
+        self.max_health = 20
+        self.health = self.max_health
 
         self.control_map = control_map
         self.image_base = Image.open('Sprites/Player.png').convert("RGBA").resize(
@@ -31,7 +35,7 @@ class Player(Entity):
         self.hurt_image = ImageTk.PhotoImage(hurt_image)
 
     def get_image(self):
-        img_s = 140
+        img_s = int(3.5*Coords.scale_factor)
         image = Image.new("RGBA", (img_s, img_s), (0, 0, 0, 0))
 
 
@@ -100,4 +104,4 @@ class Player(Entity):
         return new_projectiles
 
     def shoot(self):
-        return [Bullet(self.x,self.y,self.angle,1,self.team)]
+        return [Bullet(self.x,self.y,self.angle,0.5,self.team)]

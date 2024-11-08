@@ -1,9 +1,10 @@
 import tkinter as tk
 from PIL import ImageTk
 from src.Player import Player
-from src.Enemy import Enemy
-from src.Utiles import Coords, Vec
-import random, math
+from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie
+from src.TileMap import Tilemap
+from src.Utiles import Coords, Vec, RectHitbox
+import random, math, copy
 
 
 class Game:
@@ -22,13 +23,14 @@ class Game:
                             'Down': {'Key': 's', 'continuous': True},
                             'Shoot': {'Key': 1, 'continuous': False}}
 
-        self.player = Player(0, 0, self.control_map, self.screen_width, self.screen_height)
-        self.enemies = [Enemy(5, a * 2) for a in range(5)]
+        self.player = Player(1.5, 1.5, self.control_map, self.screen_width, self.screen_height)
+        self.enemies = []
         self.projectiles = []
+        self.tilemap = Tilemap(Coords.scale_factor)
 
         self.player_dead = False
 
-        self.camera_pos = Vec()
+        self.camera_pos = Vec(self.player.x,self.player.y)
         self.camera_target_pos = Vec()
         self.camera_vel = Vec()
         self.camera_acceleration = 0.03
@@ -40,7 +42,7 @@ class Game:
         self.enemy_img = 0
         self.world_mpos = Vec()
 
-        self.debug_info = False
+        self.debug_info = True
         self.fps = 0
         self.window.bind('<F3>', self.toggle_debug)
 
@@ -48,10 +50,13 @@ class Game:
         self.fps = 60 / delta_time
         self.get_world_mpos()
         self.generate_enemies()
+        self.get_collision_hash()
+
+        entities = self.enemies + [self.player]
 
         # Player Physics and Input control
         self.projectiles += self.player.control(self.inp, self.world_mpos)
-        self.player.physics(delta_time)
+        self.player.physics(delta_time, self.tilemap.collision_hash)
         if self.player.get_dead():
             self.player_dead = True
             return True
@@ -60,7 +65,7 @@ class Game:
         rem = []
         for enem in self.enemies:
             enem.control(self.player)
-            enem.physics(delta_time)
+            enem.physics(delta_time, self.tilemap.collision_hash)
             if enem.get_dead():
                 rem.append(enem)
         for r in rem:
@@ -69,7 +74,7 @@ class Game:
         # Player + Entity Collision
         entities = self.enemies + [self.player]
         for entity in entities:
-            entity.entity_collision(entities, self.shake_camera)
+            entity.entity_collision(self.collision_hash, self.shake_camera)
 
         # Projectile Physics and deletion
         rem = []
@@ -90,6 +95,11 @@ class Game:
     def render_frame(self):
         self.screen.delete('game_image')
 
+        # Tilemap Rendering
+        tlx, tly = self.screen_to_world_pos(Vec()).tuple()
+        brx, bry = self.screen_to_world_pos(Vec(self.screen_width,self.screen_height)).tuple()
+        self.tilemap.render_tiles(self.screen,RectHitbox(tlx,tly,round(brx-tlx),round(bry-tly)),self.get_render_coords)
+
         # Player Rendering
         player_img, player_pos = self.player.get_image()
         self.player_img = ImageTk.PhotoImage(player_img)
@@ -109,15 +119,27 @@ class Game:
         self.player.draw_ui(self.screen)
 
         if self.debug_info:
-            self.screen.create_text(10, 100, text=f'FPS: {int(self.fps)}\nKeys Pressed: {self.inp.kprs}', anchor=tk.NW,
-                                    tag='game_image')
+            output = f'''
+            FPS: {int(self.fps)}
+            Keys Pressed: {self.inp.kprs}
+            Zombies: {len(self.enemies)}
+                        '''
+            self.screen.create_text(-30, 80, text=output, anchor=tk.NW, tags='game_image')
 
     def generate_enemies(self):
-        if random.random() < 0.01:
+        if random.random() < 0.05:
             angle = math.pi * (random.random() * 2 - 1)
             dis = 10
-            self.enemies.append(Enemy(self.player.x + math.cos(angle) * dis,
-                                      self.player.y + math.sin(angle) * dis))
+            ran = random.random()
+            if ran<0.5:
+                self.enemies.append(Slow_Zombie(self.player.x + math.cos(angle) * dis,
+                                          self.player.y + math.sin(angle) * dis))
+            elif ran<0.8:
+                self.enemies.append(Fast_Zombie(self.player.x + math.cos(angle) * dis,
+                                                self.player.y + math.sin(angle) * dis))
+            else:
+                self.enemies.append(Big_Zombie(self.player.x + math.cos(angle) * dis,
+                                                self.player.y + math.sin(angle) * dis))
 
     def shake_camera(self):
         self.camera_shake_timer = 0.1
@@ -134,15 +156,26 @@ class Game:
             self.camera_shake_offset = Vec(random.gauss(0, self.camera_shake_intensity),
                                            random.gauss(0, self.camera_shake_intensity))
 
+    def get_collision_hash(self):
+        self.collision_hash = {}
+        for e in self.enemies+[self.player]:
+            for code in e.get_hitbox().colcodes:
+                if code in self.collision_hash:
+                    self.collision_hash[code].append(e)
+                else:
+                    self.collision_hash[code] = [e]
+
+
     def get_render_coords(self, pos):
         pixel_pos = Coords.world_to_pixel_coords(pos - self.camera_pos - self.camera_shake_offset)
         pixel_pos += Vec(self.screen_width, self.screen_height) / 2
         return pixel_pos.tuple()
 
+    def screen_to_world_pos(self, pos):
+        pos -= Vec(self.screen_width, self.screen_height) / 2
+        return Coords.pixel_to_world_coords(pos) + self.camera_pos + self.camera_shake_offset
     def get_world_mpos(self):
-        self.world_mpos = self.inp.get_mpos()
-        self.world_mpos -= Vec(self.screen_width, self.screen_height) / 2
-        self.world_mpos = Coords.pixel_to_world_coords(self.world_mpos) + self.camera_pos + self.camera_shake_offset
+        self.world_mpos = self.screen_to_world_pos(self.inp.get_mpos())
 
     def window_resize(self, nwidth, nheight):
         self.screen_width = nwidth
