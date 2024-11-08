@@ -57,6 +57,7 @@ class Fast_Zombie(Enemy):
         self.radius = 0.35
         self.move_acceleration = 0.008
         self.damage = 1
+        self.knockback_resistance = 0.8
 
 class Big_Zombie(Enemy):
     def __init__(self, x, y):
@@ -66,5 +67,6 @@ class Big_Zombie(Enemy):
         self.max_health = 16
         self.health = self.max_health
         self.radius = 0.48
-        self.move_acceleration = 0.002
+        self.move_acceleration = 0.003
         self.damage = 5
+        self.knockback_resistance = 0.05

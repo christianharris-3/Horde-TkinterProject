@@ -56,7 +56,10 @@ class Tilemap:
 
     def load_tiles(self):
         self.tiles = {}
-        map_ = [[8 if (x==0 or x==39 or y==0 or y==39) else random.randint(0, 10) for x in range(40)] for y in range(40)]
+        self.tilemap_width = 40
+        self.tilemap_height = 40
+        self.outside_tile = Tile(-1,-1,self.pixels_per_unit,'Cobble')
+        map_ = [[8 if (x==0 or x==39 or y==0 or y==39) else random.randint(0, 10) for x in range(self.tilemap_width)] for y in range(self.tilemap_height)]
         map_[1][1] = 0
 
         for y in range(len(map_)):
@@ -81,13 +84,14 @@ class Tilemap:
 
     def render_tiles(self, display_canvas, display_hitbox, renderpos_func):
         display_hitbox.set_ints()
-        for x in range(display_hitbox.x, display_hitbox.x + display_hitbox.width + 1):
-            for y in range(display_hitbox.y, display_hitbox.y + display_hitbox.height + 1):
+        for x in range(display_hitbox.x-1, display_hitbox.x + display_hitbox.width + 1):
+            for y in range(display_hitbox.y-1, display_hitbox.y + display_hitbox.height + 1):
                 t = Tilemap.vec_to_pos_value((x, y))
                 if t in self.tiles:
                     display_canvas.create_image(*renderpos_func(Vec(self.tiles[t].x, self.tiles[t].y)),
                                                 image=self.tiles[t].get_image(), tag='game_image', anchor=tk.NW)
-
+                elif not self.get_inside_tilemap((x,y)):
+                    display_canvas.create_image(*renderpos_func(Vec(x,y)),image=self.outside_tile.get_image(),tag='game_image',anchor=tk.NW)
     @staticmethod
     def pos_value_to_vec(pos_value):
         x = pos_value // Tilemap.pos_value_convert
@@ -97,3 +101,6 @@ class Tilemap:
     @staticmethod
     def vec_to_pos_value(vec):
         return vec[0] * Tilemap.pos_value_convert + vec[1]
+
+    def get_inside_tilemap(self,pos):
+        return pos[0]>=0 and pos[0]<=self.tilemap_width-1 and pos[1]>=0 and pos[1]<=self.tilemap_height-1

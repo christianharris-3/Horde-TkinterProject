@@ -2,6 +2,7 @@ from src.Utiles import CircleHitbox, Vec
 import math
 
 
+
 class Projectile:
     def __init__(self, x, y, angle, speed, team):
         self.team = team
@@ -42,3 +43,17 @@ class Projectile:
 class Bullet(Projectile):
     def __init__(self, x, y, angle, speed, team):
         super().__init__(x, y, angle, speed, team)
+
+class SMG_Bullet(Projectile):
+    def __init__(self, x, y, angle, speed, team):
+        super().__init__(x, y, angle, speed, team)
+        self.radius = 0.05
+        self.col = '#555555'
+        self.damage = 0.5
+
+class LMG_Bullet(Projectile):
+    def __init__(self, x, y, angle, speed, team):
+        super().__init__(x, y, angle, speed, team)
+        self.radius = 0.08
+        self.col = '#333333'
+        self.damage = 1

@@ -8,7 +8,7 @@ import random, math, copy
 
 
 class Game:
-    def __init__(self, window, inp, screen_width, screen_height):
+    def __init__(self, window, inp, screen_width, screen_height, control_map):
         self.window = window
         self.inp = inp
         self.screen_width = screen_width
@@ -17,11 +17,7 @@ class Game:
         self.screen = tk.Canvas(self.window, width=self.screen_width, height=self.screen_height, bg="green")
         self.screen.place(x=0,y=0)
 
-        self.control_map = {'Left': {'Key': 'a', 'continuous': True},
-                            'Right': {'Key': 'd', 'continuous': True},
-                            'Up': {'Key': 'w', 'continuous': True},
-                            'Down': {'Key': 's', 'continuous': True},
-                            'Shoot': {'Key': 1, 'continuous': False}}
+        self.control_map = control_map
 
         self.player = Player(1.5, 1.5, self.control_map, self.screen_width, self.screen_height)
         self.enemies = []
@@ -52,7 +48,6 @@ class Game:
         self.generate_enemies()
         self.get_collision_hash()
 
-        entities = self.enemies + [self.player]
 
         # Player Physics and Input control
         self.projectiles += self.player.control(self.inp, self.world_mpos)
@@ -127,22 +122,28 @@ class Game:
             self.screen.create_text(-30, 80, text=output, anchor=tk.NW, tags='game_image')
 
     def generate_enemies(self):
-        if random.random() < 0.05:
-            angle = math.pi * (random.random() * 2 - 1)
-            dis = 10
-            ran = random.random()
-            if ran<0.5:
-                self.enemies.append(Slow_Zombie(self.player.x + math.cos(angle) * dis,
-                                          self.player.y + math.sin(angle) * dis))
-            elif ran<0.8:
-                self.enemies.append(Fast_Zombie(self.player.x + math.cos(angle) * dis,
-                                                self.player.y + math.sin(angle) * dis))
-            else:
-                self.enemies.append(Big_Zombie(self.player.x + math.cos(angle) * dis,
-                                                self.player.y + math.sin(angle) * dis))
+        if random.random() < 0.01:
+            def make_zombie(z_class):
+                angle = math.pi * (random.random() * 2 - 1)
+                dis = 10
+                return z_class(self.player.x + math.cos(angle) * dis, self.player.y + math.sin(angle) * dis)
 
-    def shake_camera(self):
+            zombie_map = [{'Probability':2,'Class':Slow_Zombie},
+                          {'Probability':5,'Class':Fast_Zombie},
+                          {'Probability':3,'Class':Big_Zombie}]
+            choice = random.randint(1,sum([a['Probability'] for a in zombie_map]))
+            for z in zombie_map:
+                choice-=z['Probability']
+                if choice<=0:
+                    new_enemy = make_zombie(z['Class'])
+                    while not(self.tilemap.get_inside_tilemap((new_enemy.x,new_enemy.y))) or new_enemy.tilemap_collision(self.tilemap.collision_hash):
+                        new_enemy = make_zombie(z['Class'])
+                    self.enemies.append(new_enemy)
+                    break
+
+    def shake_camera(self,amplitude=0.1):
         self.camera_shake_timer = 0.1
+        self.camera_shake_intensity = amplitude
 
     def camera_physics(self, delta_time):
         self.camera_target_pos = Vec(self.player.x, self.player.y)

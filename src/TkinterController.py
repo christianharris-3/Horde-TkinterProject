@@ -6,11 +6,14 @@ class Input:
     def __init__(self,window):
         self.kprs = set()
         self.mpos = Vec()
-        window.bind('<KeyPress>',self.key_press)
-        window.bind('<KeyRelease>', self.key_release)
-        window.bind('<ButtonPress>', self.button_press)
-        window.bind('<ButtonRelease>', self.button_release)
-        window.bind('<Motion>',self.mouse_move)
+        self.window = window
+        self.refresh_binding()
+    def refresh_binding(self):
+        self.window.bind('<KeyPress>',self.key_press)
+        self.window.bind('<KeyRelease>', self.key_release)
+        self.window.bind('<ButtonPress>', self.button_press)
+        self.window.bind('<ButtonRelease>', self.button_release)
+        self.window.bind('<Motion>',self.mouse_move)
 
     def key_press(self,event):
         self.kprs.add(event.keysym)

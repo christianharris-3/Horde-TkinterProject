@@ -1,0 +1,9 @@
+DONE - Ability to Change control mappings
+- Pause menu
+- Money/Score
+- Upgrades Shop
+- Better map gen
+- Increasing Zombie difficulty
+- Death screen
+- LeaderBoard
+- Save/Load gamestate

@@ -2,12 +2,22 @@ from src.Entity import Entity
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 from src.Utiles import Coords, Vec
-from src.Projectiles import Bullet
+from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet
 import math
 
 
+class WeaponData:
+    data = {"Pistol": {"File": "Sprites/Pistol.png", "Render_Size": 1, "Render_Distance": 1, "Projectile": Bullet,
+                       "Bullet_Speed": 0.5, "Shoot_CD": 0.1, "Semi_Auto": False, "Clip_Size": 5, "Reload_Time": 0.5},
+            "SMG": {"File": "Sprites/SMG.png", "Render_Size": 1.2, "Render_Distance": 1, "Projectile": SMG_Bullet,
+                    "Bullet_Speed": 0.6, "Shoot_CD": 0.1, "Semi_Auto": True, "Clip_Size": 20, "Reload_Time": 0.8},
+            "LMG": {"File": "Sprites/LMG.png", "Render_Size": 2, "Render_Distance": 1.5, "Projectile": LMG_Bullet,
+                    "Bullet_Speed": 0.8, "Shoot_CD": 0.06, "Semi_Auto": True, "Clip_Size": 30, "Reload_Time": 1.5},
+            }
+
+
 class Player(Entity):
-    def __init__(self, x, y, control_map,screen_width, screen_height):
+    def __init__(self, x, y, control_map, screen_width, screen_height):
         super().__init__(x, y)
         self.team = 'Player'
         self.radius = 0.45
@@ -16,11 +26,19 @@ class Player(Entity):
         self.health = self.max_health
 
         self.control_map = control_map
+
+        self.weapon_data = WeaponData.data["SMG"]
+        self.control_map["Shoot"]["continuous"] = self.weapon_data["Semi_Auto"]
+        self.ammo_left = self.weapon_data["Clip_Size"]
+        self.reloading = True
+        self.reload_timer = 0
+
         self.image_base = Image.open('Sprites/Player.png').convert("RGBA").resize(
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)
 
-        self.weapon_image_base = Image.open('Sprites/Pistol.png').convert("RGBA").resize(
-            Coords.world_to_pixel_coords((self.radius, self.radius)).tuple(True), resample=Image.Resampling.BOX)
+        self.weapon_image_base = Image.open(self.weapon_data["File"]).convert("RGBA").resize(
+            (Coords.world_to_pixel_coords((self.radius, self.radius)) * self.weapon_data["Render_Size"]).tuple(True),
+            resample=Image.Resampling.BOX)
 
         self.hurt_image = 0
         self.hurt_frames_counter = 0
@@ -28,16 +46,15 @@ class Player(Entity):
 
         self.buttons_down = []
 
-    def screen_resize(self,w,h):
+    def screen_resize(self, w, h):
         hurt_image = Image.new("RGBA", (w, h), (255, 0, 0, 0))
         drawer = ImageDraw.Draw(hurt_image)
         drawer.rectangle((0, 0, w, h), (255, 0, 0, 100))
         self.hurt_image = ImageTk.PhotoImage(hurt_image)
 
     def get_image(self):
-        img_s = int(3.5*Coords.scale_factor)
+        img_s = int(3.5 * Coords.scale_factor)
         image = Image.new("RGBA", (img_s, img_s), (0, 0, 0, 0))
-
 
         # Check of player is pointing to left, then flip and weapon, else don't
         if abs(self.angle) > math.pi / 2:
@@ -53,27 +70,37 @@ class Player(Entity):
                     player_img)
 
         # Draw weapon image
-        weapon_img = weapon_img.rotate(-self.angle/math.pi*180,expand=True)
-        distance_mul = 1
+        weapon_img = weapon_img.rotate(-self.angle / math.pi * 180, expand=True)
         image.paste(weapon_img, (
-            int(img_s / 2 + math.cos(self.angle) * Coords.world_to_pixel(self.radius) * distance_mul - weapon_img.width / 2),
-            int(img_s / 2 + math.sin(self.angle) * Coords.world_to_pixel(self.radius) * distance_mul - weapon_img.width / 2 - Coords.world_to_pixel(self.radius/10))),
+            int(img_s / 2 + math.cos(self.angle) * Coords.world_to_pixel(
+                self.radius) * self.weapon_data["Render_Distance"] - weapon_img.width / 2),
+            int(img_s / 2 + math.sin(self.angle) * Coords.world_to_pixel(
+                self.radius) * self.weapon_data["Render_Distance"] - weapon_img.width / 2 - Coords.world_to_pixel(
+                self.radius / 10))),
                     weapon_img)
 
         return image, Vec(self.x, self.y)
 
-    def draw_ui(self,screen):
-        screen.create_rectangle(10, 10, 210, 60, fill="#444444", outline="#444444",tag="game_image")
+    def draw_ui(self, screen):
+        screen.create_rectangle(10, 10, 210, 60, fill="#444444", outline="#444444", tag="game_image")
         screen.create_rectangle(12, 12, 12 + (196 * self.health / self.max_health), 58,
-                                     fill="#ff0000", outline="#ff0000",tag="game_image")
+                                fill="#ff0000", outline="#ff0000", tag="game_image")
 
-        self.hurt_frames_counter-=1
-        if self.hurt_frames_counter>=0:
+        if self.reloading:
+            output = "Clip: Reloading"
+            screen.create_rectangle(220, 55, 220 + max(self.reload_timer, 0) / self.weapon_data["Reload_Time"] * 250,
+                                    60, fill="#803310", outline="#803310", tag="game_image")
+        else:
+            output = f"Clip: {self.ammo_left}/{self.weapon_data['Clip_Size']}"
+        screen.create_text(220, 10, text=output, anchor=tk.NW, tags='game_image', font=('impact', 30))
+
+        self.hurt_frames_counter -= 1
+        if self.hurt_frames_counter >= 0:
             hurt_image = Image.new("RGBA", (screen.winfo_width(), screen.winfo_height()), (255, 0, 0, 0))
             drawer = ImageDraw.Draw(hurt_image)
             drawer.rectangle((0, 0, screen.winfo_width(), screen.winfo_height()), (255, 0, 0, 100))
             self.hurt_image = ImageTk.PhotoImage(hurt_image)
-            screen.create_image(0,0,anchor=tk.NW,image=self.hurt_image,tag="game_image")
+            screen.create_image(0, 0, anchor=tk.NW, image=self.hurt_image, tag="game_image")
 
     def control(self, inp, mpos):
 
@@ -85,23 +112,50 @@ class Player(Entity):
         for r in rem:
             self.buttons_down.remove(r)
 
+        # Movement
         self.target_move = Vec()
-        if inp.get_pressed(self.control_map['Left']['Key']):
+        if self.get_pressed(inp,"Left"):
             self.target_move[0] -= 1
-        elif inp.get_pressed(self.control_map['Right']['Key']):
+        elif self.get_pressed(inp,"Right"):
             self.target_move[0] += 1
-        if inp.get_pressed(self.control_map['Up']['Key']):
+        if self.get_pressed(inp,"Up"):
             self.target_move[1] -= 1
-        elif inp.get_pressed(self.control_map['Down']['Key']):
+        elif self.get_pressed(inp,"Down"):
             self.target_move[1] += 1
 
+        # Reload
+        if self.get_pressed(inp,"Reload"):
+            self.reload()
+
+        # Shooting
+        if self.reload_timer <= 0 and self.reloading:
+            self.reloading = False
+            self.ammo_left = self.weapon_data["Clip_Size"]
         new_projectiles = []
-        if inp.get_pressed(self.control_map['Shoot']['Key']) and self.control_map['Shoot']['Key'] not in self.buttons_down:
+        if self.get_pressed(inp,"Shoot") and self.auto_fire_cooldown < 0:
             new_projectiles = self.shoot()
-            self.buttons_down.append(self.control_map['Shoot']['Key'])
+            self.auto_fire_cooldown = self.weapon_data["Shoot_CD"]
 
         self.angle = math.atan2(mpos[1] - self.y, mpos[0] - self.x)
         return new_projectiles
 
+    def get_pressed(self,inp,key):
+        if inp.get_pressed(self.control_map[key]['Key']) and (self.control_map[key]['Key'] not in self.buttons_down):
+            if not self.control_map[key]['continuous']:
+                self.buttons_down.append(self.control_map[key]['Key'])
+            return True
+        return False
+
     def shoot(self):
-        return [Bullet(self.x,self.y,self.angle,0.5,self.team)]
+        if self.ammo_left > 0 and not self.reloading:
+            self.ammo_left -= 1
+            if self.ammo_left == 0:
+                self.reload()
+            return [
+                self.weapon_data["Projectile"](self.x, self.y, self.angle, self.weapon_data["Bullet_Speed"], self.team)]
+        else:
+            return []
+
+    def reload(self):
+        self.reloading = True
+        self.reload_timer = self.weapon_data["Reload_Time"]
