@@ -1,5 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import time
 
 # class that fixes a bug when making lots of lambda functions in a loop
 class funcer:
@@ -19,7 +20,7 @@ class Menus:
         # self.font = 'Kristen ITC'
         self.font = 'Segoe Print'
 
-        self.frame = tk.Frame(self.window, width=self.window_width, height=self.window_height, bg="darkolivegreen2")
+        self.frame = tk.Frame(self.window)
         self.frame.pack()
         self.active_menu = ''
         self.set_menu('Start_Screen')
@@ -63,6 +64,11 @@ class Menus:
                             font=(self.font, 15), bg="green",relief=tk.GROOVE,bd=4,activebackground="green4",padx=0,pady=0)
             reset.place(relx=0.5,x=10,y=140+75*i,anchor=tk.W)
 
+    def make_pause_menu(self):
+        self.frame.configure(width=300,height=300)
+        self.frame.lift()
+        self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
     def start_key_listener(self,action, button):
         if self.listening_remap_action is None:
             self.window.bind('<ButtonPress>', self.get_key_mapping)
@@ -89,13 +95,17 @@ class Menus:
             widget.destroy()
         self.active_menu = menu
         if self.active_menu != "Game":
-            self.frame.pack()
-            if self.active_menu == "Start_Screen":
-                self.make_start_screen()
-            elif self.active_menu == "Settings":
-                self.make_settings_menu()
+            if self.active_menu == "Pause_Screen":
+                self.make_pause_menu()
+            else:
+                self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2")
+                if self.active_menu == "Start_Screen":
+                    self.make_start_screen()
+                elif self.active_menu == "Settings":
+                    self.make_settings_menu()
+
         else:
-            self.frame.pack_forget()
+            self.frame.lower()
 
     def start_game(self):
         self.set_menu("Game")

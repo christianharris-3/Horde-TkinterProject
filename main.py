@@ -25,6 +25,8 @@ class Main:
                                      'Pause': {'Key': 'Escape', 'continuous': False}}
         self.control_map = copy.deepcopy(self.control_map_defaults)
 
+        self.game_paused = False
+        self.pause_button_down = False
         self.game_active = False
         self.game = None
         self.menus = Menus(self.window, self.input, self.window_width, self.window_height,self.start_game,
@@ -32,10 +34,23 @@ class Main:
 
 
     def game_loop(self, delta_time):
-        done = self.game.gameloop(delta_time)
+        if not self.game_paused:
+            done = self.game.gameloop(delta_time)
+        else:
+            done = False
         self.game.render_frame()
         if done:
             self.end_game()
+        if self.input.get_pressed(self.control_map["Pause"]["Key"]):
+            if not self.pause_button_down:
+                self.pause_button_down = True
+                self.game_paused = not self.game_paused
+                if self.game_paused:
+                    self.menus.set_menu("Pause_Screen")
+                else:
+                    self.menus.set_menu("Game")
+        else:
+            self.pause_button_down = False
         return done
 
 
