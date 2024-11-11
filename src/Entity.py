@@ -10,10 +10,7 @@ class Entity:
         self.angle = 0
         self.move_drag = 0.9
         self.target_move = Vec()
-
         self.i_frames = 0
-        self.auto_fire_cooldown = 0
-        self.reload_timer = 0
 
         self.knockback_resistance = 0.5
 
@@ -33,9 +30,6 @@ class Entity:
         if self.tilemap_collision(tilemap_collision_hash):
             self.y -= self.vel[1] * delta_time
 
-        self.i_frames -= delta_time / 60
-        self.auto_fire_cooldown -= delta_time / 60
-        self.reload_timer -= delta_time / 60
 
     def entity_collision(self, collision_hash, shake_camera):
         ownhitbox = self.get_hitbox()
@@ -50,11 +44,17 @@ class Entity:
                                 shake_camera(self.damage/100)
     def tilemap_collision(self, collision_hash):
         ownhitbox = self.get_hitbox()
+        self.can_open_shop = False
         for code in ownhitbox.colcodes:
             if code in collision_hash:
                 for t in collision_hash[code]:
                     if ownhitbox.Get_Collide(t.get_hitbox()):
-                        return True
+                        if t.tile_type == 'Shop':
+                            if self.team == "Player":
+                                self.can_open_shop = True
+                                self.closest_shop = t
+                        else:
+                            return True
         return False
 
     def take_hit(self, projectile):
@@ -62,7 +62,7 @@ class Entity:
         self.take_damage(projectile.damage)
 
     def take_damage(self, damage):
-        if self.i_frames < 0:
+        if self.i_frames <= 0:
             self.health -= damage
             if self.team == "Player": self.i_frames = 0.3
             self.hurt_frames_counter = 3

@@ -3,6 +3,7 @@ import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 from src.Utiles import Coords, Vec
 from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet
+from src.TileMap import Tile
 import math
 
 
@@ -44,6 +45,12 @@ class Player(Entity):
         self.hurt_frames_counter = 0
         self.screen_resize(screen_width, screen_height)
 
+        self.can_open_shop = False
+        self.closest_shop = Tile(-1, -1, 40, "Shop")
+
+        self.auto_fire_cooldown = 0
+        self.reload_timer = 0
+
         self.buttons_down = []
 
     def screen_resize(self, w, h):
@@ -51,6 +58,14 @@ class Player(Entity):
         drawer = ImageDraw.Draw(hurt_image)
         drawer.rectangle((0, 0, w, h), (255, 0, 0, 100))
         self.hurt_image = ImageTk.PhotoImage(hurt_image)
+
+    def manage_time(self,delta_time):
+        self.i_frames -= delta_time / 60
+        self.auto_fire_cooldown -= delta_time / 60
+        self.reload_timer -= delta_time / 60
+
+        self.closest_shop.can_be_opened = self.can_open_shop
+        self.closest_shop.open_shop_text = f"Click {self.control_map['Shop']['Key'].upper()} To Open Shop"
 
     def get_image(self):
         img_s = int(3.5 * Coords.scale_factor)
@@ -88,11 +103,11 @@ class Player(Entity):
 
         if self.reloading:
             output = "Clip: Reloading"
-            screen.create_rectangle(220, 55, 220 + max(self.reload_timer, 0) / self.weapon_data["Reload_Time"] * 250,
+            screen.create_rectangle(220, 55, 220 + max(self.reload_timer, 0) / self.weapon_data["Reload_Time"] * 300,
                                     60, fill="#803310", outline="#803310", tag="game_image")
         else:
             output = f"Clip: {self.ammo_left}/{self.weapon_data['Clip_Size']}"
-        screen.create_text(220, 10, text=output, anchor=tk.NW, tags='game_image', font=('impact', 30))
+        screen.create_text(220, 0, text=output, anchor=tk.NW, tags='game_image', font=('Segoe Print', 30))
 
         self.hurt_frames_counter -= 1
         if self.hurt_frames_counter >= 0:
@@ -127,6 +142,11 @@ class Player(Entity):
         if self.get_pressed(inp,"Reload"):
             self.reload()
 
+        # Shop
+        open_shop = False
+        if self.get_pressed(inp,"Shop") and self.can_open_shop:
+            open_shop = True
+
         # Shooting
         if self.reload_timer <= 0 and self.reloading:
             self.reloading = False
@@ -137,7 +157,7 @@ class Player(Entity):
             self.auto_fire_cooldown = self.weapon_data["Shoot_CD"]
 
         self.angle = math.atan2(mpos[1] - self.y, mpos[0] - self.x)
-        return new_projectiles
+        return new_projectiles, open_shop
 
     def get_pressed(self,inp,key):
         if inp.get_pressed(self.control_map[key]['Key']) and (self.control_map[key]['Key'] not in self.buttons_down):

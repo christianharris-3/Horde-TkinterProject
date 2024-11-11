@@ -46,6 +46,7 @@ class Slow_Zombie(Enemy):
         self.radius = 0.4
         self.move_acceleration = 0.005
         self.damage = 2
+        self.coin_value = 1
 
 class Fast_Zombie(Enemy):
     def __init__(self, x, y):
@@ -58,6 +59,7 @@ class Fast_Zombie(Enemy):
         self.move_acceleration = 0.008
         self.damage = 1
         self.knockback_resistance = 0.8
+        self.coin_value = 2
 
 class Big_Zombie(Enemy):
     def __init__(self, x, y):
@@ -70,3 +72,4 @@ class Big_Zombie(Enemy):
         self.move_acceleration = 0.003
         self.damage = 5
         self.knockback_resistance = 0.05
+        self.coin_value = 5

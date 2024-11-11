@@ -1,4 +1,4 @@
-from src.Utiles import Vec, RectHitbox, Coords
+from src.Utiles import Vec, RectHitbox, CircleHitbox, Coords
 from PIL import Image, ImageTk
 import tkinter as tk
 import json
@@ -7,7 +7,8 @@ class TileData:
 
     data = {'Grass':{'File':'Sprites/Grass.png','Hitbox':()},
             'Rock':{'File':'Sprites/Rock.png','Hitbox':(0.1,0.4,0.8,0.6)},
-            'Cobble':{'File':'Sprites/Cobble2.png','Hitbox':(0,0,1,1)}}
+            'Cobble':{'File':'Sprites/Cobble2.png','Hitbox':(0,0,1,1)},
+            'Shop':{'File':'Sprites/Shop.png','Hitbox':(0.5,0.5,0.5)}}
 
     @staticmethod
     def image_load():
@@ -24,11 +25,16 @@ class Tile:
         self.hitbox = None
         self.team = "Tilemap"
         self.tile_type = tile_type
+        self.can_be_opened = False
+        self.open_shop_text = ""
 
         self.image = TileData.data[self.tile_type]['Image']
         if len(TileData.data[self.tile_type]['Hitbox'])!=0:
             hb = TileData.data[self.tile_type]['Hitbox']
-            self.hitbox = RectHitbox(self.x+hb[0],self.y+hb[1],hb[2],hb[3])
+            if len(hb) == 4:
+                self.hitbox = RectHitbox(self.x+hb[0],self.y+hb[1],hb[2],hb[3])
+            else:
+                self.hitbox = CircleHitbox(self.x + hb[0], self.y + hb[1], hb[2])
         else:
             self.hitbox = None
 
@@ -56,23 +62,6 @@ class Tilemap:
 
         self.load_map("Maps/first.json")
         self.load_collision_hash()
-
-    # def load_tiles(self):
-        # self.tiles = {}
-        # self.tilemap_width = 40
-        # self.tilemap_height = 40
-        # self.outside_tile = Tile(-1,-1,self.pixels_per_unit,'Cobble')
-        # map_ = [[8 if (x==0 or x==39 or y==0 or y==39) else random.randint(0, 10) for x in range(self.tilemap_width)] for y in range(self.tilemap_height)]
-        # map_[1][1] = 0
-        #
-        # for y in range(len(map_)):
-        #     for x in range(len(map_[0])):
-        #         if map_[y][x] == 10:
-        #             self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Grass')
-        #         elif map_[y][x] == 9:
-        #             self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Rock')
-        #         elif map_[y][x] == 8:
-        #             self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Cobble')
 
     def load_map(self,map_name):
         self.tiles = {}
@@ -110,8 +99,12 @@ class Tilemap:
                 if t in self.tiles:
                     display_canvas.create_image(*renderpos_func(Vec(self.tiles[t].x, self.tiles[t].y)),
                                                 image=self.tiles[t].get_image(), tag='game_image', anchor=tk.NW)
+                    if self.tiles[t].can_be_opened:
+                        display_canvas.create_text(*renderpos_func(Vec(self.tiles[t].x+0.5, self.tiles[t].y-0.2)),
+                                                   text=self.tiles[t].open_shop_text,tags='game_image',font=('Segoe Print',15))
                 elif not self.get_inside_tilemap(Vec(x,y)):
-                    display_canvas.create_image(*renderpos_func(Vec(x,y)),image=self.outside_tile.get_image(),tag='game_image',anchor=tk.NW)
+                    display_canvas.create_image(*renderpos_func(Vec(x,y)),image=self.outside_tile.get_image(),
+                                                tag='game_image',anchor=tk.NW)
     @staticmethod
     def pos_value_to_vec(pos_value):
         x = pos_value // Tilemap.pos_value_convert

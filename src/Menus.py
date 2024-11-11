@@ -74,18 +74,20 @@ class Menus:
         tk.Button(self.frame, text="Resume", width=15, command=self.menu_funcs['pause'],
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
                   pady=0).place(relx=0.5, y=20, anchor=tk.N)
-
         tk.Button(self.frame, text='Settings', width=12, command=lambda: self.set_menu("Settings"),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
                   pady=0).place(relx=0.5, y=100, anchor=tk.N)
-
         tk.Button(self.frame, text='Save', width=10,
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   padx=0, pady=0).place(relx=0.5, y=180, anchor=tk.N)
-
         tk.Button(self.frame, text='Exit To Main Menu', width=16, command=self.menu_funcs['end_game'],
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   padx=0, pady=0).place(relx=0.5, y=260, anchor=tk.N)
+
+    def make_shop_menu(self):
+        self.frame.configure(width=500, height=400, highlightbackground="darkgreen", highlightthickness=3)
+        self.frame.lift()
+        self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
     def start_key_listener(self, action, button):
         if self.listening_remap_action is None:
@@ -117,6 +119,8 @@ class Menus:
         if self.active_menu != "Game":
             if self.active_menu == "Pause_Screen":
                 self.make_pause_menu()
+            elif self.active_menu == "Shop_Menu":
+                self.make_shop_menu()
             else:
                 self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2")
                 if self.active_menu == "Start_Screen":

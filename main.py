@@ -21,6 +21,7 @@ class Main:
                                      'Up': {'Key': 'w', 'continuous': True},
                                      'Down': {'Key': 's', 'continuous': True},
                                      'Shoot': {'Key': 1, 'continuous': False},
+                                     'Shop': {'Key': 'b', 'continuous': False},
                                      'Reload': {'Key': 'r', 'continuous': False},
                                      'Pause': {'Key': 'Escape', 'continuous': False}}
         self.control_map = copy.deepcopy(self.control_map_defaults)
@@ -41,7 +42,10 @@ class Main:
             return True
         else:
             if not self.game_paused:
-                done = self.game.gameloop(delta_time)
+                done, open_shop = self.game.gameloop(delta_time)
+                if open_shop:
+                    self.game_paused = True
+                    self.menus.set_menu("Shop_Menu")
             else:
                 done = False
             if done:
@@ -64,7 +68,7 @@ class Main:
     def start_game(self):
         self.game_paused = False
         self.game_active = True
-        self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map)
+        self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map, self.menus)
         TC.game_looper(self.game_loop, self.window)
 
         # this thing messes up everything so hard for no reason
