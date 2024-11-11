@@ -19,10 +19,10 @@ class Game:
 
         self.control_map = control_map
 
-        self.player = Player(1.5, 1.5, self.control_map, self.screen_width, self.screen_height)
+        self.tilemap = Tilemap(Coords.scale_factor)
+        self.player = Player(self.tilemap.entity_data[0]["x_pos"], self.tilemap.entity_data[0]["y_pos"], self.control_map, self.screen_width, self.screen_height)
         self.enemies = []
         self.projectiles = []
-        self.tilemap = Tilemap(Coords.scale_factor)
 
         self.player_dead = False
 
@@ -136,7 +136,7 @@ class Game:
                 choice-=z['Probability']
                 if choice<=0:
                     new_enemy = make_zombie(z['Class'])
-                    while not(self.tilemap.get_inside_tilemap((new_enemy.x,new_enemy.y))) or new_enemy.tilemap_collision(self.tilemap.collision_hash):
+                    while not(self.tilemap.get_inside_tilemap(Vec(new_enemy.x,new_enemy.y))) or new_enemy.tilemap_collision(self.tilemap.collision_hash):
                         new_enemy = make_zombie(z['Class'])
                     self.enemies.append(new_enemy)
                     break

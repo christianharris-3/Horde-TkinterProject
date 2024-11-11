@@ -2,7 +2,7 @@ import tkinter as tk
 import src.TkinterController as TC
 from src.Game import Game
 from src.Menus import Menus
-import copy
+import copy,time
 
 #tkinter color list
 #https://www.plus2net.com/python/tkinter-colors.php
@@ -29,29 +29,30 @@ class Main:
         self.pause_button_down = False
         self.game_active = False
         self.game = None
-        self.menus = Menus(self.window, self.input, self.window_width, self.window_height,self.start_game,
+        menu_funcs  = {'start_game':self.start_game,
+                       'pause':self.pause,
+                       'end_game':self.end_game}
+        self.menus = Menus(self.window, self.input, self.window_width, self.window_height, menu_funcs,
                            self.control_map, self.control_map_defaults)
 
 
     def game_loop(self, delta_time):
-        if not self.game_paused:
-            done = self.game.gameloop(delta_time)
+        if not self.game_active:
+            return True
         else:
-            done = False
-        self.game.render_frame()
-        if done:
-            self.end_game()
-        if self.input.get_pressed(self.control_map["Pause"]["Key"]):
-            if not self.pause_button_down:
-                self.pause_button_down = True
-                self.game_paused = not self.game_paused
-                if self.game_paused:
-                    self.menus.set_menu("Pause_Screen")
+            if not self.game_paused:
+                done = self.game.gameloop(delta_time)
+            else:
+                done = False
+            if done:
+                self.end_game()
+            else:
+                self.game.render_frame()
+                if self.input.get_pressed(self.control_map["Pause"]["Key"]):
+                    self.pause()
                 else:
-                    self.menus.set_menu("Game")
-        else:
-            self.pause_button_down = False
-        return done
+                    self.pause_button_down = False
+            return done
 
 
     def window_resize(self,event):
@@ -61,6 +62,7 @@ class Main:
             self.game.window_resize(self.window_width,self.window_height)
 
     def start_game(self):
+        self.game_paused = False
         self.game_active = True
         self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map)
         TC.game_looper(self.game_loop, self.window)
@@ -73,6 +75,16 @@ class Main:
         self.game.screen.destroy()
         self.game = -1
         self.menus.set_menu('Start_Screen')
+        self.menus.prev_menu = []
+
+    def pause(self):
+        if not self.pause_button_down:
+            self.pause_button_down = True
+            self.game_paused = not self.game_paused
+            if self.game_paused:
+                self.menus.set_menu("Pause_Screen")
+            else:
+                self.menus.set_menu("Game")
 
 
 

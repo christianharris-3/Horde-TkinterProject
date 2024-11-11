@@ -1,13 +1,13 @@
 from src.Utiles import Vec, RectHitbox, Coords
 from PIL import Image, ImageTk
 import tkinter as tk
-import random
+import json
 
 class TileData:
 
     data = {'Grass':{'File':'Sprites/Grass.png','Hitbox':()},
             'Rock':{'File':'Sprites/Rock.png','Hitbox':(0.1,0.4,0.8,0.6)},
-            'Cobble':{'File':'Sprites/Cobble.png','Hitbox':(0,0,1,1)}}
+            'Cobble':{'File':'Sprites/Cobble2.png','Hitbox':(0,0,1,1)}}
 
     @staticmethod
     def image_load():
@@ -49,27 +49,47 @@ class Tilemap:
         self.pixels_per_unit = pixels_per_unit
         self.tiles = {}
         self.collision_hash = {}
+        self.pos = Vec()
+        self.entity_data = []
 
         TileData.image_load()
-        self.load_tiles()
+
+        self.load_map("Maps/first.json")
         self.load_collision_hash()
 
-    def load_tiles(self):
-        self.tiles = {}
-        self.tilemap_width = 40
-        self.tilemap_height = 40
-        self.outside_tile = Tile(-1,-1,self.pixels_per_unit,'Cobble')
-        map_ = [[8 if (x==0 or x==39 or y==0 or y==39) else random.randint(0, 10) for x in range(self.tilemap_width)] for y in range(self.tilemap_height)]
-        map_[1][1] = 0
+    # def load_tiles(self):
+        # self.tiles = {}
+        # self.tilemap_width = 40
+        # self.tilemap_height = 40
+        # self.outside_tile = Tile(-1,-1,self.pixels_per_unit,'Cobble')
+        # map_ = [[8 if (x==0 or x==39 or y==0 or y==39) else random.randint(0, 10) for x in range(self.tilemap_width)] for y in range(self.tilemap_height)]
+        # map_[1][1] = 0
+        #
+        # for y in range(len(map_)):
+        #     for x in range(len(map_[0])):
+        #         if map_[y][x] == 10:
+        #             self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Grass')
+        #         elif map_[y][x] == 9:
+        #             self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Rock')
+        #         elif map_[y][x] == 8:
+        #             self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Cobble')
 
-        for y in range(len(map_)):
-            for x in range(len(map_[0])):
-                if map_[y][x] == 10:
-                    self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Grass')
-                elif map_[y][x] == 9:
-                    self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Rock')
-                elif map_[y][x] == 8:
-                    self.tiles[Tilemap.vec_to_pos_value((x, y))] = Tile(x, y, self.pixels_per_unit, 'Cobble')
+    def load_map(self,map_name):
+        self.tiles = {}
+        self.outside_tile = Tile(-1, -1, self.pixels_per_unit, 'Cobble')
+
+        with open(map_name, 'r') as f:
+            data = json.load(f)
+        self.entity_data = data["entities"]
+        self.pos = Vec(*data["map"]["pos"])
+        self.tilemap_width = len(data["map"]["tilemap"][0])
+        self.tilemap_height = len(data["map"]["tilemap"])
+
+        for y in range(self.tilemap_height):
+            for x in range(self.tilemap_width):
+                if data["map"]["tilemap"][y][x] != "None":
+                    self.tiles[Tilemap.vec_to_pos_value(self.pos+Vec(x, y))] = Tile(x+self.pos[0], y+self.pos[1], self.pixels_per_unit, data["map"]["tilemap"][y][x])
+
 
     def load_collision_hash(self):
         self.collision_hash = {}
@@ -90,7 +110,7 @@ class Tilemap:
                 if t in self.tiles:
                     display_canvas.create_image(*renderpos_func(Vec(self.tiles[t].x, self.tiles[t].y)),
                                                 image=self.tiles[t].get_image(), tag='game_image', anchor=tk.NW)
-                elif not self.get_inside_tilemap((x,y)):
+                elif not self.get_inside_tilemap(Vec(x,y)):
                     display_canvas.create_image(*renderpos_func(Vec(x,y)),image=self.outside_tile.get_image(),tag='game_image',anchor=tk.NW)
     @staticmethod
     def pos_value_to_vec(pos_value):
@@ -103,4 +123,5 @@ class Tilemap:
         return vec[0] * Tilemap.pos_value_convert + vec[1]
 
     def get_inside_tilemap(self,pos):
+        pos-=self.pos
         return pos[0]>=0 and pos[0]<=self.tilemap_width-1 and pos[1]>=0 and pos[1]<=self.tilemap_height-1
