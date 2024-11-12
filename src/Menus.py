@@ -1,6 +1,6 @@
 import tkinter as tk
 from PIL import Image, ImageTk
-import time
+from src.Player import WeaponData
 
 
 # class that fixes a bug when making lots of lambda functions in a loop
@@ -84,10 +84,44 @@ class Menus:
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   padx=0, pady=0).place(relx=0.5, y=260, anchor=tk.N)
 
-    def make_shop_menu(self):
+    def make_shop_menu(self,shop_data):
         self.frame.configure(width=500, height=400, highlightbackground="darkgreen", highlightthickness=3)
         self.frame.lift()
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.image_storer = []
+        player = shop_data["Player_Object"]
+        for i,weapon in enumerate(WeaponData.data):
+            x_pos = i*120+70
+            img = Image.open(WeaponData.data[weapon]["File"]).convert("RGBA")
+            img_height = 60
+            img = img.resize((int(img_height*img.width/img.height),img_height),resample=Image.Resampling.BOX)
+            self.image_storer.append(ImageTk.PhotoImage(img))
+            if weapon == player.active_weapon:
+                label_font = (self.font,15,"bold")
+            else:
+                label_font = (self.font,13)
+            tk.Label(self.frame, text=weapon, image=self.image_storer[-1],compound="top",highlightbackground="darkgreen", highlightthickness=3,
+                      bg="darkolivegreen2",width=100,height=300,font=label_font,anchor=tk.N,pady=10).place(x=x_pos,y=10,anchor=tk.N)
+            if not(weapon in shop_data['Owned_Guns']):
+                func = funcer(self.buy_weapon, player_func=player.set_weapon, new_weapon=weapon, shop_data=shop_data,
+                              price=WeaponData.data[weapon]["Price"])
+                tk.Button(self.frame, text=f'Buy: {WeaponData.data[weapon]["Price"]}', command=func.func,
+                          font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                          ).place(x=x_pos,y=135,width=100,height=50,anchor=tk.N)
+            else:
+                func = funcer(self.set_weapon,player_func=player.set_weapon,new_weapon=weapon,shop_data=shop_data)
+                tk.Button(self.frame, text='Equip', command=func.func,
+                          font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                          ).place(x=x_pos, y=135, width=100, height=50, anchor=tk.N)
+
+    def set_weapon(self,player_func,new_weapon,shop_data):
+        player_func(new_weapon)
+        self.set_menu('Shop_Menu',False,shop_data)
+    def buy_weapon(self,player_func,new_weapon,shop_data,price):
+        if shop_data['Coins']>=price:
+            shop_data['Coins']-=price
+            shop_data['Owned_Guns'].append(new_weapon)
+            self.set_weapon(player_func,new_weapon,shop_data)
 
     def start_key_listener(self, action, button):
         if self.listening_remap_action is None:
@@ -110,7 +144,7 @@ class Menus:
         self.control_map[action]["Key"] = self.control_map_defaults[action]["Key"]
         self.set_menu("Settings",False)
 
-    def set_menu(self, menu, add_to_prev_menu=True):
+    def set_menu(self, menu, add_to_prev_menu=True,shop_data=None):
         for widget in self.frame.winfo_children():
             widget.destroy()
         if add_to_prev_menu:
@@ -120,7 +154,7 @@ class Menus:
             if self.active_menu == "Pause_Screen":
                 self.make_pause_menu()
             elif self.active_menu == "Shop_Menu":
-                self.make_shop_menu()
+                self.make_shop_menu(shop_data)
             else:
                 self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2")
                 if self.active_menu == "Start_Screen":

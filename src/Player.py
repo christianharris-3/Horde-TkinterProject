@@ -2,18 +2,25 @@ from src.Entity import Entity
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 from src.Utiles import Coords, Vec
-from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet
+from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell
 from src.TileMap import Tile
 import math
 
 
 class WeaponData:
     data = {"Pistol": {"File": "Sprites/Pistol.png", "Render_Size": 1, "Render_Distance": 1, "Projectile": Bullet,
-                       "Bullet_Speed": 0.5, "Shoot_CD": 0.1, "Semi_Auto": False, "Clip_Size": 5, "Reload_Time": 0.5},
+                       "Bullet_Speed": 0.5, "Shoot_CD": 0.2, "Semi_Auto": False, "Clip_Size": 5, "Reload_Time": 1,
+                       "Spray_Count": 1, "Price": 0},
             "SMG": {"File": "Sprites/SMG.png", "Render_Size": 1.2, "Render_Distance": 1, "Projectile": SMG_Bullet,
-                    "Bullet_Speed": 0.6, "Shoot_CD": 0.1, "Semi_Auto": True, "Clip_Size": 20, "Reload_Time": 0.8},
+                    "Bullet_Speed": 0.6, "Shoot_CD": 0.1, "Semi_Auto": True, "Clip_Size": 20, "Reload_Time": 0.8,
+                    "Spray_Count": 1, "Price": 15},
             "LMG": {"File": "Sprites/LMG.png", "Render_Size": 2, "Render_Distance": 1.5, "Projectile": LMG_Bullet,
-                    "Bullet_Speed": 0.8, "Shoot_CD": 0.06, "Semi_Auto": True, "Clip_Size": 30, "Reload_Time": 1.5},
+                    "Bullet_Speed": 0.8, "Shoot_CD": 0.06, "Semi_Auto": True, "Clip_Size": 30, "Reload_Time": 1.5,
+                    "Spray_Count": 1, "Price": 30},
+            "Shotgun": {"File": "Sprites/Shotgun.png", "Render_Size": 1.8, "Render_Distance": 1.3,
+                        "Projectile": Shotgun_Shell,
+                        "Bullet_Speed": 0.4, "Shoot_CD": 0.2, "Semi_Auto": False, "Clip_Size": 10, "Reload_Time": 1.5,
+                        "Spray_Count": 8, "Price": 60},
             }
 
 
@@ -28,18 +35,16 @@ class Player(Entity):
 
         self.control_map = control_map
 
-        self.weapon_data = WeaponData.data["LMG"]
-        self.control_map["Shoot"]["continuous"] = self.weapon_data["Semi_Auto"]
+        self.weapon_data = WeaponData.data["Pistol"]
         self.ammo_left = self.weapon_data["Clip_Size"]
         self.reloading = True
         self.reload_timer = 0
+        self.weapon_image_base = None
+
+        self.set_weapon('Pistol')
 
         self.image_base = Image.open('Sprites/Player.png').convert("RGBA").resize(
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)
-
-        self.weapon_image_base = Image.open(self.weapon_data["File"]).convert("RGBA").resize(
-            (Coords.world_to_pixel_coords((self.radius, self.radius)) * self.weapon_data["Render_Size"]).tuple(True),
-            resample=Image.Resampling.BOX)
 
         self.hurt_image = 0
         self.hurt_frames_counter = 0
@@ -53,13 +58,33 @@ class Player(Entity):
 
         self.buttons_down = []
 
+    def set_weapon(self, new_weapon):
+        self.weapon_data = WeaponData.data[new_weapon]
+        self.active_weapon = new_weapon
+        self.control_map["Shoot"]["continuous"] = self.weapon_data["Semi_Auto"]
+        self.ammo_left = self.weapon_data["Clip_Size"]
+        self.reloading = True
+        self.reload_timer = self.weapon_data["Reload_Time"]
+
+        self.weapon_image_base = Image.open(self.weapon_data["File"]).convert("RGBA")
+        ratio = self.weapon_image_base.height / self.weapon_image_base.width
+        self.weapon_image_base = self.weapon_image_base.resize(
+            (Coords.world_to_pixel_coords((self.radius, self.radius * ratio)) * self.weapon_data["Render_Size"]).tuple(
+                True),
+            resample=Image.Resampling.BOX)
+        size = max(self.weapon_image_base.height, self.weapon_image_base.width)
+        square_surf = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+        square_surf.paste(self.weapon_image_base, (int(size / 2 - self.weapon_image_base.width / 2),
+                                                   int(size / 2 - self.weapon_image_base.height / 2)))
+        self.weapon_image_base = square_surf
+
     def screen_resize(self, w, h):
         hurt_image = Image.new("RGBA", (w, h), (255, 0, 0, 0))
         drawer = ImageDraw.Draw(hurt_image)
         drawer.rectangle((0, 0, w, h), (255, 0, 0, 100))
         self.hurt_image = ImageTk.PhotoImage(hurt_image)
 
-    def manage_time(self,delta_time):
+    def manage_time(self, delta_time):
         self.i_frames -= delta_time / 60
         self.auto_fire_cooldown -= delta_time / 60
         self.reload_timer -= delta_time / 60
@@ -129,22 +154,22 @@ class Player(Entity):
 
         # Movement
         self.target_move = Vec()
-        if self.get_pressed(inp,"Left"):
+        if self.get_pressed(inp, "Left"):
             self.target_move[0] -= 1
-        elif self.get_pressed(inp,"Right"):
+        elif self.get_pressed(inp, "Right"):
             self.target_move[0] += 1
-        if self.get_pressed(inp,"Up"):
+        if self.get_pressed(inp, "Up"):
             self.target_move[1] -= 1
-        elif self.get_pressed(inp,"Down"):
+        elif self.get_pressed(inp, "Down"):
             self.target_move[1] += 1
 
         # Reload
-        if self.get_pressed(inp,"Reload"):
+        if self.get_pressed(inp, "Reload"):
             self.reload()
 
         # Shop
         open_shop = False
-        if self.get_pressed(inp,"Shop") and self.can_open_shop:
+        if self.get_pressed(inp, "Shop") and self.can_open_shop:
             open_shop = True
 
         # Shooting
@@ -152,14 +177,14 @@ class Player(Entity):
             self.reloading = False
             self.ammo_left = self.weapon_data["Clip_Size"]
         new_projectiles = []
-        if self.get_pressed(inp,"Shoot") and self.auto_fire_cooldown < 0:
+        if self.get_pressed(inp, "Shoot") and self.auto_fire_cooldown < 0:
             new_projectiles = self.shoot()
             self.auto_fire_cooldown = self.weapon_data["Shoot_CD"]
 
         self.angle = math.atan2(mpos[1] - self.y, mpos[0] - self.x)
         return new_projectiles, open_shop
 
-    def get_pressed(self,inp,key):
+    def get_pressed(self, inp, key):
         if inp.get_pressed(self.control_map[key]['Key']) and (self.control_map[key]['Key'] not in self.buttons_down):
             if not self.control_map[key]['continuous']:
                 self.buttons_down.append(self.control_map[key]['Key'])
@@ -172,7 +197,8 @@ class Player(Entity):
             if self.ammo_left == 0:
                 self.reload()
             return [
-                self.weapon_data["Projectile"](self.x, self.y, self.angle, self.weapon_data["Bullet_Speed"], self.team)]
+                self.weapon_data["Projectile"](self.x, self.y, self.angle, self.weapon_data["Bullet_Speed"], self.team)
+                for b in range(self.weapon_data["Spray_Count"])]
         else:
             return []
 

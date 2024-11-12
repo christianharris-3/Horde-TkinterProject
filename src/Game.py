@@ -27,9 +27,11 @@ class Game:
         self.enemies = []
         self.projectiles = []
 
-        self.coins = 0
         self.coin_image = ImageTk.PhotoImage(
             image=Image.open('Sprites/Coin.png').convert("RGBA").resize((60, 60), resample=Image.Resampling.BOX))
+        self.shop_data = {'Owned_Guns':['Pistol'],
+                          'Player_Object':self.player,
+                          'Coins':0}
 
         self.player_dead = False
 
@@ -72,7 +74,7 @@ class Game:
             if enem.get_dead():
                 rem.append(enem)
         for r in rem:
-            self.coins+=r.coin_value
+            self.shop_data["Coins"]+=r.coin_value
             self.enemies.remove(r)
 
         # Player + Entity Collision
@@ -125,7 +127,7 @@ class Game:
 
         # coins
         self.screen.create_image((10, self.screen_height - 10), image=self.coin_image, tag='game_image', anchor=tk.SW)
-        self.screen.create_text(80, self.screen_height - 40, text=str(self.coins), anchor=tk.W, tags='game_image',
+        self.screen.create_text(80, self.screen_height - 40, text=str(self.shop_data["Coins"]), anchor=tk.W, tags='game_image',
                                 font=('Segoe Print', 30))
 
         # Debug
@@ -152,11 +154,14 @@ class Game:
                 choice -= z['Probability']
                 if choice <= 0:
                     new_enemy = make_zombie(z['Class'])
-                    while not (
+                    count = 0
+                    while count<100 and not (
                     self.tilemap.get_inside_tilemap(Vec(new_enemy.x, new_enemy.y))) or new_enemy.tilemap_collision(
                             self.tilemap.collision_hash):
+                        count+=1
                         new_enemy = make_zombie(z['Class'])
-                    self.enemies.append(new_enemy)
+                    if count<100:
+                        self.enemies.append(new_enemy)
                     break
 
     def shake_camera(self, amplitude=0.1):

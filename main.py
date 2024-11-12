@@ -45,7 +45,7 @@ class Main:
                 done, open_shop = self.game.gameloop(delta_time)
                 if open_shop:
                     self.game_paused = True
-                    self.menus.set_menu("Shop_Menu")
+                    self.menus.set_menu("Shop_Menu",shop_data=self.game.shop_data)
             else:
                 done = False
             if done:

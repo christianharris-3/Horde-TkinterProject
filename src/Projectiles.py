@@ -1,5 +1,5 @@
 from src.Utiles import CircleHitbox, Vec
-import math
+import math, random
 
 
 
@@ -49,11 +49,18 @@ class SMG_Bullet(Projectile):
         super().__init__(x, y, angle, speed, team)
         self.radius = 0.05
         self.col = '#555555'
-        self.damage = 0.5
+        self.damage = 1
+
+class Shotgun_Shell(Projectile):
+    def __init__(self, x, y, angle, speed, team):
+        super().__init__(x, y, angle+random.gauss(0,0.2), max(speed+random.gauss(0,0.15),0.1), team)
+        self.radius = 0.03
+        self.col = '#444444'
+        self.damage = 1
 
 class LMG_Bullet(Projectile):
     def __init__(self, x, y, angle, speed, team):
         super().__init__(x, y, angle, speed, team)
         self.radius = 0.08
         self.col = '#333333'
-        self.damage = 1
+        self.damage = 1.5
