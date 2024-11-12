@@ -41,7 +41,7 @@ class Slow_Zombie(Enemy):
         self.image_path = 'Sprites/Slow_Zombie.png'
         self.radius = 0.4
         super().__init__(x, y, self.image_path)
-        self.max_health = 8
+        self.max_health = 5
         self.health = self.max_health
         self.radius = 0.4
         self.move_acceleration = 0.005
@@ -73,3 +73,16 @@ class Big_Zombie(Enemy):
         self.damage = 5
         self.knockback_resistance = 0.05
         self.coin_value = 5
+
+class Demon_Zombie(Enemy):
+    def __init__(self, x, y):
+        self.image_path = 'Sprites/Demon_Zombie.png'
+        self.radius = 0.3
+        super().__init__(x, y, self.image_path)
+        self.max_health = 3
+        self.health = self.max_health
+        self.radius = 0.3
+        self.move_acceleration = 0.011
+        self.damage = 8
+        self.knockback_resistance = 0.5
+        self.coin_value = 3
