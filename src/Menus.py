@@ -103,12 +103,12 @@ class Menus:
             elif event.num != '??':
                 self.control_map[self.listening_remap_action]["Key"] = event.num
             self.inp.refresh_binding()
-            self.set_menu("Settings")
+            self.set_menu("Settings",False)
             self.listening_remap_action = None
 
     def reset_keybind(self, action):
         self.control_map[action]["Key"] = self.control_map_defaults[action]["Key"]
-        self.set_menu("Settings")
+        self.set_menu("Settings",False)
 
     def set_menu(self, menu, add_to_prev_menu=True):
         for widget in self.frame.winfo_children():

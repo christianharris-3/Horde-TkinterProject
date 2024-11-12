@@ -28,7 +28,7 @@ class Player(Entity):
 
         self.control_map = control_map
 
-        self.weapon_data = WeaponData.data["SMG"]
+        self.weapon_data = WeaponData.data["LMG"]
         self.control_map["Shoot"]["continuous"] = self.weapon_data["Semi_Auto"]
         self.ammo_left = self.weapon_data["Clip_Size"]
         self.reloading = True
