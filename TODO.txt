@@ -1,14 +1,17 @@
 DONE - Ability to Change control mappings
 DONE - Pause menu
-- Money/Score
-- Upgrades Shop
+DONE - Upgrades Shop
 Done(map editor) - Better map gen
-- Increasing Zombie difficulty
+DONE - Increasing Zombie difficulty
+- Money/Score
 - Death screen
 - LeaderBoard
 - Save/Load gamestate
+- Marker for offscreen zombies
+- Bullets collide with tilemap
 
 (less important)
-- particle effects
-- grenades
+DONE - particle effects
+DONE - grenades
 - sound effects 
+

@@ -8,10 +8,13 @@ class Particle:
     def __init__(self, x, y, angle, speed):
         self.x = x
         self.y = y
+        self.start_x = x
+        self.start_y = y
         self.angle = angle
         self.vel = Vec.make_from_angle(angle) * speed
         self.radius = 0.1
         self.move_drag = 0.9
+        self.velocity_kill_cutoff = 0.01
 
         self.shape = 'Circle'
         self.col = 'grey'
@@ -29,6 +32,11 @@ class Particle:
             screen.create_line(coord_mapper(Vec(self.x, self.y)), coord_mapper(Vec(self.prev_x, self.prev_y)),
                                fill=self.col, tag='game_image', capstyle=tk.ROUND,
                                width=Coords.world_to_pixel(self.radius))
+        elif self.shape == 'Ring_Expand':
+            ring_rad = abs(self.x-self.start_x)
+            screen.create_oval(*coord_mapper(Vec(self.start_x - ring_rad, self.start_y - ring_rad)),
+                               *coord_mapper(Vec(self.start_x + ring_rad, self.start_y + ring_rad)),
+                               outline=self.outline_col, width=int(self.vel.length()*self.radius) ,tag='game_image')
 
     def physics(self, delta_time):
         self.prev_x = self.x
@@ -38,7 +46,7 @@ class Particle:
         self.y += self.vel[1] * delta_time
 
     def get_dead(self):
-        return self.vel.length() < 0.01
+        return self.vel.length() < self.velocity_kill_cutoff
 
 class Blood_Particle(Particle):
     def __init__(self,x,y,angle,speed, size):
@@ -52,3 +60,27 @@ class Bullet_Hit_Particle(Particle):
         super().__init__(x, y, angle, speed)
         self.radius = 0.04
         self.shape = 'Line'
+
+class Explosion(Particle):
+    def __init__(self,x,y,speed):
+        super().__init__(x, y, 0, speed)
+        self.shape = 'Ring_Expand'
+        self.radius = 40
+        self.move_drag=0.78
+
+class Grenade_Fragment(Particle):
+    def __init__(self,x,y,angle,speed):
+        super().__init__(x, y, angle, speed)
+        self.shape = 'Circle'
+        self.col = '#585858'
+        self.outline_col = '#444'
+        self.radius = 0.05
+        self.velocity_kill_cutoff = 0.08
+
+class Force_Push_Effect(Particle):
+    def __init__(self,x,y,speed):
+        super().__init__(x, y, 0, speed)
+        self.shape = 'Ring_Expand'
+        self.radius = 40
+        self.outline_col = '#d6bad6'
+        self.move_drag=0.78

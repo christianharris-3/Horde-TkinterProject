@@ -14,9 +14,16 @@ class Enemy(Entity):
     def get_image(self):
         img_s = int(3.5*Coords.scale_factor)
         image = Image.new("RGBA", (img_s, img_s), (0, 0, 0, 0))
+
+        # Draw enemy Sprite
         enemy_image = self.image_base
         if self.target_move[0] > 0:
             enemy_image = enemy_image.transpose(Image.FLIP_LEFT_RIGHT)
+        if self.stunned and self.stun_timer>1:
+            angle = ((self.stun_timer-1)**3)*360
+            if self.target_move[0] > 0:
+                angle = 360-angle
+            enemy_image = enemy_image.rotate(angle)
         image.paste(enemy_image,
                     (int(img_s / 2 - self.image_base.width / 2), int(img_s / 2 - self.image_base.height / 2)))
 
@@ -74,7 +81,7 @@ class Big_Zombie(Enemy):
         self.move_acceleration = 0.003
         self.damage = 5
         self.knockback_resistance = 0.05
-        self.coin_value = 5
+        self.coin_value = 3
 
 class Demon_Zombie(Enemy):
     def __init__(self, x, y):

@@ -49,12 +49,12 @@ class Game:
 
         self.coin_image = ImageTk.PhotoImage(
             image=Image.open('Sprites/Coin.png').convert("RGBA").resize((60, 60), resample=Image.Resampling.BOX))
-        self.shop_data = {'Owned_Guns': ['Pistol','Shotgun'],
-                          'Temp_Upgrades':{'Heal':-1,'Shield':0,'Grenade':10,'Force Push':10},
+        self.shop_data = {'Owned_Guns': ['Pistol'],
+                          'Temp_Upgrades':{'Heal':-1,'Shield':0,'Grenade':0,'Force Push':0},
                           'Player_Object': self.player,
-                          'Coins': 250}
+                          'Coins': 0}
 
-        self.wave_index = 6
+        self.wave_index = 0
         self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
@@ -86,17 +86,14 @@ class Game:
         self.get_collision_hash()
 
         # Player Physics and Input control
-        new_projectiles, open_shop, do_force_push, thrown_grenade = self.player.control(self.inp, self.world_mpos)
+        new_projectiles, new_particles, open_shop = self.player.control(self.inp, self.world_mpos, self.shop_data, self.enemies)
         self.projectiles += new_projectiles
+        self.particles += new_particles
         self.player.physics(delta_time, self.tilemap.collision_hash)
         self.player.manage_time(delta_time)
         if self.player.get_dead():
             self.player_dead = True
             return True, False
-        if do_force_push:
-            pass
-        if thrown_grenade:
-            pass
 
         # Enemy Physics, AI control and deletion
         rem = []
@@ -120,7 +117,7 @@ class Game:
             proj.physics(delta_time)
             for entity in entities:
                 self.particles += proj.detect_hit(entity)
-            if proj.get_dead():
+            if proj.get_dead(self.tilemap.collision_hash):
                 if type(proj) == Grenade:
                     self.particles+=proj.explode(entities)
                 rem.append(proj)
@@ -248,7 +245,6 @@ class Game:
                 self.wave_title_timer = 2
                 self.zombie_spawn_timer = 0
                 self.zombies_left = -1
-                self.player.health = self.player.max_health
 
     def shake_camera(self, amplitude=0.1):
         self.camera_shake_timer = 0.1

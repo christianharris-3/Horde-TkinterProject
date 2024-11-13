@@ -16,13 +16,18 @@ class Entity:
 
         self.knockback_resistance = 0.5
 
+        self.stunned = False
+        self.stun_timer = 0
+
     def get_hitbox(self):
-        return RectHitbox(self.x-self.radius/2,self.y-self.radius/2,self.radius,self.radius)
+        f = 1.4
+        return RectHitbox(self.x-self.radius/2*f,self.y-self.radius/2*f,self.radius*f,self.radius*f)
         # return CircleHitbox(self.x, self.y, self.radius)
 
     def physics(self, delta_time, tilemap_collision_hash):
         self.target_move.normalize()
-        self.vel += self.target_move * self.move_acceleration * delta_time
+        if not self.stunned:
+            self.vel += self.target_move * self.move_acceleration * delta_time
         self.vel *= self.move_drag ** delta_time
 
         self.x += self.vel[0] * delta_time
@@ -32,6 +37,10 @@ class Entity:
         self.y += self.vel[1] * delta_time
         if self.tilemap_collision(tilemap_collision_hash):
             self.y -= self.vel[1] * delta_time
+
+        self.stun_timer -= delta_time / 60
+        if self.stun_timer<0:
+            self.stunned = False
 
 
     def entity_collision(self, collision_hash, shake_camera):
@@ -45,6 +54,7 @@ class Entity:
                             e.take_damage(self.damage)
                             if e.team == "Player":
                                 shake_camera(self.damage/100)
+
     def tilemap_collision(self, collision_hash):
         ownhitbox = self.get_hitbox()
         self.can_open_shop = False
@@ -61,6 +71,9 @@ class Entity:
         return False
 
     def take_hit(self, projectile):
+        if projectile.stuns:
+            self.stunned = True
+            self.stun_timer = 2
         self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
         self.take_damage(projectile.damage)
         return [Blood_Particle(random.gauss(self.x,self.radius/3),random.gauss(self.y,self.radius/3),

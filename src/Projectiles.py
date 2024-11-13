@@ -1,5 +1,5 @@
 from src.Utiles import ListHitbox, Vec, CircleHitbox
-from src.Particles import Particle, Bullet_Hit_Particle
+from src.Particles import Particle, Bullet_Hit_Particle, Explosion, Grenade_Fragment
 from PIL import Image, ImageTk
 import tkinter as tk
 import math, random
@@ -13,6 +13,7 @@ class Projectile(Particle):
 
         self.damage = 1
         self.knockback = 0.1
+        self.stuns = False
 
     def get_hitbox(self):
         steps = 4
@@ -20,7 +21,14 @@ class Projectile(Particle):
         dy = self.prev_y - self.y
         return ListHitbox([(self.x - dx * a / steps, self.y - dy * a / steps, self.radius) for a in range(steps)])
 
-    def get_dead(self):
+    def get_dead(self, collision_hash=None):
+        if collision_hash:
+            ownhitbox = CircleHitbox(self.x,self.y,self.radius)
+            for code in ownhitbox.colcodes:
+                if code in collision_hash:
+                    for t in collision_hash[code]:
+                        if ownhitbox.Get_Collide(t.get_hitbox()):
+                            return True
         return self.vel.length() < 0.05 or self.hits_to_live <= 0
 
     def detect_hit(self, entity):
@@ -29,7 +37,7 @@ class Projectile(Particle):
             particles += entity.take_hit(self)
             self.hits_to_live -= 1
             particles += [Bullet_Hit_Particle(self.x,self.y,random.gauss(self.angle,0.2),
-                                        max(random.gauss(self.vel.length(),0.2),0.1)) for a in range(round(self.damage*2))]
+                                        max(random.gauss(self.vel.length(),0.2),0.1)) for _ in range(round(self.damage*2))]
 
         return particles
 
@@ -64,10 +72,11 @@ class LMG_Bullet(Projectile):
 
 
 class KB_Obj:
-    def __init__(self, kb, angle, damage):
+    def __init__(self, kb, angle, damage, stuns=False):
         self.knockback = kb
         self.angle = angle
         self.damage = damage
+        self.stuns = stuns
 
 
 class Grenade:
@@ -89,7 +98,7 @@ class Grenade:
         self.y_vel = (self.target_y - self.start_y) / self.total_life - (self.acceleration / 2 * self.total_life)
 
         self.damage = 10
-        self.range = 4
+        self.range = 3
         self.knockback = 1
 
         self.grenade_image_base = Image.open('Sprites/Grenade.png').convert("RGBA").resize((18, 18),
@@ -115,7 +124,8 @@ class Grenade:
         return self.t > self.total_life
 
     def explode(self, entities):
-        particles = []
+        particles = [Explosion(self.x,self.y,1)]
+        particles += [Grenade_Fragment(self.x,self.y,random.random()*math.pi*2,max(random.gauss(0.5,0.1),0.1)) for _ in range(25)]
         for e in entities:
             if e.team != self.team:
                 dx = e.x - self.x

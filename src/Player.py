@@ -2,7 +2,8 @@ from src.Entity import Entity
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 from src.Utiles import Coords, Vec
-from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade
+from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade, KB_Obj
+from src.Particles import Force_Push_Effect
 from src.TileMap import Tile
 import math, random
 
@@ -191,7 +192,7 @@ class Player(Entity):
             self.hurt_image = ImageTk.PhotoImage(hurt_image)
             screen.create_image(0, 0, anchor=tk.NW, image=self.hurt_image, tag="game_image")
 
-    def control(self, inp, mpos):
+    def control(self, inp, mpos, shop_data, enemies):
 
         # Remove all not pressed buttons from buttons_down list
         rem = []
@@ -223,11 +224,15 @@ class Player(Entity):
 
         # Abilities
         new_projectiles = []
-        thrown_grenade = False
-        if self.get_pressed(inp, "Grenade"):
+        new_particles = []
+        if self.get_pressed(inp, "Grenade") and shop_data["Temp_Upgrades"]["Grenade"]>0:
             new_projectiles = [Grenade(self.x,self.y,*mpos.tuple(),self.team)]
-            thrown_grenade = True
-        do_force_push = self.get_pressed(inp, "Force Push")
+            shop_data["Temp_Upgrades"]["Grenade"]-=1
+
+        if self.get_pressed(inp, "Force Push") and shop_data["Temp_Upgrades"]["Force Push"]>0:
+            shop_data["Temp_Upgrades"]["Force Push"]-=1
+            new_particles += self.force_push(enemies)
+
 
         # Shooting
         if self.reload_timer <= 0 and self.reloading:
@@ -238,7 +243,7 @@ class Player(Entity):
             self.auto_fire_cooldown = self.weapon_data["Shoot_CD"]
 
         self.angle = math.atan2(mpos[1] - self.y, mpos[0] - self.x)
-        return new_projectiles, open_shop, do_force_push, thrown_grenade
+        return new_projectiles, new_particles, open_shop
 
     def get_pressed(self, inp, key):
         if inp.get_pressed(self.control_map[key]['Key']) and (self.control_map[key]['Key'] not in self.buttons_down):
@@ -260,6 +265,18 @@ class Player(Entity):
         else:
             return []
 
+    def force_push(self,enemies):
+        push_range = 6
+        knockback = 1
+        for e in enemies:
+            dx = e.x - self.x
+            dy = e.y - self.y
+            dis = (dx ** 2 + dy ** 2) ** 0.5
+            if dis < push_range:
+                kb = knockback / max(dis, 1)/e.knockback_resistance
+                angle = math.atan2(dy, dx)
+                e.take_hit(KB_Obj(kb, angle, 0, True))
+        return [Force_Push_Effect(self.x,self.y,1)]
 
     def reload(self):
         self.reloading = True
