@@ -25,10 +25,12 @@ class Enemy(Entity):
         drawer.rectangle((img_s / 2 - self.image_base.width * 0.6, img_s / 2 - self.image_base.height * 0.7,
                           img_s / 2 + self.image_base.width * 0.6, img_s / 2 - self.image_base.height * 0.55),
                          fill=(100, 100, 100))
-        drawer.rectangle((img_s / 2 - self.image_base.width * 0.6 + 1, img_s / 2 - self.image_base.height * 0.7 + 1,
-                          img_s / 2 - self.image_base.width * 0.6 + 1 + (self.image_base.width * 1.2 - 2) * (
-                                  self.health / self.max_health), img_s / 2 - self.image_base.height * 0.55 - 1),
-                         fill=(200, 0, 0))
+        health_terp = self.health / self.max_health
+        if health_terp>0:
+            drawer.rectangle((img_s / 2 - self.image_base.width * 0.6 + 1, img_s / 2 - self.image_base.height * 0.7 + 1,
+                            img_s / 2 - self.image_base.width * 0.6 + 1 + (self.image_base.width * 1.2 - 2) * (
+                                    health_terp), img_s / 2 - self.image_base.height * 0.55 - 1),
+                            fill=(200, 0, 0))
 
         return image, Vec(self.x, self.y)
 
