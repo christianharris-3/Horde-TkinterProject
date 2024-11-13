@@ -19,10 +19,12 @@ class Entity:
         self.stunned = False
         self.stun_timer = 0
 
-    def get_hitbox(self):
-        f = 1.4
-        return RectHitbox(self.x-self.radius/2*f,self.y-self.radius/2*f,self.radius*f,self.radius*f)
-        # return CircleHitbox(self.x, self.y, self.radius)
+    def get_hitbox(self,circle=False):
+        if circle:
+            return CircleHitbox(self.x, self.y, self.radius)
+        else:
+            f = 1.4
+            return RectHitbox(self.x-self.radius/2*f,self.y-self.radius/2*f,self.radius*f,self.radius*f)
 
     def physics(self, delta_time, tilemap_collision_hash):
         self.target_move.normalize()

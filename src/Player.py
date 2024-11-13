@@ -101,7 +101,7 @@ class Player(Entity):
         self.closest_shop.can_be_opened = self.can_open_shop
         self.closest_shop.open_shop_text = f"Click {self.control_map['Shop']['Key'].upper()} To Open Shop"
 
-    def get_image(self):
+    def get_image(self, enemies, screen_hitbox):
         img_s = int(3.5 * Coords.scale_factor)
         image = Image.new("RGBA", (img_s, img_s), (0, 0, 0, 0))
 
@@ -127,6 +127,17 @@ class Player(Entity):
                 self.radius) * self.weapon_data["Render_Distance"] - weapon_img.width / 2 - Coords.world_to_pixel(
                 self.radius / 10))),
                     weapon_img)
+
+        # Draw arrows to all off screen enemies
+        for e in enemies:
+            if not e.get_hitbox(True).Get_Collide(screen_hitbox):
+                angle = math.atan2(e.y-self.y,e.x-self.x)
+                dis = Coords.world_to_pixel(self.radius*2)
+                draw = ImageDraw.Draw(image)
+                center = Vec(img_s/2,img_s/2)
+                draw.polygon([(Vec.make_from_angle(angle)*dis+center).tuple(),
+                              (Vec.make_from_angle(angle+0.1)*(dis-5)+center).tuple(),
+                              (Vec.make_from_angle(angle-0.1)*(dis-5)+center).tuple()],fill='#f22')
 
         return image, Vec(self.x, self.y)
 

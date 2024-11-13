@@ -147,17 +147,21 @@ class Game:
         self.tilemap.render_tiles(self.screen, RectHitbox(tlx, tly, round(brx - tlx), round(bry - tly)),
                                   self.get_render_coords)
 
-        # Player Rendering
-        player_img, player_pos = self.player.get_image()
-        self.player_img = ImageTk.PhotoImage(player_img)
-        self.screen.create_image(self.get_render_coords(player_pos), image=self.player_img, tag='game_image')
-
         # Enemy Rendering
         self.enemy_images = []
         for enemy in self.enemies:
             enemy_img, enemy_pos = enemy.get_image()
             self.enemy_images.append(ImageTk.PhotoImage(enemy_img))
             self.screen.create_image(self.get_render_coords(enemy_pos), image=self.enemy_images[-1], tag='game_image')
+
+        # Player Rendering
+        screen_hitbox = RectHitbox(*self.screen_to_world_pos(Vec()),
+                                   *Coords.pixel_to_world_coords(Vec(self.screen_width,self.screen_height)))
+
+        player_img, player_pos = self.player.get_image(self.enemies,screen_hitbox)
+        self.player_img = ImageTk.PhotoImage(player_img)
+        self.screen.create_image(self.get_render_coords(player_pos), image=self.player_img, tag='game_image')
+
 
         # Projectile/Particle Rendering
         for par in self.projectiles+self.particles:

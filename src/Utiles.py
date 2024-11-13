@@ -34,6 +34,9 @@ class Vec:
     def __repr__(self):
         return self.__str__()
 
+    def __iter__(self):
+        return iter((self.x, self.y))
+
     @staticmethod
     def make_from_angle(angle,magnitude=1):
         return Vec(math.cos(angle),math.sin(angle))*magnitude
@@ -65,6 +68,10 @@ class Rect:
         return self.x<rect.x+rect.w and self.x+self.w>rect.x and self.y<rect.y+rect.h and self.y+self.h>rect.y
     def collidepoint(self,point):
         return point[0]>self.x and point[0]<self.x+self.w and point[1]>self.y and point[1]<self.y+self.h
+    def __str__(self):
+        return f'<Rect: (x:{self.x}, y:{self.y}, w:{self.w}, h:{self.h})>'
+    def __repr__(self):
+        return self.__str__()
 
 class Hitbox:
     box_types = {1: 'Rect',

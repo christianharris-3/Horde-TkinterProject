@@ -12,6 +12,8 @@ class Enemy(Entity):
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)
 
     def get_image(self):
+
+
         img_s = int(3.5*Coords.scale_factor)
         image = Image.new("RGBA", (img_s, img_s), (0, 0, 0, 0))
 
