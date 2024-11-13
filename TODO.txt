@@ -3,12 +3,12 @@ DONE - Pause menu
 DONE - Upgrades Shop
 Done(map editor) - Better map gen
 DONE - Increasing Zombie difficulty
+DONE - Marker for offscreen zombies
+DONE - Bullets collide with tilemap
 - Money/Score
 - Death screen
 - LeaderBoard
 - Save/Load gamestate
-- Marker for offscreen zombies
-- Bullets collide with tilemap
 
 (less important)
 DONE - particle effects

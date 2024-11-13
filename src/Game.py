@@ -205,6 +205,8 @@ class Game:
             Keys Pressed: {self.inp.kprs}
             Zombies Alive: {len(self.enemies)}
             Zombies To Spawn: {'+'.join([str(a['Num']) for a in self.wave_data['Zombies']])}
+            Particles: {len(self.particles)}
+            Projectiles: {len(self.projectiles)}
                         """
             self.screen.create_text(-30, 80, text=output, anchor=tk.NW, tags='game_image')
 

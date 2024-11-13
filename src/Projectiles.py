@@ -27,7 +27,7 @@ class Projectile(Particle):
             for code in ownhitbox.colcodes:
                 if code in collision_hash:
                     for t in collision_hash[code]:
-                        if ownhitbox.Get_Collide(t.get_hitbox()):
+                        if ownhitbox.Get_Collide(t.get_hitbox()) and t.tile_type != 'Shop':
                             return True
         return self.vel.length() < 0.05 or self.hits_to_live <= 0
 
@@ -120,7 +120,7 @@ class Grenade:
         self.image = ImageTk.PhotoImage(self.grenade_image_base.rotate(self.angle))
         screen.create_image(*coord_mapper(Vec(self.x, self.y)), anchor=tk.CENTER, image=self.image)
 
-    def get_dead(self):
+    def get_dead(self,_):
         return self.t > self.total_life
 
     def explode(self, entities):

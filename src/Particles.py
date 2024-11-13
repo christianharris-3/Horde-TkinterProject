@@ -14,7 +14,10 @@ class Particle:
         self.vel = Vec.make_from_angle(angle) * speed
         self.radius = 0.1
         self.move_drag = 0.9
+        self.time_alive = 0
         self.velocity_kill_cutoff = 0.01
+        self.time_kill_cutoff = 10
+
 
         self.shape = 'Circle'
         self.col = 'grey'
@@ -45,8 +48,10 @@ class Particle:
         self.x += self.vel[0] * delta_time
         self.y += self.vel[1] * delta_time
 
+        self.time_alive += delta_time/60
+
     def get_dead(self):
-        return self.vel.length() < self.velocity_kill_cutoff
+        return self.vel.length() < self.velocity_kill_cutoff or self.time_alive > self.time_kill_cutoff
 
 class Blood_Particle(Particle):
     def __init__(self,x,y,angle,speed, size):
@@ -54,6 +59,15 @@ class Blood_Particle(Particle):
         self.radius = size
         self.col = "red"
         self.outline_col = "red3"
+
+class Blood_Splat(Particle):
+    def __init__(self,x,y,angle,speed, size):
+        super().__init__(x, y, angle, speed)
+        self.radius = size
+        self.col = "red"
+        self.outline_col = "red3"
+        self.velocity_kill_cutoff = -1
+        self.time_kill_cutoff = random.random()*2+1
 
 class Bullet_Hit_Particle(Particle):
     def __init__(self,x,y,angle,speed):

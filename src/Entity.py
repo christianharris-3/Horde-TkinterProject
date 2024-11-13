@@ -1,5 +1,5 @@
 from src.Utiles import CircleHitbox, Vec, RectHitbox
-from src.Particles import Blood_Particle
+from src.Particles import Blood_Particle, Blood_Splat
 import random
 
 
@@ -78,10 +78,20 @@ class Entity:
             self.stun_timer = 2
         self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
         self.take_damage(projectile.damage)
-        return [Blood_Particle(random.gauss(self.x,self.radius/3),random.gauss(self.y,self.radius/3),
+        particle_num = round(projectile.damage*2)
+        particles = []
+        if self.get_dead():
+            particle_num*=4
+            particles += [Blood_Splat(self.x+(random.random()*1.4-0.7)*self.radius,
+                                      self.y+(random.random()*1.4-0.7)*self.radius,
+                                      random.gauss(projectile.angle,0.2), max(random.gauss(0,0.1),0.01),
+                                      random.random()/10+0.01)
+                          for _ in range(round(self.radius*10))]
+        particles += [Blood_Particle(random.gauss(self.x,self.radius/3),random.gauss(self.y,self.radius/3),
                                random.gauss(projectile.angle,0.3),
                                max(random.gauss(projectile.knockback*self.knockback_resistance,0.4),0.1),
-                               random.random()/15+0.01) for a in range(round(projectile.damage*2))]
+                               random.random()/15+0.01) for a in range(particle_num)]
+        return particles
 
     def take_damage(self, damage):
         self.health -= damage
