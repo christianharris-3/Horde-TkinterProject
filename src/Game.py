@@ -164,19 +164,23 @@ class Game:
         # Wave Title
         if self.wave_title_timer > 0:
             fade_progress = max(math.sin(min(self.wave_title_timer, 1) * math.pi / 2), 0)
-            surf_s = 80
-            scale_factor = 10 * fade_progress
-            surf = Image.new('RGBA', (surf_s, surf_s), (255, 255, 255, 0))
-            drawer = ImageDraw.Draw(surf)
-            font = ImageFont.load_default()
-            text_size = drawer.textsize(self.wave_data["Title"], font)
-            drawer.text((surf_s / 2 - text_size[0] / 2, surf_s / 2 - text_size[1] / 2), self.wave_data["Title"],
-                        font=font, fill=(0, 0, 0, int(255 * fade_progress)), anchor=tk.S)
-            self.image_cache = ImageTk.PhotoImage(
-                surf.resize((int(surf_s * scale_factor) + 1, int(surf_s * scale_factor) + 1),
-                            resample=Image.Resampling.BOX))
-            self.screen.create_image(self.screen_width / 2, self.screen_height / 2, image=self.image_cache,
-                                     anchor=tk.CENTER, tags='game_image')
+            try:
+                surf_s = 80
+                scale_factor = 10 * fade_progress
+                surf = Image.new('RGBA', (surf_s, surf_s), (255, 255, 255, 0))
+                drawer = ImageDraw.Draw(surf)
+                font = ImageFont.load_default()
+                text_size = drawer.textsize(self.wave_data["Title"], font)
+                drawer.text((surf_s / 2 - text_size[0] / 2, surf_s / 2 - text_size[1] / 2), self.wave_data["Title"],
+                            font=font, fill=(0, 0, 0, int(255 * fade_progress)), anchor=tk.S)
+                self.image_cache = ImageTk.PhotoImage(
+                    surf.resize((int(surf_s * scale_factor) + 1, int(surf_s * scale_factor) + 1),
+                                resample=Image.Resampling.BOX))
+                self.screen.create_image(self.screen_width / 2, self.screen_height / 2, image=self.image_cache,
+                                        anchor=tk.CENTER, tags='game_image')
+            except:
+                self.screen.create_text((self.screen_width / 2, self.screen_height / 2), text=self.wave_data["Title"],
+                                         anchor=tk.CENTER,font=('Segoe Print',int(80*fade_progress)),tags='game_image')
 
         # Debug
         if self.debug_info:
