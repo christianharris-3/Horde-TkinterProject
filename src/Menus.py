@@ -10,7 +10,7 @@ class funcer:
 
 
 class Menus:
-    def __init__(self, window, inp, window_width, window_height, menu_funcs, control_map, control_map_defaults):
+    def __init__(self, window, inp, window_width, window_height, menu_funcs, control_map, control_map_defaults, font):
         self.window = window
         self.inp = inp
         self.window_width = window_width
@@ -19,8 +19,7 @@ class Menus:
         self.control_map = control_map
         self.control_map_defaults = control_map_defaults
 
-        # self.font = 'Kristen ITC'
-        self.font = 'Segoe Print'
+        self.font = font
 
         self.frame = tk.Frame(self.window)
         self.frame.pack()
@@ -39,11 +38,11 @@ class Menus:
 
         tk.Button(self.frame, text='Start', command=self.start_game,
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  padx=20, pady=0).place(relx=0.5, rely=0.5, y=-40, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, y=-40, width=141, height=78, anchor=tk.CENTER)
 
         tk.Button(self.frame, text='Settings', command=lambda: self.set_menu("Settings"),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  padx=20, pady=0).place(relx=0.5, rely=0.5, y=60, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, y=60, width=178, height=84, anchor=tk.CENTER)
 
     def make_settings_menu(self):
         tk.Button(self.frame, text='Back', command=self.menu_back,
@@ -55,16 +54,15 @@ class Menus:
 
         for i, action in enumerate(self.control_map):
             txt = f"{action}: {self.control_map[action]['Key']}".replace('1', 'Left Click').replace('3', 'Right Click')
-            key = tk.Button(self.frame, text=txt, width=18,
-                            font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
-                            pady=0)
-            key.place(relx=0.53, x=-10, y=130 + 65 * i,height=50, anchor=tk.E)
+            key = tk.Button(self.frame, text=txt,
+                            font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4")
+            key.place(relx=0.53, x=-10, y=130 + 65 * i, height=50, width=246, anchor=tk.E)
             func = funcer(self.start_key_listener, action=action, button=key)
             key.configure(command=func.func)
             func = funcer(self.reset_keybind, action=action)
-            tk.Button(self.frame, text='Reset Keybind', width=12, command=func.func,
+            tk.Button(self.frame, text='Reset Keybind', command=func.func,
                       font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                      padx=0, pady=0).place(relx=0.53, x=10, y=130 + 65 * i,height=50, anchor=tk.W)
+                      padx=0, pady=0).place(relx=0.53, x=10, y=130 + 65 * i, height=50, width=168, anchor=tk.W)
 
     def make_pause_menu(self):
         self.frame.configure(width=270, height=345, highlightbackground="darkgreen", highlightthickness=3)
@@ -85,7 +83,7 @@ class Menus:
                   padx=0, pady=0).place(relx=0.5, y=260, anchor=tk.N)
 
     def make_shop_menu(self,shop_data):
-        self.frame.configure(width=500, height=400, highlightbackground="darkgreen", highlightthickness=3)
+        self.frame.configure(width=500, height=319, highlightbackground="darkgreen", highlightthickness=3)
         self.frame.lift()
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         self.image_storer = []

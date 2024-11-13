@@ -21,7 +21,7 @@ class Main:
                                      'Up': {'Key': 'w', 'continuous': True},
                                      'Down': {'Key': 's', 'continuous': True},
                                      'Shoot': {'Key': 1, 'continuous': False},
-                                     'Shop': {'Key': 'b', 'continuous': False},
+                                     'Shop': {'Key': 'e', 'continuous': False},
                                      'Reload': {'Key': 'r', 'continuous': False},
                                      'Grenade': {'Key': 3, 'continuous': False},
                                      'Force Push': {'Key': 'Space', 'continuous': False},
@@ -32,11 +32,13 @@ class Main:
         self.pause_button_down = False
         self.game_active = False
         self.game = None
+        self.font = 'Segoe Print'
+
         menu_funcs  = {'start_game':self.start_game,
                        'pause':self.pause,
                        'end_game':self.end_game}
         self.menus = Menus(self.window, self.input, self.window_width, self.window_height, menu_funcs,
-                           self.control_map, self.control_map_defaults)
+                           self.control_map, self.control_map_defaults, self.font)
 
 
     def game_loop(self, delta_time):
@@ -70,7 +72,8 @@ class Main:
     def start_game(self):
         self.game_paused = False
         self.game_active = True
-        self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map, self.menus)
+        self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map, self.menus,
+                         self.font)
         TC.game_looper(self.game_loop, self.window)
 
         # this thing messes up everything so hard for no reason

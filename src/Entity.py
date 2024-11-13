@@ -1,4 +1,6 @@
 from src.Utiles import CircleHitbox, Vec, RectHitbox
+from src.Particles import Blood_Particle
+import random
 
 
 class Entity:
@@ -61,6 +63,10 @@ class Entity:
     def take_hit(self, projectile):
         self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
         self.take_damage(projectile.damage)
+        return [Blood_Particle(random.gauss(self.x,self.radius/3),random.gauss(self.y,self.radius/3),
+                               random.gauss(projectile.angle,0.3),
+                               max(random.gauss(projectile.knockback*self.knockback_resistance,0.4),0.1),
+                               random.random()/15+0.01) for a in range(round(projectile.damage*2))]
 
     def take_damage(self, damage):
         self.health -= damage

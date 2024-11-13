@@ -4,22 +4,22 @@ from PIL import Image, ImageTk, ImageDraw
 from src.Utiles import Coords, Vec
 from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade
 from src.TileMap import Tile
-import math
+import math, random
 
 
 class WeaponData:
     data = {"Pistol": {"File": "Sprites/Pistol.png", "Render_Size": 1, "Render_Distance": 1, "Projectile": Bullet,
                        "Bullet_Speed": 0.5, "Shoot_CD": 0.2, "Semi_Auto": False, "Clip_Size": 5, "Reload_Time": 1,
-                       "Spray_Count": 1, "Price": 0},
+                       "Spray_Count": 1, "Spread":0.05, "Speed_Ran":0.05, "Price": 0},
             "SMG": {"File": "Sprites/SMG.png", "Render_Size": 1.2, "Render_Distance": 1, "Projectile": SMG_Bullet,
                     "Bullet_Speed": 0.6, "Shoot_CD": 0.1, "Semi_Auto": True, "Clip_Size": 20, "Reload_Time": 0.8,
-                    "Spray_Count": 1, "Price": 25},
+                    "Spray_Count": 1, "Spread":0.08, "Speed_Ran":0.05, "Price": 25},
             "Shotgun": {"File": "Sprites/Shotgun.png", "Render_Size": 1.8, "Render_Distance": 1.3, "Projectile": Shotgun_Shell,
                         "Bullet_Speed": 0.4, "Shoot_CD": 0.2, "Semi_Auto": False, "Clip_Size": 10, "Reload_Time": 1.5,
-                        "Spray_Count": 8, "Price": 100},
+                        "Spray_Count": 8, "Spread":0.2, "Speed_Ran":0.1, "Price": 100},
             "LMG": {"File": "Sprites/LMG.png", "Render_Size": 2, "Render_Distance": 1.5, "Projectile": LMG_Bullet,
                     "Bullet_Speed": 0.65, "Shoot_CD": 0.06, "Semi_Auto": True, "Clip_Size": 30, "Reload_Time": 1.2,
-                    "Spray_Count": 1, "Price": 150},
+                    "Spray_Count": 1, "Spread":0.03, "Speed_Ran":0.03, "Price": 150},
             }
 
 
@@ -129,7 +129,7 @@ class Player(Entity):
 
         return image, Vec(self.x, self.y)
 
-    def draw_ui(self, screen, temp_upgrades):
+    def draw_ui(self, screen, temp_upgrades, font):
         ## Health Bar
         if self.i_frames<0:
             self.recent_health = self.health
@@ -167,19 +167,19 @@ class Player(Entity):
                                     ammo_y-10, fill="#803310", outline="#803310", tag="game_image")
         else:
             output = f"Clip: {self.ammo_left}/{self.weapon_data['Clip_Size']}"
-        screen.create_text(ammo_x, ammo_y, text=output, anchor=tk.SW, tags='game_image', font=('Segoe Print', 30))
+        screen.create_text(ammo_x, ammo_y, text=output, anchor=tk.SW, tags='game_image', font=(font, 30))
 
         # Grenade/Force Push Display
         grenade_x = (screen.winfo_width() - w) / 2 - 150
         grenade_y = screen.winfo_height() - 55
         output = f"{temp_upgrades['Grenade']}/10"
-        screen.create_text(grenade_x, grenade_y, text=output, anchor=tk.W, tags='game_image', font=('Segoe Print', 30))
+        screen.create_text(grenade_x, grenade_y, text=output, anchor=tk.W, tags='game_image', font=(font, 30))
         screen.create_image(grenade_x-10, grenade_y, image=self.grenade_image_base,anchor=tk.E ,tags='game_image')
 
         push_x = (screen.winfo_width() - w) / 2 - 360
         push_y = screen.winfo_height() - 55
         output = f"{temp_upgrades['Force Push']}/10"
-        screen.create_text(push_x, push_y, text=output, anchor=tk.W, tags='game_image', font=('Segoe Print', 30))
+        screen.create_text(push_x, push_y, text=output, anchor=tk.W, tags='game_image', font=(font, 30))
         screen.create_image(push_x - 10, push_y, image=self.push_image_base, anchor=tk.E, tags='game_image')
 
         # Damage tick
@@ -253,7 +253,9 @@ class Player(Entity):
             if self.ammo_left == 0:
                 self.reload()
             return [
-                self.weapon_data["Projectile"](self.x, self.y, self.angle, self.weapon_data["Bullet_Speed"], self.team)
+                self.weapon_data["Projectile"](self.x, self.y, random.gauss(self.angle, self.weapon_data["Spread"]),
+                                               max(random.gauss(self.weapon_data["Bullet_Speed"],
+                                                                self.weapon_data["Speed_Ran"]), 0.1), self.team)
                 for b in range(self.weapon_data["Spray_Count"])]
         else:
             return []

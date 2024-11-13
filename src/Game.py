@@ -26,12 +26,13 @@ class ZombieWaves:
 
 
 class Game:
-    def __init__(self, window, inp, screen_width, screen_height, control_map, menus):
+    def __init__(self, window, inp, screen_width, screen_height, control_map, menus, font):
         self.window = window
         self.inp = inp
         self.menus = menus
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.font = font
 
         self.screen = tk.Canvas(self.window, width=self.screen_width, height=self.screen_height, bg="green",
                                 highlightthickness=0)
@@ -44,6 +45,7 @@ class Game:
                              self.control_map, self.screen_width, self.screen_height)
         self.enemies = []
         self.projectiles = []
+        self.particles = []
 
         self.coin_image = ImageTk.PhotoImage(
             image=Image.open('Sprites/Coin.png').convert("RGBA").resize((60, 60), resample=Image.Resampling.BOX))
@@ -117,13 +119,22 @@ class Game:
         for proj in self.projectiles:
             proj.physics(delta_time)
             for entity in entities:
-                proj.detect_hit(entity)
+                self.particles += proj.detect_hit(entity)
             if proj.get_dead():
                 if type(proj) == Grenade:
-                    proj.explode(entities)
+                    self.particles+=proj.explode(entities)
                 rem.append(proj)
         for r in rem:
             self.projectiles.remove(r)
+
+        # Particle Physics and deletion
+        rem = []
+        for par in self.particles:
+            par.physics(delta_time)
+            if par.get_dead():
+                rem.append(par)
+        for r in rem:
+            self.particles.remove(r)
 
         # Camera movement
         self.camera_physics(delta_time)
@@ -151,16 +162,17 @@ class Game:
             self.enemy_images.append(ImageTk.PhotoImage(enemy_img))
             self.screen.create_image(self.get_render_coords(enemy_pos), image=self.enemy_images[-1], tag='game_image')
 
-        for proj in self.projectiles:
-            proj.draw_image(self.screen, self.get_render_coords)
+        # Projectile/Particle Rendering
+        for par in self.projectiles+self.particles:
+            par.draw_image(self.screen, self.get_render_coords)
 
         ### UI Rendering
-        self.player.draw_ui(self.screen,self.shop_data["Temp_Upgrades"])
+        self.player.draw_ui(self.screen,self.shop_data["Temp_Upgrades"],self.font)
 
         # Coins
         self.screen.create_image((10, 10), image=self.coin_image, tag='game_image', anchor=tk.NW)
         self.screen.create_text(80, 40, text=str(self.shop_data["Coins"]), anchor=tk.W,
-                                tags='game_image', font=('Segoe Print', 30))
+                                tags='game_image', font=(self.font, 30))
         # Wave Title
         if self.wave_title_timer > 0:
             fade_progress = max(math.sin(min(self.wave_title_timer, 1) * math.pi / 2), 0)
@@ -178,9 +190,12 @@ class Game:
                                 resample=Image.Resampling.BOX))
                 self.screen.create_image(self.screen_width / 2, self.screen_height / 2, image=self.image_cache,
                                         anchor=tk.CENTER, tags='game_image')
-            except:
+            except Exception as e:
                 self.screen.create_text((self.screen_width / 2, self.screen_height / 2), text=self.wave_data["Title"],
-                                         anchor=tk.CENTER,font=('Segoe Print',int(80*fade_progress)),tags='game_image')
+                                         anchor=tk.CENTER,font=(self.font,int(80*fade_progress)),tags='game_image')
+
+        # Wave Progress Bar
+
 
         # Debug
         if self.debug_info:
