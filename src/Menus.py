@@ -55,16 +55,16 @@ class Menus:
 
         for i, action in enumerate(self.control_map):
             txt = f"{action}: {self.control_map[action]['Key']}".replace('1', 'Left Click').replace('3', 'Right Click')
-            key = tk.Button(self.frame, text=txt, width=15,
+            key = tk.Button(self.frame, text=txt, width=18,
                             font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
                             pady=0)
-            key.place(relx=0.5, x=-10, y=140 + 75 * i, anchor=tk.E)
+            key.place(relx=0.53, x=-10, y=130 + 65 * i,height=50, anchor=tk.E)
             func = funcer(self.start_key_listener, action=action, button=key)
             key.configure(command=func.func)
             func = funcer(self.reset_keybind, action=action)
             tk.Button(self.frame, text='Reset Keybind', width=12, command=func.func,
                       font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                      padx=0, pady=0).place(relx=0.5, x=10, y=140 + 75 * i, anchor=tk.W)
+                      padx=0, pady=0).place(relx=0.53, x=10, y=130 + 65 * i,height=50, anchor=tk.W)
 
     def make_pause_menu(self):
         self.frame.configure(width=270, height=345, highlightbackground="darkgreen", highlightthickness=3)
@@ -90,6 +90,8 @@ class Menus:
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         self.image_storer = []
         player = shop_data["Player_Object"]
+
+        ## Weapon Shop
         for i,weapon in enumerate(WeaponData.data):
             x_pos = i*120+70
             img = Image.open(WeaponData.data[weapon]["File"]).convert("RGBA")
@@ -101,7 +103,7 @@ class Menus:
             else:
                 label_font = (self.font,13)
             tk.Label(self.frame, text=weapon, image=self.image_storer[-1],compound="top",highlightbackground="darkgreen", highlightthickness=3,
-                      bg="darkolivegreen2",width=100,height=300,font=label_font,anchor=tk.N,pady=10).place(x=x_pos,y=10,anchor=tk.N)
+                      bg="darkolivegreen2",width=100,height=151,font=label_font,anchor=tk.N,pady=10).place(x=x_pos,y=10,anchor=tk.N)
             if not(weapon in shop_data['Owned_Guns']):
                 func = funcer(self.buy_weapon, player_func=player.set_weapon, new_weapon=weapon, shop_data=shop_data,
                               price=WeaponData.data[weapon]["Price"])
@@ -114,6 +116,24 @@ class Menus:
                           font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                           ).place(x=x_pos, y=135, width=100, height=50, anchor=tk.N)
 
+        ## Temp Upgrades
+        temp_upgrades = [{'Name':'Heal','Func':Menus.buy_heal,'Counter':-1,'Price':10},
+                         {'Name':'Shield','Func':Menus.buy_shield,'Counter':1, 'Price':20},
+                         {'Name': 'Grenade', 'Func': self.buy_grenade,'Counter':10, 'Price':8},
+                         {'Name':'Force Push','Func':self.buy_forcepush,'Counter':10, 'Price':16}]
+        for i,upgrade in enumerate(temp_upgrades):
+            x_pos = i*120+70
+            tk.Label(self.frame, text=upgrade['Name'],highlightbackground="darkgreen", highlightthickness=3,
+                      bg="darkolivegreen2",font=(self.font,14),anchor=tk.N,pady=0
+                     ).place(x=x_pos,y=200,width=112,height=96,anchor=tk.N)
+            func = funcer(upgrade['Func'],price=upgrade["Price"],shop_data=shop_data,counter=upgrade["Counter"])
+            txt = f'Buy: {upgrade["Price"]}'
+            tk.Button(self.frame, text=txt, command=func.func,
+                      font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                      ).place(x=x_pos, y=240, width=100, height=50, anchor=tk.N)
+
+
+
     def set_weapon(self,player_func,new_weapon,shop_data):
         player_func(new_weapon)
         self.set_menu('Shop_Menu',False,shop_data)
@@ -122,6 +142,27 @@ class Menus:
             shop_data['Coins']-=price
             shop_data['Owned_Guns'].append(new_weapon)
             self.set_weapon(player_func,new_weapon,shop_data)
+
+    @staticmethod
+    def buy_heal(price,shop_data,counter):
+        if shop_data['Coins']>=price and shop_data["Player_Object"].health < shop_data["Player_Object"].max_health:
+            shop_data['Coins'] -= price
+            shop_data["Player_Object"].health = shop_data["Player_Object"].max_health
+
+    @staticmethod
+    def buy_shield(price,shop_data,counter):
+        if shop_data['Coins'] >= price and shop_data["Player_Object"].shield < shop_data["Player_Object"].max_health:
+            shop_data['Coins'] -= price
+            shop_data["Player_Object"].shield = shop_data["Player_Object"].max_health
+
+    def buy_grenade(self,price,shop_data,counter):
+        if shop_data['Coins'] >= price and shop_data["Temp_Upgrades"]["Grenade"] < counter:
+            shop_data['Coins'] -= price
+            shop_data["Temp_Upgrades"]["Grenade"] += 1
+    def buy_forcepush(self,price,shop_data,counter):
+        if shop_data['Coins'] >= price and shop_data["Temp_Upgrades"]["Force Push"] < counter:
+            shop_data['Coins'] -= price
+            shop_data["Temp_Upgrades"]["Force Push"] += 1
 
     def start_key_listener(self, action, button):
         if self.listening_remap_action is None:

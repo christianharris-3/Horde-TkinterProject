@@ -4,6 +4,7 @@ from src.Player import Player
 from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie
 from src.TileMap import Tilemap
 from src.Utiles import Coords, Vec, RectHitbox
+from src.Projectiles import Grenade
 import random, math, copy
 
 
@@ -17,10 +18,10 @@ class ZombieWaves:
             {'Title': 'Wave 5', 'Zombies': [{'Num': 6, 'Class': Slow_Zombie}, {'Num': 10, 'Class': Fast_Zombie}],
              'Spawn_Rate': 1.5},
             {'Title': 'Wave 6', 'Zombies': [{'Num': 4, 'Class': Slow_Zombie}, {'Num': 10, 'Class': Fast_Zombie}, {'Num': 3, 'Class': Big_Zombie}], 'Spawn_Rate': 1},
-            {'Title': 'Wave 7', 'Zombies': [{'Num': 2, 'Class': Slow_Zombie}, {'Num': 12, 'Class': Fast_Zombie}, {'Num': 8, 'Class': Big_Zombie}], 'Spawn_Rate': 0.7},
-            {'Title': 'Wave 8', 'Zombies': [{'Num': 12, 'Class': Fast_Zombie}, {'Num': 12, 'Class': Big_Zombie},{'Num': 1, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.5},
-            {'Title': 'Wave 9', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie},{'Num': 15, 'Class': Big_Zombie},{'Num': 4, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.3},
-            {'Title': 'Boss Wave 1', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},{'Num': 10, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.1},
+            {'Title': 'Wave 7', 'Zombies': [{'Num': 2, 'Class': Slow_Zombie}, {'Num': 12, 'Class': Fast_Zombie}, {'Num': 8, 'Class': Big_Zombie}], 'Spawn_Rate': 1},
+            {'Title': 'Wave 8', 'Zombies': [{'Num': 12, 'Class': Fast_Zombie}, {'Num': 12, 'Class': Big_Zombie},{'Num': 1, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.8},
+            {'Title': 'Wave 9', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie},{'Num': 15, 'Class': Big_Zombie},{'Num': 4, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.6},
+            {'Title': 'Boss Wave', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},{'Num': 10, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.5},
             ]
 
 
@@ -46,11 +47,12 @@ class Game:
 
         self.coin_image = ImageTk.PhotoImage(
             image=Image.open('Sprites/Coin.png').convert("RGBA").resize((60, 60), resample=Image.Resampling.BOX))
-        self.shop_data = {'Owned_Guns': ['Pistol'],
+        self.shop_data = {'Owned_Guns': ['Pistol','Shotgun'],
+                          'Temp_Upgrades':{'Heal':-1,'Shield':0,'Grenade':10,'Force Push':10},
                           'Player_Object': self.player,
-                          'Coins': 0}
+                          'Coins': 250}
 
-        self.wave_index = 0
+        self.wave_index = 6
         self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
@@ -82,13 +84,17 @@ class Game:
         self.get_collision_hash()
 
         # Player Physics and Input control
-        new_projectiles, open_shop = self.player.control(self.inp, self.world_mpos)
+        new_projectiles, open_shop, do_force_push, thrown_grenade = self.player.control(self.inp, self.world_mpos)
         self.projectiles += new_projectiles
         self.player.physics(delta_time, self.tilemap.collision_hash)
         self.player.manage_time(delta_time)
         if self.player.get_dead():
             self.player_dead = True
             return True, False
+        if do_force_push:
+            pass
+        if thrown_grenade:
+            pass
 
         # Enemy Physics, AI control and deletion
         rem = []
@@ -113,6 +119,8 @@ class Game:
             for entity in entities:
                 proj.detect_hit(entity)
             if proj.get_dead():
+                if type(proj) == Grenade:
+                    proj.explode(entities)
                 rem.append(proj)
         for r in rem:
             self.projectiles.remove(r)
@@ -147,16 +155,16 @@ class Game:
             proj.draw_image(self.screen, self.get_render_coords)
 
         ### UI Rendering
-        self.player.draw_ui(self.screen)
+        self.player.draw_ui(self.screen,self.shop_data["Temp_Upgrades"])
 
         # Coins
-        self.screen.create_image((10, self.screen_height - 10), image=self.coin_image, tag='game_image', anchor=tk.SW)
-        self.screen.create_text(80, self.screen_height - 40, text=str(self.shop_data["Coins"]), anchor=tk.W,
+        self.screen.create_image((10, 10), image=self.coin_image, tag='game_image', anchor=tk.NW)
+        self.screen.create_text(80, 40, text=str(self.shop_data["Coins"]), anchor=tk.W,
                                 tags='game_image', font=('Segoe Print', 30))
         # Wave Title
         if self.wave_title_timer > 0:
             fade_progress = max(math.sin(min(self.wave_title_timer, 1) * math.pi / 2), 0)
-            surf_s = 50
+            surf_s = 80
             scale_factor = 10 * fade_progress
             surf = Image.new('RGBA', (surf_s, surf_s), (255, 255, 255, 0))
             drawer = ImageDraw.Draw(surf)
@@ -221,6 +229,7 @@ class Game:
                 self.wave_title_timer = 2
                 self.zombie_spawn_timer = 0
                 self.zombies_left = -1
+                self.player.health = self.player.max_health
 
     def shake_camera(self, amplitude=0.1):
         self.camera_shake_timer = 0.1

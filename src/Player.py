@@ -2,7 +2,7 @@ from src.Entity import Entity
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 from src.Utiles import Coords, Vec
-from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell
+from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade
 from src.TileMap import Tile
 import math
 
@@ -14,13 +14,12 @@ class WeaponData:
             "SMG": {"File": "Sprites/SMG.png", "Render_Size": 1.2, "Render_Distance": 1, "Projectile": SMG_Bullet,
                     "Bullet_Speed": 0.6, "Shoot_CD": 0.1, "Semi_Auto": True, "Clip_Size": 20, "Reload_Time": 0.8,
                     "Spray_Count": 1, "Price": 25},
-            "LMG": {"File": "Sprites/LMG.png", "Render_Size": 2, "Render_Distance": 1.5, "Projectile": LMG_Bullet,
-                    "Bullet_Speed": 0.8, "Shoot_CD": 0.06, "Semi_Auto": True, "Clip_Size": 30, "Reload_Time": 1.5,
-                    "Spray_Count": 1, "Price": 100},
-            "Shotgun": {"File": "Sprites/Shotgun.png", "Render_Size": 1.8, "Render_Distance": 1.3,
-                        "Projectile": Shotgun_Shell,
+            "Shotgun": {"File": "Sprites/Shotgun.png", "Render_Size": 1.8, "Render_Distance": 1.3, "Projectile": Shotgun_Shell,
                         "Bullet_Speed": 0.4, "Shoot_CD": 0.2, "Semi_Auto": False, "Clip_Size": 10, "Reload_Time": 1.5,
-                        "Spray_Count": 8, "Price": 200},
+                        "Spray_Count": 8, "Price": 100},
+            "LMG": {"File": "Sprites/LMG.png", "Render_Size": 2, "Render_Distance": 1.5, "Projectile": LMG_Bullet,
+                    "Bullet_Speed": 0.65, "Shoot_CD": 0.06, "Semi_Auto": True, "Clip_Size": 30, "Reload_Time": 1.2,
+                    "Spray_Count": 1, "Price": 150},
             }
 
 
@@ -32,6 +31,9 @@ class Player(Entity):
         self.move_acceleration = 0.01
         self.max_health = 20
         self.health = self.max_health
+        self.recent_health = self.health
+        self.shield = 0
+        self.recent_shield = self.shield
 
         self.control_map = control_map
 
@@ -46,6 +48,11 @@ class Player(Entity):
         self.image_base = Image.open('Sprites/Player.png').convert("RGBA").resize(
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)
 
+        self.grenade_image_base = ImageTk.PhotoImage(Image.open('Sprites/Grenade.png'
+                                             ).convert("RGBA").resize((54,54),resample=Image.Resampling.BOX))
+        self.push_image_base = ImageTk.PhotoImage(Image.open('Sprites/Force_Push.png'
+                                                  ).convert("RGBA").resize((54, 54),resample=Image.Resampling.BOX))
+
         self.hurt_image = 0
         self.hurt_frames_counter = 0
         self.screen_resize(screen_width, screen_height)
@@ -55,6 +62,7 @@ class Player(Entity):
 
         self.auto_fire_cooldown = 0
         self.reload_timer = 0
+        self.recent_health_timer = 0
 
         self.buttons_down = []
 
@@ -121,19 +129,60 @@ class Player(Entity):
 
         return image, Vec(self.x, self.y)
 
-    def draw_ui(self, screen):
-        screen.create_rectangle(10, 10, 210, 60, fill="#444444", outline="#444444", tag="game_image")
-        screen.create_rectangle(12, 12, 12 + (196 * self.health / self.max_health), 58,
-                                fill="#ff0000", outline="#ff0000", tag="game_image")
+    def draw_ui(self, screen, temp_upgrades):
+        ## Health Bar
+        if self.i_frames<0:
+            self.recent_health = self.health
+            self.recent_shield = self.shield
+        w = 300
+        # Main hp bar, 3 rects for border, recent health and health display
+        screen.create_rectangle(screen.winfo_width()/2-w/2,screen.winfo_height()-80,
+                                screen.winfo_width()/2+w/2-1,screen.winfo_height()-30-1,
+                                fill="#444", outline="#666",tag='game_image')
+        screen.create_rectangle(screen.winfo_width() / 2 - (w - 10) / 2 * (self.recent_health / self.max_health),screen.winfo_height() - 75,
+                                screen.winfo_width() / 2 + (w - 10) / 2 * (self.recent_health / self.max_health),screen.winfo_height() - 35,
+                                fill="#a44", outline="#b33", tag='game_image', width=4)
+        screen.create_rectangle(screen.winfo_width()/2 - (w-10)/2*(self.health / self.max_health), screen.winfo_height() - 75,
+                                screen.winfo_width()/2 + (w-10)/2*(self.health / self.max_health), screen.winfo_height() - 35,
+                                fill="#f00", outline="#f22", tag='game_image',width=4)
+        # Shield hp overlay, 2 rects recent shield and shield display
+        if self.shield!=0:
+            screen.create_rectangle(screen.winfo_width() / 2 - (w - 10) / 2 * (self.recent_shield / self.max_health),
+                                    screen.winfo_height() - 75,
+                                    screen.winfo_width() / 2 + (w - 10) / 2 * (self.recent_shield / self.max_health),
+                                    screen.winfo_height() - 35,stipple="gray50",
+                                    fill="#44a", outline="#33b", tag='game_image', width=4)
+            screen.create_rectangle(screen.winfo_width() / 2 - (w - 10) / 2 * (self.shield / self.max_health),
+                                    screen.winfo_height() - 75,
+                                    screen.winfo_width() / 2 + (w - 10) / 2 * (self.shield / self.max_health),
+                                    screen.winfo_height() - 35,stipple="gray50",
+                                    fill="#00b", outline="#22b", tag='game_image', width=4)
 
+        # Ammo Display
+        ammo_x = (screen.winfo_width()+w) / 2+20
+        ammo_y = screen.winfo_height()-20
         if self.reloading:
             output = "Clip: Reloading"
-            screen.create_rectangle(220, 55, 220 + max(self.reload_timer, 0) / self.weapon_data["Reload_Time"] * 300,
-                                    60, fill="#803310", outline="#803310", tag="game_image")
+            screen.create_rectangle(ammo_x, ammo_y-15, ammo_x + max(self.reload_timer, 0) / self.weapon_data["Reload_Time"] * 300,
+                                    ammo_y-10, fill="#803310", outline="#803310", tag="game_image")
         else:
             output = f"Clip: {self.ammo_left}/{self.weapon_data['Clip_Size']}"
-        screen.create_text(220, 0, text=output, anchor=tk.NW, tags='game_image', font=('Segoe Print', 30))
+        screen.create_text(ammo_x, ammo_y, text=output, anchor=tk.SW, tags='game_image', font=('Segoe Print', 30))
 
+        # Grenade/Force Push Display
+        grenade_x = (screen.winfo_width() - w) / 2 - 150
+        grenade_y = screen.winfo_height() - 55
+        output = f"{temp_upgrades['Grenade']}/10"
+        screen.create_text(grenade_x, grenade_y, text=output, anchor=tk.W, tags='game_image', font=('Segoe Print', 30))
+        screen.create_image(grenade_x-10, grenade_y, image=self.grenade_image_base,anchor=tk.E ,tags='game_image')
+
+        push_x = (screen.winfo_width() - w) / 2 - 360
+        push_y = screen.winfo_height() - 55
+        output = f"{temp_upgrades['Force Push']}/10"
+        screen.create_text(push_x, push_y, text=output, anchor=tk.W, tags='game_image', font=('Segoe Print', 30))
+        screen.create_image(push_x - 10, push_y, image=self.push_image_base, anchor=tk.E, tags='game_image')
+
+        # Damage tick
         self.hurt_frames_counter -= 1
         if self.hurt_frames_counter >= 0:
             hurt_image = Image.new("RGBA", (screen.winfo_width(), screen.winfo_height()), (255, 0, 0, 0))
@@ -172,17 +221,24 @@ class Player(Entity):
         if self.get_pressed(inp, "Shop") and self.can_open_shop:
             open_shop = True
 
+        # Abilities
+        new_projectiles = []
+        thrown_grenade = False
+        if self.get_pressed(inp, "Grenade"):
+            new_projectiles = [Grenade(self.x,self.y,*mpos.tuple(),self.team)]
+            thrown_grenade = True
+        do_force_push = self.get_pressed(inp, "Force Push")
+
         # Shooting
         if self.reload_timer <= 0 and self.reloading:
             self.reloading = False
             self.ammo_left = self.weapon_data["Clip_Size"]
-        new_projectiles = []
         if self.get_pressed(inp, "Shoot") and self.auto_fire_cooldown < 0:
             new_projectiles = self.shoot()
             self.auto_fire_cooldown = self.weapon_data["Shoot_CD"]
 
         self.angle = math.atan2(mpos[1] - self.y, mpos[0] - self.x)
-        return new_projectiles, open_shop
+        return new_projectiles, open_shop, do_force_push, thrown_grenade
 
     def get_pressed(self, inp, key):
         if inp.get_pressed(self.control_map[key]['Key']) and (self.control_map[key]['Key'] not in self.buttons_down):
@@ -202,6 +258,20 @@ class Player(Entity):
         else:
             return []
 
+
     def reload(self):
         self.reloading = True
         self.reload_timer = self.weapon_data["Reload_Time"]
+
+    def take_damage(self, damage):
+        if self.i_frames <= 0:
+            if self.shield>damage:
+                self.shield-=damage
+                damage = 0
+            else:
+                damage-=self.shield
+                self.shield = 0
+            self.health-=damage
+            if self.team == "Player":
+                self.i_frames = 0.3
+            self.hurt_frames_counter = 3

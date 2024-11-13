@@ -23,6 +23,8 @@ class Main:
                                      'Shoot': {'Key': 1, 'continuous': False},
                                      'Shop': {'Key': 'b', 'continuous': False},
                                      'Reload': {'Key': 'r', 'continuous': False},
+                                     'Grenade': {'Key': 3, 'continuous': False},
+                                     'Force Push': {'Key': 'Space', 'continuous': False},
                                      'Pause': {'Key': 'Escape', 'continuous': False}}
         self.control_map = copy.deepcopy(self.control_map_defaults)
 

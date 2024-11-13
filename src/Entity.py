@@ -1,4 +1,4 @@
-from src.Utiles import CircleHitbox, Vec
+from src.Utiles import CircleHitbox, Vec, RectHitbox
 
 
 class Entity:
@@ -15,7 +15,8 @@ class Entity:
         self.knockback_resistance = 0.5
 
     def get_hitbox(self):
-        return CircleHitbox(self.x, self.y, self.radius)
+        return RectHitbox(self.x-self.radius/2,self.y-self.radius/2,self.radius,self.radius)
+        # return CircleHitbox(self.x, self.y, self.radius)
 
     def physics(self, delta_time, tilemap_collision_hash):
         self.target_move.normalize()
@@ -62,10 +63,7 @@ class Entity:
         self.take_damage(projectile.damage)
 
     def take_damage(self, damage):
-        if self.i_frames <= 0:
-            self.health -= damage
-            if self.team == "Player": self.i_frames = 0.3
-            self.hurt_frames_counter = 3
+        self.health -= damage
 
     def get_dead(self):
         return self.health <= 0
