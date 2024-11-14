@@ -33,13 +33,15 @@ class Projectile(Particle):
 
     def detect_hit(self, entity):
         particles = []
+        damage = 0
         if self.get_hitbox().Get_Collide(entity.get_hitbox()) and self.team != entity.team and not self.get_dead():
             particles += entity.take_hit(self)
+            damage += self.damage
             self.hits_to_live -= 1
             particles += [Bullet_Hit_Particle(self.x,self.y,random.gauss(self.angle,0.2),
                                         max(random.gauss(self.vel.length(),0.2),0.1)) for _ in range(round(self.damage*2))]
 
-        return particles
+        return particles, damage
 
 
 class Bullet(Projectile):
@@ -126,6 +128,7 @@ class Grenade:
     def explode(self, entities):
         particles = [Explosion(self.x,self.y,1)]
         particles += [Grenade_Fragment(self.x,self.y,random.random()*math.pi*2,max(random.gauss(0.5,0.1),0.1)) for _ in range(25)]
+        damage = 0
         for e in entities:
             if e.team != self.team:
                 dx = e.x - self.x
@@ -136,7 +139,8 @@ class Grenade:
                     kb = self.knockback / max(dis, 1)
                     angle = math.atan2(dy, dx)
                     particles += e.take_hit(KB_Obj(kb, angle, dmg))
-        return particles
+                    damage+=dmg
+        return particles, damage
 
     def detect_hit(self, _):
-        return []
+        return [], 0

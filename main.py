@@ -53,10 +53,10 @@ class Main:
                 done = False
                 player_died, open_shop = self.game.gameloop(delta_time)
                 if player_died:
-                    self.menus.set_menu("Death_Screen")
+                    self.menus.set_menu("Death_Screen",data=self.game.game_stats)
                 elif open_shop:
                     self.game_paused = True
-                    self.menus.set_menu("Shop_Menu",shop_data=self.game.shop_data)
+                    self.menus.set_menu("Shop_Menu",data=self.game.shop_data)
             else:
                 done = False
             if done:
@@ -64,7 +64,11 @@ class Main:
             else:
                 self.game.render_frame()
                 if self.input.get_pressed(self.control_map["Pause"]["Key"]):
-                    self.pause()
+                    if self.menus.active_menu != "Death_Screen":
+                        self.pause()
+                    else:
+                        done = True
+                        self.end_game()
                 else:
                     self.pause_button_down = False
             return done

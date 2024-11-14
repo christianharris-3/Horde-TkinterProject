@@ -130,13 +130,55 @@ class Menus:
                       font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                       ).place(x=x_pos, y=240, width=100, height=50, anchor=tk.N)
 
-    def make_death_screen(self):
-        self.frame.configure(width=300, height=319, highlightbackground="darkgreen", highlightthickness=3)
+    def make_death_screen(self,game_stats):
+        self.frame.configure(width=400, height=530, highlightbackground="darkgreen", highlightthickness=3)
         self.frame.lift()
-        self.frame.place(relx=0.5, rely=0, anchor=tk.CENTER)
+        self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        tk.Label(self.frame,text='YOU DIED',font=(self.font,50),
-                 ).place(relx=0.5,y=30,anchor=tk.N)
+        tk.Label(self.frame,text='YOU DIED',font=(self.font,40,'bold'), fg='red', bg="darkolivegreen2",
+                 ).place(relx=0.5, y=15, anchor=tk.N)
+
+        tk.Label(self.frame,text=f'Score: {game_stats["Score"]}',font=(self.font,30), bg="darkolivegreen2",
+                 ).place(relx=0.5, y=100, anchor=tk.N)
+
+        display_info = ['Wave Reached', 'Zombie Kills', 'Damage Dealt', 'Coins Earned',
+                        'Rounds Fired', 'Grenades Thrown', 'Force Pushes Used']
+        for i,dat in enumerate(display_info):
+            stat = game_stats[dat]
+            if type(stat) == float:
+                stat = int(stat)
+            tk.Label(self.frame,text=f'{dat}: {stat}',font=(self.font,15), bg="darkolivegreen2",
+                 ).place(x=20, y=175+i*40, anchor=tk.NW)
+
+        tk.Button(self.frame, text='Save', command=lambda: self.set_menu('Score_Entry_Menu',data=game_stats),
+                  font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.7,y=460,width=140,height=50,anchor=tk.N)
+
+        tk.Button(self.frame, text='Main Menu', command= self.menu_funcs["end_game"],
+                  font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.3, y=460, width=140, height=50, anchor=tk.N)
+
+    def make_score_entry_menu(self,game_stats):
+        self.frame.configure(width=400, height=185, highlightbackground="darkgreen", highlightthickness=3)
+        self.frame.lift()
+        self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        tk.Label(self.frame,text=f'Save Score: {game_stats["Score"]}',font=(self.font,25),  bg="darkolivegreen2",
+                 ).place(relx=0.5, y=5, anchor=tk.N)
+
+        name_entry = tk.Entry(self.frame, bg="darkolivegreen2", borderwidth=3, font=('arial',15))
+        name_entry.place(relx=0.5, x=-50,y=90, width=200, anchor=tk.W)
+
+        tk.Label(self.frame, text='Enter Name:' ,bg="darkolivegreen2", font=('arial', 15),
+                 ).place(relx=0.5,x=-50, y=90,  anchor=tk.E)
+
+        tk.Button(self.frame, text='Save', command=lambda: self.save_score(game_stats,name_entry),
+                  font=(self.font, 16), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.5,y=120,width=140,height=50,anchor=tk.N)
+
+    def save_score(self, game_stats, name_entry):
+        print('saved')
+        self.menu_funcs["end_game"]()
 
     def set_weapon(self,player_func,new_weapon,shop_data):
         player_func(new_weapon)
@@ -189,7 +231,7 @@ class Menus:
         self.control_map[action]["Key"] = self.control_map_defaults[action]["Key"]
         self.set_menu("Settings",False)
 
-    def set_menu(self, menu, add_to_prev_menu=True,shop_data=None):
+    def set_menu(self, menu, add_to_prev_menu=True,data=None):
         for widget in self.frame.winfo_children():
             widget.destroy()
         if add_to_prev_menu:
@@ -199,9 +241,11 @@ class Menus:
             if self.active_menu == "Pause_Screen":
                 self.make_pause_menu()
             elif self.active_menu == "Shop_Menu":
-                self.make_shop_menu(shop_data)
+                self.make_shop_menu(data)
             elif self.active_menu == "Death_Screen":
-                self.make_death_screen()
+                self.make_death_screen(data)
+            elif self.active_menu == "Score_Entry_Menu":
+                self.make_score_entry_menu(data)
             else:
                 self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2")
                 if self.active_menu == "Start_Screen":
@@ -218,6 +262,7 @@ class Menus:
     def start_game(self):
         self.set_menu("Game")
         self.menu_funcs['start_game']()
+
 
     def window_resize(self,window_width, window_height):
         self.window_width = window_width

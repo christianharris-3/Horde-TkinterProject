@@ -30,7 +30,7 @@ class Player(Entity):
         self.team = 'Player'
         self.radius = 0.45
         self.move_acceleration = 0.01
-        self.max_health = 20
+        self.max_health = 1#20
         self.health = self.max_health
         self.recent_health = self.health
         self.shield = 0
@@ -203,7 +203,7 @@ class Player(Entity):
             self.hurt_image = ImageTk.PhotoImage(hurt_image)
             screen.create_image(0, 0, anchor=tk.NW, image=self.hurt_image, tag="game_image")
 
-    def control(self, inp, mpos, shop_data, enemies):
+    def control(self, inp, mpos, shop_data, enemies, game_stats):
 
         # Remove all not pressed buttons from buttons_down list
         rem = []
@@ -239,10 +239,12 @@ class Player(Entity):
         if self.get_pressed(inp, "Grenade") and shop_data["Temp_Upgrades"]["Grenade"]>0:
             new_projectiles = [Grenade(self.x,self.y,*mpos.tuple(),self.team)]
             shop_data["Temp_Upgrades"]["Grenade"]-=1
+            game_stats["Grenades Thrown"]+=1
 
         if self.get_pressed(inp, "Force Push") and shop_data["Temp_Upgrades"]["Force Push"]>0:
             shop_data["Temp_Upgrades"]["Force Push"]-=1
             new_particles += self.force_push(enemies)
+            game_stats["Force Pushes Used"] += 1
 
 
         # Shooting

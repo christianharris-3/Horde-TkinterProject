@@ -53,19 +53,26 @@ class Game:
         self.shop_data = {'Owned_Guns': ['Pistol'],
                           'Temp_Upgrades':{'Heal':-1,'Shield':0,'Grenade':0,'Force Push':0},
                           'Player_Object': self.player,
-                          'Coins': 0}
+                          'Coins': 100}
+        self.game_stats = {'Zombie Kills': 0,
+                           'Coins Earned': 0,
+                           'Score': 0,
+                           'Wave Reached':'Wave 1',
+                           'Rounds Fired': 0,
+                           'Grenades Thrown': 0,
+                           'Force Pushes Used': 0,
+                           'Damage Dealt': 0}
 
-        self.wave_index = 0
+        self.wave_index = 6
         self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
-        self.zombies_in_wave = 4
+        self.zombies_in_wave = sum([a["Num"] for a in self.wave_data['Zombies']])
         self.zombies_left = -1
         self.zombies_killed_in_wave = 0
 
         self.player_dead = False
 
-        self.score = 0
         self.combo = 0
         self.combo_timer = 0
 
@@ -96,7 +103,10 @@ class Game:
         # Player Physics and Input control
         open_shop = False
         if not self.player_dead:
-            new_projectiles, new_particles, open_shop = self.player.control(self.inp, self.world_mpos, self.shop_data, self.enemies)
+            new_projectiles, new_particles, open_shop = self.player.control(self.inp, self.world_mpos, self.shop_data,
+                                                                            self.enemies, self.game_stats)
+            if len(new_projectiles)>0:
+                self.game_stats['Rounds Fired'] += 1
             self.projectiles += new_projectiles
             self.particles += new_particles
             self.player.physics(delta_time, self.tilemap.collision_hash)
@@ -116,12 +126,14 @@ class Game:
                 rem.append(enem)
         for r in rem:
             self.zombies_killed_in_wave += 1
+            self.game_stats['Zombie Kills'] +=1
             self.shop_data["Coins"] += r.coin_value
+            self.game_stats["Coins Earned"] += r.coin_value
             if self.combo_timer<0:
                 self.combo = 0
             else:
                 self.combo+=1
-            self.score+=(10+self.combo)*r.coin_value
+            self.game_stats["Score"] += (10+self.combo)*r.coin_value
             self.combo_timer = 1
             self.enemies.remove(r)
 
@@ -135,10 +147,14 @@ class Game:
         for proj in self.projectiles:
             proj.physics(delta_time)
             for entity in entities:
-                self.particles += proj.detect_hit(entity)
+                new_particles, damage_dealt = proj.detect_hit(entity)
+                self.particles += new_particles
+                self.game_stats["Damage Dealt"] += damage_dealt
             if proj.get_dead(self.tilemap.collision_hash):
                 if type(proj) == Grenade:
-                    self.particles+=proj.explode(entities)
+                    new_particles, damage_dealt = proj.explode(entities)
+                    self.particles += new_particles
+                    self.game_stats["Damage Dealt"] += damage_dealt
                 rem.append(proj)
         for r in rem:
             self.projectiles.remove(r)
@@ -196,7 +212,7 @@ class Game:
         self.screen.create_text(80, 40, text=str(self.shop_data["Coins"]), anchor=tk.W,
                                 tags='game_image', font=(self.font, 30))
         # Score
-        self.screen.create_text(self.screen_width-30, 10, text=f"Score: {self.score}", anchor=tk.NE,
+        self.screen.create_text(self.screen_width-30, 10, text=f"Score: {self.game_stats['Score']}", anchor=tk.NE,
                                 tags='game_image', font=(self.font, 30))
 
         # Wave Title
@@ -245,7 +261,8 @@ class Game:
             Zombies To Spawn: {'+'.join([str(a['Num']) for a in self.wave_data['Zombies']])}
             Particles: {len(self.particles)}
             Projectiles: {len(self.projectiles)}
-                        """
+            """
+            output+='\n            '.join([f"{stat}: {self.game_stats[stat]}" for stat in self.game_stats])
             self.screen.create_text(-30, 80, text=output, anchor=tk.NW, tags='game_image')
 
     def generate_enemies(self, delta_time):
@@ -291,6 +308,7 @@ class Game:
                 self.zombies_left = -1
                 self.zombies_in_wave = sum([a["Num"] for a in self.wave_data['Zombies']])
                 self.zombies_killed_in_wave = 0
+                self.game_stats["Wave Reached"] = self.wave_data["Title"]
 
     def shake_camera(self, amplitude=0.1):
         self.camera_shake_timer = 0.1
