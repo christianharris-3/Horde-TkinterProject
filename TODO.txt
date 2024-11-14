@@ -5,11 +5,19 @@ Done(map editor) - Better map gen
 DONE - Increasing Zombie difficulty
 DONE - Marker for offscreen zombies
 DONE - Bullets collide with tilemap
-- Wave Display
-- Money/Score
+DONE - Wave Display
+DONE- Money/Score
 - Death screen
 - LeaderBoard
 - Save/Load gamestate
+- Boss Key
+- Combo Display
+- Cheat Codes
+ - imortality
+ - infinite ammo/grenades
+ - insta kill
+ - edit speed of time
+ - max shop/give coins
 
 (less important)
 DONE - particle effects

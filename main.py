@@ -50,8 +50,11 @@ class Main:
             return True
         else:
             if not self.game_paused:
-                done, open_shop = self.game.gameloop(delta_time)
-                if open_shop:
+                done = False
+                player_died, open_shop = self.game.gameloop(delta_time)
+                if player_died:
+                    self.menus.set_menu("Death_Screen")
+                elif open_shop:
                     self.game_paused = True
                     self.menus.set_menu("Shop_Menu",shop_data=self.game.shop_data)
             else:

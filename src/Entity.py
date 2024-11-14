@@ -1,6 +1,7 @@
 from src.Utiles import CircleHitbox, Vec, RectHitbox
 from src.Particles import Blood_Particle, Blood_Splat
-import random
+from src.Projectiles import KB_Obj
+import random, math
 
 
 class Entity:
@@ -12,12 +13,14 @@ class Entity:
         self.angle = 0
         self.move_drag = 0.9
         self.target_move = Vec()
-        self.i_frames = 0
+        self.i_frames = -1
 
         self.knockback_resistance = 0.5
 
         self.stunned = False
         self.stun_timer = 0
+        self.passive_ai_wait_timer = 0
+        self.passive_ai_move_timer = 0
 
     def get_hitbox(self,circle=False):
         if circle:
@@ -44,8 +47,11 @@ class Entity:
         if self.stun_timer<0:
             self.stunned = False
 
+        self.passive_ai_move_timer -= delta_time / 60
+        self.passive_ai_wait_timer -= delta_time / 60
 
     def entity_collision(self, collision_hash, shake_camera):
+        particles = []
         ownhitbox = self.get_hitbox()
         for code in ownhitbox.colcodes:
             if code in collision_hash:
@@ -53,9 +59,13 @@ class Entity:
                     if not (e is self) and ownhitbox.Get_Collide(e.get_hitbox()):
                         self.vel += Vec(self.x - e.x, self.y - e.y).normalized() / 100
                         if self.team == "Enemy" and e.team == "Player":
-                            e.take_damage(self.damage)
-                            if e.team == "Player":
-                                shake_camera(self.damage/100)
+                            # Deal Damage to Player
+                            dmg = self.damage
+                            kb = 0#self.knockback
+                            angle = math.atan2(e.y-self.y, e.x-self.x)
+                            particles += e.take_hit(KB_Obj(kb, angle, dmg))
+                            shake_camera(self.damage/100)
+        return particles
 
     def tilemap_collision(self, collision_hash):
         ownhitbox = self.get_hitbox()
@@ -73,24 +83,25 @@ class Entity:
         return False
 
     def take_hit(self, projectile):
-        if projectile.stuns:
-            self.stunned = True
-            self.stun_timer = 2
-        self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
-        self.take_damage(projectile.damage)
-        particle_num = round(projectile.damage*2)
         particles = []
-        if self.get_dead():
-            particle_num*=4
-            particles += [Blood_Splat(self.x+(random.random()*1.4-0.7)*self.radius,
-                                      self.y+(random.random()*1.4-0.7)*self.radius,
-                                      random.gauss(projectile.angle,0.2), max(random.gauss(0,0.1),0.01),
-                                      random.random()/10+0.01)
-                          for _ in range(round(self.radius*10))]
-        particles += [Blood_Particle(random.gauss(self.x,self.radius/3),random.gauss(self.y,self.radius/3),
-                               random.gauss(projectile.angle,0.3),
-                               max(random.gauss(projectile.knockback*self.knockback_resistance,0.4),0.1),
-                               random.random()/15+0.01) for a in range(particle_num)]
+        if self.i_frames<0:
+            if projectile.stuns:
+                self.stunned = True
+                self.stun_timer = 2
+            self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
+            self.take_damage(projectile.damage)
+            particle_num = round(projectile.damage*2)
+            if self.get_dead():
+                particle_num*=4
+                particles += [Blood_Splat(self.x+(random.random()*1.4-0.7)*self.radius,
+                                          self.y+(random.random()*1.4-0.7)*self.radius,
+                                          random.gauss(projectile.angle,0.2), max(random.gauss(0,0.1),0.01),
+                                          random.random()/10+0.01)
+                              for _ in range(round(self.radius*10))]
+            particles += [Blood_Particle(random.gauss(self.x,self.radius/3),random.gauss(self.y,self.radius/3),
+                                   random.gauss(projectile.angle,0.3),
+                                   max(random.gauss(projectile.knockback*self.knockback_resistance,0.4),0.1),
+                                   random.random()/15+0.01) for a in range(particle_num)]
         return particles
 
     def take_damage(self, damage):

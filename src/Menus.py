@@ -130,7 +130,13 @@ class Menus:
                       font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                       ).place(x=x_pos, y=240, width=100, height=50, anchor=tk.N)
 
+    def make_death_screen(self):
+        self.frame.configure(width=300, height=319, highlightbackground="darkgreen", highlightthickness=3)
+        self.frame.lift()
+        self.frame.place(relx=0.5, rely=0, anchor=tk.CENTER)
 
+        tk.Label(self.frame,text='YOU DIED',font=(self.font,50),
+                 ).place(relx=0.5,y=30,anchor=tk.N)
 
     def set_weapon(self,player_func,new_weapon,shop_data):
         player_func(new_weapon)
@@ -194,6 +200,8 @@ class Menus:
                 self.make_pause_menu()
             elif self.active_menu == "Shop_Menu":
                 self.make_shop_menu(shop_data)
+            elif self.active_menu == "Death_Screen":
+                self.make_death_screen()
             else:
                 self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2")
                 if self.active_menu == "Start_Screen":

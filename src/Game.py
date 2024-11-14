@@ -5,6 +5,7 @@ from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie
 from src.TileMap import Tilemap
 from src.Utiles import Coords, Vec, RectHitbox
 from src.Projectiles import Grenade
+from src.Particles import Blood_Splat, Blood_Particle
 import random, math, copy
 
 
@@ -36,7 +37,7 @@ class Game:
 
         self.screen = tk.Canvas(self.window, width=self.screen_width, height=self.screen_height, bg="green",
                                 highlightthickness=0)
-        self.screen.place(x=0, y=0)
+        self.screen.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         self.control_map = control_map
 
@@ -93,14 +94,18 @@ class Game:
         self.get_collision_hash()
 
         # Player Physics and Input control
-        new_projectiles, new_particles, open_shop = self.player.control(self.inp, self.world_mpos, self.shop_data, self.enemies)
-        self.projectiles += new_projectiles
-        self.particles += new_particles
-        self.player.physics(delta_time, self.tilemap.collision_hash)
-        self.player.manage_time(delta_time)
-        if self.player.get_dead():
-            self.player_dead = True
-            return True, False
+        open_shop = False
+        if not self.player_dead:
+            new_projectiles, new_particles, open_shop = self.player.control(self.inp, self.world_mpos, self.shop_data, self.enemies)
+            self.projectiles += new_projectiles
+            self.particles += new_particles
+            self.player.physics(delta_time, self.tilemap.collision_hash)
+            self.player.manage_time(delta_time)
+            if self.player.get_dead():
+                self.player_dead = True
+                for e in self.enemies:
+                    e.passive_ai_wait_timer = random.random()*5+2
+                return True, False
 
         # Enemy Physics, AI control and deletion
         rem = []
@@ -123,7 +128,7 @@ class Game:
         # Player + Entity Collision
         entities = self.enemies + [self.player]
         for entity in entities:
-            entity.entity_collision(self.collision_hash, self.shake_camera)
+            self.particles += entity.entity_collision(self.collision_hash, self.shake_camera)
 
         # Projectile Physics and deletion
         rem = []
@@ -169,12 +174,13 @@ class Game:
             self.screen.create_image(self.get_render_coords(enemy_pos), image=self.enemy_images[-1], tag='game_image')
 
         # Player Rendering
-        screen_hitbox = RectHitbox(*self.screen_to_world_pos(Vec()),
-                                   *Coords.pixel_to_world_coords(Vec(self.screen_width,self.screen_height)))
+        if not self.player_dead:
+            screen_hitbox = RectHitbox(*self.screen_to_world_pos(Vec()),
+                                       *Coords.pixel_to_world_coords(Vec(self.screen_width,self.screen_height)))
 
-        player_img, player_pos = self.player.get_image(self.enemies,screen_hitbox)
-        self.player_img = ImageTk.PhotoImage(player_img)
-        self.screen.create_image(self.get_render_coords(player_pos), image=self.player_img, tag='game_image')
+            player_img, player_pos = self.player.get_image(self.enemies,screen_hitbox)
+            self.player_img = ImageTk.PhotoImage(player_img)
+            self.screen.create_image(self.get_render_coords(player_pos), image=self.player_img, tag='game_image')
 
 
         # Projectile/Particle Rendering
@@ -182,7 +188,8 @@ class Game:
             par.draw_image(self.screen, self.get_render_coords)
 
         ### UI Rendering
-        self.player.draw_ui(self.screen,self.shop_data["Temp_Upgrades"],self.font)
+        if not self.player_dead:
+            self.player.draw_ui(self.screen,self.shop_data["Temp_Upgrades"],self.font)
 
         # Coins
         self.screen.create_image((10, 10), image=self.coin_image, tag='game_image', anchor=tk.NW)
@@ -303,7 +310,10 @@ class Game:
 
     def get_collision_hash(self):
         self.collision_hash = {}
-        for e in self.enemies + [self.player]:
+        entities = self.enemies[:]
+        if not self.player_dead:
+            entities.append(self.player)
+        for e in entities:
             for code in e.get_hitbox().colcodes:
                 if code in self.collision_hash:
                     self.collision_hash[code].append(e)
