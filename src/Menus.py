@@ -117,8 +117,8 @@ class Menus:
         ## Temp Upgrades
         temp_upgrades = [{'Name':'Heal','Func':Menus.buy_heal,'Counter':-1,'Price':10},
                          {'Name':'Shield','Func':Menus.buy_shield,'Counter':1, 'Price':20},
-                         {'Name': 'Grenade', 'Func': self.buy_grenade,'Counter':10, 'Price':8},
-                         {'Name':'Force Push','Func':self.buy_forcepush,'Counter':10, 'Price':16}]
+                         {'Name': 'Force Push', 'Func': self.buy_forcepush, 'Counter': 10, 'Price': 5},
+                         {'Name': 'Grenade', 'Func': self.buy_grenade,'Counter':10, 'Price':8}]
         for i,upgrade in enumerate(temp_upgrades):
             x_pos = i*120+70
             tk.Label(self.frame, text=upgrade['Name'],highlightbackground="darkgreen", highlightthickness=3,
@@ -210,3 +210,9 @@ class Menus:
     def start_game(self):
         self.set_menu("Game")
         self.menu_funcs['start_game']()
+
+    def window_resize(self,window_width, window_height):
+        self.window_width = window_width
+        self.window_height = window_height
+        if self.active_menu != "Shop_Menu":
+            self.set_menu(self.active_menu,False)

@@ -5,6 +5,7 @@ Done(map editor) - Better map gen
 DONE - Increasing Zombie difficulty
 DONE - Marker for offscreen zombies
 DONE - Bullets collide with tilemap
+- Wave Display
 - Money/Score
 - Death screen
 - LeaderBoard
@@ -14,4 +15,9 @@ DONE - Bullets collide with tilemap
 DONE - particle effects
 DONE - grenades
 - sound effects 
+
+
+
+-grenade only mode // infinite grenades no guns
+-pistol+force mode
 

@@ -7,7 +7,7 @@ class TileData:
 
     data = {'Grass':{'File':'Sprites/Grass.png','Hitbox':()},
             'Rock':{'File':'Sprites/Rock.png','Hitbox':(0.1,0.4,0.8,0.6)},
-            'Cobble':{'File':'Sprites/Cobble2.png','Hitbox':(0,0,1,1)},
+            'Cobble':{'File':'Sprites/Cobble3.png','Hitbox':(0,0,1,1)},
             'Shop':{'File':'Sprites/Shop.png','Hitbox':(0.5,0.5,0.5)}}
 
     @staticmethod

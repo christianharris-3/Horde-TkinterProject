@@ -40,6 +40,10 @@ class Main:
         self.menus = Menus(self.window, self.input, self.window_width, self.window_height, menu_funcs,
                            self.control_map, self.control_map_defaults, self.font)
 
+        # this thing messes up everything so hard for no reason
+        # self.window.bind('<Configure>', self.window_resize)
+        # self.window_resize_timestamp = time.perf_counter()
+
 
     def game_loop(self, delta_time):
         if not self.game_active:
@@ -64,10 +68,13 @@ class Main:
 
 
     def window_resize(self,event):
-        self.window_width = event.width
-        self.window_height = event.height
-        if self.game_active:
-            self.game.window_resize(self.window_width,self.window_height)
+        if self.window_resize_timestamp+0.1 < time.perf_counter():
+            self.window_resize_timestamp = time.perf_counter()
+            self.window_width = event.width
+            self.window_height = event.height
+            self.menus.window_resize(self.window_width, self.window_height)
+            if self.game_active:
+                self.game.window_resize(self.window_width,self.window_height)
 
     def start_game(self):
         self.game_paused = False
@@ -76,8 +83,6 @@ class Main:
                          self.font)
         TC.game_looper(self.game_loop, self.window)
 
-        # this thing messes up everything so hard for no reason
-        # self.window.bind('<Configure>', self.window_resize)
 
     def end_game(self):
         self.game_active = False
