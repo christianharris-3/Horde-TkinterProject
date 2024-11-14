@@ -16,8 +16,51 @@ DONE - particle effects
 DONE - grenades
 - sound effects 
 
-
-
 -grenade only mode // infinite grenades no guns
 -pistol+force mode
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-multiplayer

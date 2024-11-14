@@ -58,9 +58,15 @@ class Game:
         self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
+        self.zombies_in_wave = 4
         self.zombies_left = -1
+        self.zombies_killed_in_wave = 0
 
         self.player_dead = False
+
+        self.score = 0
+        self.combo = 0
+        self.combo_timer = 0
 
         self.camera_pos = Vec(self.player.x, self.player.y)
         self.camera_target_pos = Vec()
@@ -80,6 +86,7 @@ class Game:
 
     def gameloop(self, delta_time):
         self.fps = 60 / delta_time
+        self.combo_timer -= delta_time / 60
         self.get_world_mpos()
         self.generate_enemies(delta_time)
         self.wave_manager()
@@ -103,7 +110,14 @@ class Game:
             if enem.get_dead():
                 rem.append(enem)
         for r in rem:
+            self.zombies_killed_in_wave += 1
             self.shop_data["Coins"] += r.coin_value
+            if self.combo_timer<0:
+                self.combo = 0
+            else:
+                self.combo+=1
+            self.score+=(10+self.combo)*r.coin_value
+            self.combo_timer = 1
             self.enemies.remove(r)
 
         # Player + Entity Collision
@@ -174,6 +188,10 @@ class Game:
         self.screen.create_image((10, 10), image=self.coin_image, tag='game_image', anchor=tk.NW)
         self.screen.create_text(80, 40, text=str(self.shop_data["Coins"]), anchor=tk.W,
                                 tags='game_image', font=(self.font, 30))
+        # Score
+        self.screen.create_text(self.screen_width-30, 10, text=f"Score: {self.score}", anchor=tk.NE,
+                                tags='game_image', font=(self.font, 30))
+
         # Wave Title
         if self.wave_title_timer > 0:
             fade_progress = max(math.sin(min(self.wave_title_timer, 1) * math.pi / 2), 0)
@@ -196,7 +214,20 @@ class Game:
                                          anchor=tk.CENTER,font=(self.font,int(80*fade_progress)),tags='game_image')
 
         # Wave Progress Bar
-
+        w = 300
+        h = 30
+        self.screen.create_rectangle(self.screen_width/2-w,10,self.screen_width/2+w,10+h,
+                                     fill='#888',tags='game_image')
+        first_bar = (2*w*self.zombies_killed_in_wave/self.zombies_in_wave)
+        second_bar = (2*w*len(self.enemies)/self.zombies_in_wave)
+        if first_bar>0:
+            self.screen.create_rectangle(self.screen_width / 2 - w, 10, self.screen_width / 2 - w +first_bar, 10+h,
+                                         fill='#8255b9',tags='game_image')
+        if second_bar>0:
+            self.screen.create_rectangle(self.screen_width / 2 - w + first_bar, 10, self.screen_width / 2 - w + first_bar + second_bar, 10+h,
+                                         fill='#8255b9',stipple='gray50',tags='game_image')
+        self.screen.create_text(self.screen_width/2,10+h/2,text=self.wave_data["Title"],anchor=tk.CENTER,
+                                font=(self.font,12),tags='game_image')
 
         # Debug
         if self.debug_info:
@@ -251,6 +282,8 @@ class Game:
                 self.wave_title_timer = 2
                 self.zombie_spawn_timer = 0
                 self.zombies_left = -1
+                self.zombies_in_wave = sum([a["Num"] for a in self.wave_data['Zombies']])
+                self.zombies_killed_in_wave = 0
 
     def shake_camera(self, amplitude=0.1):
         self.camera_shake_timer = 0.1
