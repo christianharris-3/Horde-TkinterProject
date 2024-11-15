@@ -76,7 +76,7 @@ class Menus:
         tk.Button(self.frame, text='Settings', width=12, command=lambda: self.set_menu("Settings"),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
                   pady=0).place(relx=0.5, y=100, anchor=tk.N)
-        tk.Button(self.frame, text='Save', width=10,
+        tk.Button(self.frame, text='Save', width=10, command=lambda: self.menu_funcs["save_game"]('filename'),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   padx=0, pady=0).place(relx=0.5, y=180, anchor=tk.N)
         tk.Button(self.frame, text='Exit To Main Menu', width=16, command=self.menu_funcs['end_game'],

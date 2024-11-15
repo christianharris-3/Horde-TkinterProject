@@ -85,19 +85,15 @@ class Grenade:
     def __init__(self, x, y, target_x, target_y, team):
         self.x = x
         self.y = y
-        self.start_x = x
-        self.start_y = y
-        self.target_x = target_x
-        self.target_y = target_y
         self.team = team
         self.angle = 0
         self.radius = 0.1
-        self.t = 0
-        self.total_life = 0.15 * ((self.target_x - self.start_x) ** 2 + (self.target_y - self.start_y) ** 2) ** 0.5
+        self.time_alive = 0
+        self.time_kill_cutoff = 0.15 * ((target_x - x) ** 2 + (target_y - y) ** 2) ** 0.5
 
         self.acceleration = 20
-        self.x_vel = (self.target_x - self.start_x) / self.total_life
-        self.y_vel = (self.target_y - self.start_y) / self.total_life - (self.acceleration / 2 * self.total_life)
+        self.vel = Vec((target_x - x) / self.time_kill_cutoff,
+                       (target_y - y) / self.time_kill_cutoff - (self.acceleration / 2 * self.time_kill_cutoff))
 
         self.damage = 10
         self.range = 3
@@ -107,11 +103,11 @@ class Grenade:
                                                                                            resample=Image.Resampling.BOX)
 
     def physics(self, delta_time):
-        self.t += delta_time / 60
+        self.time_alive += delta_time / 60
 
-        self.x += self.x_vel * delta_time / 60
-        self.y += self.y_vel * delta_time / 60
-        self.y_vel += self.acceleration * delta_time / 60
+        self.x += self.vel.x * delta_time / 60
+        self.y += self.vel.y * delta_time / 60
+        self.vel.y += self.acceleration * delta_time / 60
 
         self.angle += 0.4
 
@@ -123,7 +119,7 @@ class Grenade:
         screen.create_image(*coord_mapper(Vec(self.x, self.y)), anchor=tk.CENTER, image=self.image)
 
     def get_dead(self,_):
-        return self.t > self.total_life
+        return self.time_alive > self.time_kill_cutoff
 
     def explode(self, entities):
         particles = [Explosion(self.x,self.y,1)]

@@ -47,6 +47,8 @@ class Vec:
 
     def length(self):
         return ((self.x)**2+(self.y)**2)**0.5
+    def angle(self):
+        return math.atan2(self.y,self.x)
 
     def normalize(self):
         length = self.length()

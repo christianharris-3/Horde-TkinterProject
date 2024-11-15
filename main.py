@@ -88,6 +88,7 @@ class Main:
         self.game_active = True
         self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map, self.menus,
                          self.font)
+        self.menus.menu_funcs["save_game"] = self.game.save_game
         TC.game_looper(self.game_loop, self.window)
 
 

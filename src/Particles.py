@@ -6,6 +6,7 @@ import math, random
 
 class Particle:
     def __init__(self, x, y, angle, speed):
+        self.team = "Neutral"
         self.x = x
         self.y = y
         self.start_x = x

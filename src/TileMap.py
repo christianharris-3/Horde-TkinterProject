@@ -51,8 +51,8 @@ class Tile:
 class Tilemap:
     pos_value_convert = 100000
 
-    def __init__(self, pixels_per_unit):
-        self.pixels_per_unit = pixels_per_unit
+    def __init__(self):
+        self.pixels_per_unit = Coords.scale_factor
         self.tiles = {}
         self.collision_hash = {}
         self.pos = Vec()
@@ -65,6 +65,7 @@ class Tilemap:
 
     def load_map(self,map_name):
         self.tiles = {}
+        self.map_name = map_name
         self.outside_tile = Tile(-1, -1, self.pixels_per_unit, 'Cobble')
 
         with open(map_name, 'r') as f:
