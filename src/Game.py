@@ -53,7 +53,7 @@ class Game:
         self.shop_data = {'Owned_Guns': ['Pistol'],
                           'Temp_Upgrades':{'Heal':-1,'Shield':0,'Grenade':0,'Force Push':0},
                           'Player_Object': self.player,
-                          'Coins': 100}
+                          'Coins': 10000}
         self.game_stats = {'Zombie Kills': 0,
                            'Coins Earned': 0,
                            'Score': 0,
@@ -63,7 +63,7 @@ class Game:
                            'Force Pushes Used': 0,
                            'Damage Dealt': 0}
 
-        self.wave_index = 6
+        self.wave_index = 9
         self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
@@ -309,6 +309,20 @@ class Game:
                 self.zombies_in_wave = sum([a["Num"] for a in self.wave_data['Zombies']])
                 self.zombies_killed_in_wave = 0
                 self.game_stats["Wave Reached"] = self.wave_data["Title"]
+
+    def save_game(self,filename):
+        # Player
+        # Shop data
+        # entities
+        # Projectiles
+        # Particles?
+        # Tilemap
+        game_data = {}
+
+        pass
+
+
+
 
     def shake_camera(self, amplitude=0.1):
         self.camera_shake_timer = 0.1

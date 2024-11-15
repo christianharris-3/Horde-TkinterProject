@@ -30,7 +30,7 @@ class Player(Entity):
         self.team = 'Player'
         self.radius = 0.45
         self.move_acceleration = 0.01
-        self.max_health = 1#20
+        self.max_health = 20
         self.health = self.max_health
         self.recent_health = self.health
         self.shield = 0
@@ -38,13 +38,12 @@ class Player(Entity):
 
         self.control_map = control_map
 
-        self.weapon_data = WeaponData.data["Pistol"]
+        self.active_weapon = "Pistol"
+        self.weapon_data = WeaponData.data[self.active_weapon]
         self.ammo_left = self.weapon_data["Clip_Size"]
         self.reloading = True
-        self.reload_timer = 0
         self.weapon_image_base = None
-
-        self.set_weapon('Pistol')
+        self.set_weapon(self.active_weapon)
 
         self.image_base = Image.open('Sprites/Player.png').convert("RGBA").resize(
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)

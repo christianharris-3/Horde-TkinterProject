@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from src.Player import WeaponData
+import json, os
 
 
 # class that fixes a bug when making lots of lambda functions in a loop
@@ -177,7 +178,16 @@ class Menus:
                   ).place(relx=0.5,y=120,width=140,height=50,anchor=tk.N)
 
     def save_score(self, game_stats, name_entry):
-        print('saved')
+        game_stats["Username"] = name_entry.get()
+        data = [game_stats]
+        if os.path.isfile('Data/player_scores.json'):
+            with open('Data/player_scores.json','r') as f:
+                data = json.load(f)
+                data.append(game_stats)
+
+        with open('Data/player_scores.json','w') as f:
+            json.dump(data,f)
+
         self.menu_funcs["end_game"]()
 
     def set_weapon(self,player_func,new_weapon,shop_data):
