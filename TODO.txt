@@ -29,6 +29,10 @@ DONE - grenades
 
 
 
+- score based on time since last took damage
+
+
+
 
 
 
