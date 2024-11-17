@@ -9,6 +9,7 @@ DONE - Wave Display
 DONE- Money/Score
 DONE - Death screen
 - LeaderBoard
+- add multiple levels/difficulties. easy,normal,hard, current game is hard.
 DONE - Save/Load gamestate
 - Boss Key
 - Combo Display

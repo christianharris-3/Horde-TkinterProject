@@ -119,5 +119,5 @@ class Chonk_Zombie(Enemy):
         self.radius = 0.6
         self.move_acceleration = 0.0055
         self.damage = 10
-        self.knockback_resistance = 0
+        self.knockback_resistance = 0.001
         self.coin_value = 8

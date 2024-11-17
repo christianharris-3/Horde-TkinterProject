@@ -68,7 +68,7 @@ class Game:
         self.shop_data = {'Owned_Guns': ['Pistol'],
                           'Temp_Upgrades': {'Heal': -1, 'Shield': 0, 'Grenade': 0, 'Force Push': 0},
                           'Player_Object': self.player,
-                          'Coins': 0}
+                          'Coins': 10000}
         self.game_stats = {'Zombie Kills': 0,
                            'Coins Earned': 0,
                            'Score': 0,
@@ -79,7 +79,7 @@ class Game:
                            'Damage Dealt': 0,
                            'Damage Taken': 0}
 
-        self.wave_index = 0
+        self.wave_index = 9
         self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
@@ -300,7 +300,7 @@ class Game:
 
     def generate_enemies(self, delta_time):
         self.wave_title_timer -= delta_time / 60
-        if self.wave_title_timer < 0:
+        if self.wave_title_timer < 0 and not(self.player_dead):
             self.zombie_spawn_timer -= delta_time / 60
             if self.zombie_spawn_timer <= 0:
                 # Slows down zombie spawns when more zombies are alive

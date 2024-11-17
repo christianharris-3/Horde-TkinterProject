@@ -195,6 +195,8 @@ class Menus:
         if gamefile:
             name_entry.insert(0, gamefile)
         else:
+            # fruit names source
+            # https://www.goodgoodgood.co/articles/list-of-fruits
             with open('Data/fruit_names.json','r') as f:
                 fruit = random.choice(json.load(f))
             name_entry.insert(0, fruit)
