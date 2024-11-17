@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 from src.Player import WeaponData
+from src.Utiles import get_now
 import json, os, random
 
 
@@ -31,6 +32,19 @@ class Menus:
 
         self.listening_remap_action = None
 
+        # style for tables
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure('Treeview.Heading', font=(self.font, 18), background='#060', relief="flat",
+                        borderwidth=0, fieldbackground='#060')
+        style.map('Treeview.Heading', background=[('selected', '#060')],
+                  foreground=[('selected', '#grey9')])
+        style.configure('Treeview', font=(self.font, 16), rowheight=35, background="green",
+                        fieldbackground='darkolivegreen2',
+                        relief='flat', borderwidth=0, bd=0, highlightthickness=0)
+        style.map('Treeview', background=[('selected', 'green4')],
+                  foreground=[('selected', 'gray6')])
+
     def make_start_screen(self):
         image = Image.open('Sprites/Title.png').resize((300, 150), resample=Image.Resampling.BOX)
         self.image = ImageTk.PhotoImage(image)
@@ -46,16 +60,20 @@ class Menus:
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, rely=0.5, y=60, width=185, height=84, anchor=tk.CENTER)
 
+        tk.Button(self.frame, text='LeaderBoard', command=lambda: self.set_menu("Leaderboard_Menu"),
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.5, rely=0.5, y=160, width=220, height=84, anchor=tk.CENTER)
+
         tk.Button(self.frame, text='Settings', command=lambda: self.set_menu("Settings"),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  ).place(relx=0.5, rely=0.5, y=160, width=178, height=84, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, y=260, width=178, height=84, anchor=tk.CENTER)
 
     def make_settings_menu(self):
         tk.Button(self.frame, text='Back', command=self.menu_back,
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, anchor=tk.NW)
 
-        tk.Label(self.frame, text="Edit Keybinds", bg="darkolivegreen2", font=(self.font, 40)
+        tk.Label(self.frame, text="Edit Keybinds", bg="darkolivegreen2", font=(self.font, 40, "bold")
                  ).place(relx=0.5, y=50, anchor=tk.CENTER)
 
         for i, action in enumerate(self.control_map):
@@ -222,16 +240,6 @@ class Menus:
             with open("Data/Game Saves/"+filename,'r') as f:
                 gamestates.append(json.load(f))
 
-        style = ttk.Style()
-        style.theme_use("clam")
-        style.configure('Treeview.Heading',font=(self.font, 18), background='#060', relief="flat",
-                        borderwidth=0, fieldbackground='#060')
-        style.map('Treeview.Heading', background=[('selected', '#060')],
-                                      foreground=[('selected', '#grey9')])
-        style.configure('Treeview', font=(self.font, 16), rowheight=35, background="green", fieldbackground='darkolivegreen2',
-                        relief='flat',borderwidth=0, bd=0, highlightthickness=0)
-        style.map('Treeview', background=[('selected','green4')],
-                   foreground=[('selected','gray6')])
         titles = [('Name', 400), ('Score', 150), ('Wave', 150)]
 
         table = ttk.Treeview(self.frame, columns=[a[0] for a in titles], show='headings', style='Treeview', height=len(gamestates))
@@ -254,6 +262,59 @@ class Menus:
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(relx=0.5, x=450, y=240, anchor=tk.CENTER)
 
+    def make_leaderboard_menu(self):
+        tk.Button(self.frame, text='Back', command=self.menu_back,
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
+                  pady=0).place(x=10, y=10, height=70, anchor=tk.NW)
+        tk.Label(self.frame, text='Leaderboard', font=(self.font, 30, "bold"), bg="darkolivegreen2",
+                 ).place(relx=0.5, y=5, anchor=tk.N)
+
+        if os.path.exists('Data/player_scores.json'):
+            with open('Data/player_scores.json', 'r') as f:
+                self.leaderboard_data = json.load(f)
+        else:
+            self.leaderboard_data = []
+        self.leaderboard_data.sort(reverse=True,key=lambda x: x["Score"])
+
+        titles = [('Username', 400), ('Score', 150), ('Wave', 150)]
+        self.leaderboard_table = ttk.Treeview(self.frame, columns=[a[0] for a in titles], show='headings', style='Treeview',
+                             height=len(self.leaderboard_data))
+
+        for i, t in enumerate(titles):
+            self.leaderboard_table.column(t[0], width=t[1], anchor='center')
+            self.leaderboard_table.heading(t[0], text=t[0])
+
+        for i, score in enumerate(self.leaderboard_data):
+            self.leaderboard_table.insert('', 'end', iid=i, values=[score["Username"], score['Score'], score["Wave Reached"]])
+
+
+        self.leaderboard_table.place(relx=0.5,x=-150, y=90, anchor=tk.N)
+
+        self.score_info_display = tk.Frame(self.frame, highlightbackground="darkgreen", highlightthickness=3,
+                                           background='darkolivegreen2')
+        self.score_info_display.place(relx=0.5,x=230,y=90,width=270,height=370,anchor=tk.NW)
+
+
+        self.leaderboard_table.bind('<1>',self.detect_selected_leaderboard_entry)
+
+    def detect_selected_leaderboard_entry(self,event):
+        self.leaderboard_table.after(1,self.detect_selected_leaderboard_entry_delayed)
+    def detect_selected_leaderboard_entry_delayed(self):
+        if self.leaderboard_table.selection() != ():
+            for widget in self.score_info_display.winfo_children():
+                widget.destroy()
+            data = self.leaderboard_data[int(self.leaderboard_table.selection()[0])]
+
+            tk.Label(self.score_info_display,text=data["Username"],font=(self.font,17), bg="darkolivegreen2"
+                     ).place(relx=0.5,y=5,anchor=tk.N)
+
+            data_list = ["Wave Reached","Zombie Kills","Damage Dealt","Damage Taken","Coins Earned","Rounds Fired","Grenades Thrown","Force Pushes Used","Date","Time"]
+            for i,d in enumerate(data_list):
+                txt = f'{d}: {data[d]}'
+                if d == "Damage Dealt": txt = f'{d}: {int(data[d])}'
+                tk.Label(self.score_info_display,text=txt,font=(self.font,13), bg="darkolivegreen2"
+                         ).place(x=20,y=50+i*30,anchor=tk.NW)
+
     def load_gamestate(self,table):
         selection = table.selection()
         if selection != ():
@@ -268,6 +329,8 @@ class Menus:
 
     def save_score(self, game_stats, name_entry):
         game_stats["Username"] = name_entry.get()
+        game_stats["Date"] = get_now()[0]
+        game_stats["Time"] = get_now()[1]
         data = [game_stats]
         if os.path.isfile('Data/player_scores.json'):
             with open('Data/player_scores.json','r') as f:
@@ -360,6 +423,8 @@ class Menus:
                     self.make_settings_menu()
                 elif self.active_menu == "Load_Gamestate_Menu":
                     self.make_load_gamestate_menu()
+                elif self.active_menu == "Leaderboard_Menu":
+                    self.make_leaderboard_menu()
 
         else:
             self.frame.lower()

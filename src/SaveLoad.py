@@ -1,9 +1,9 @@
-from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie
+from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie, Chonk_Zombie
 from src.Player import Player
 from src.TileMap import Tilemap
 from src.Projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
 from src.Particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect
-from src.Utiles import Vec
+from src.Utiles import Vec, get_now
 import json, copy, os
 
 ### Player
@@ -19,6 +19,7 @@ class Save:
                        Fast_Zombie: 'Fast_Zombie',
                        Big_Zombie: 'Big_Zombie',
                        Demon_Zombie: 'Demon_Zombie',
+                       Chonk_Zombie: 'Chonk_Zombie',
                        Player: 'Player'}
     particle_type_map = {Bullet: 'Bullet', SMG_Bullet: 'SMG_Bullet', Shotgun_Shell: 'Shotgun_Shell',
                          LMG_Bullet: 'LMG_Bullet', Grenade: 'Grenade',
@@ -34,7 +35,8 @@ class Save:
         data = {"player":Save.player(player),"enemies":[Save.entity(e) for e in enemies],
                 "game_stats":game_stats,"shop_data":shop_data, "projectiles":[Save.particle(e) for e in projectiles],
                 "particles":[Save.particle(e) for e in particles],"tilemap":Save.tilemap(tilemap),
-                "camera_pos":camera_pos.tuple(), "filename":filename, "wave_data":Save.wave_data(wave_data)}
+                "camera_pos":camera_pos.tuple(), "filename":filename, "wave_data":Save.wave_data(wave_data),
+                'save_timestamp':{'date':get_now()[0], 'time':get_now()[1]}}
         with open(f'Data/Game Saves/{filename}.json','w') as f:
             json.dump(data,f)
 

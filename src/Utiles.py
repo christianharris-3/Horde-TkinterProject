@@ -1,4 +1,4 @@
-import math
+import math, datetime
 
 class Vec:
     def __init__(self, x=0, y=0):
@@ -314,3 +314,12 @@ class Coords:
     @staticmethod
     def world_to_pixel_coords(world_pos):
         return Vec(world_pos[0], world_pos[1])*Coords.scale_factor
+
+def get_now():
+    timestamp = datetime.datetime.now()
+    datelist = str(timestamp.date()).split('-')
+    datelist.reverse()
+    datestr = '/'.join(datelist)
+    timelist = str(timestamp.time()).split('.')[0].split(':')[:2]
+    timestr = str(int(timelist[0])%12)+':'+timelist[1]+['am','pm'][int(timelist[0])//12]
+    return datestr, timestr
