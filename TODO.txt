@@ -7,9 +7,9 @@ DONE - Marker for offscreen zombies
 DONE - Bullets collide with tilemap
 DONE - Wave Display
 DONE- Money/Score
-- Death screen
+DONE - Death screen
 - LeaderBoard
-- Save/Load gamestate
+DONE - Save/Load gamestate
 - Boss Key
 - Combo Display
 - Cheat Codes

@@ -108,3 +108,16 @@ class Demon_Zombie(Enemy):
         self.damage = 8
         self.knockback_resistance = 0.5
         self.coin_value = 3
+
+class Chonk_Zombie(Enemy):
+    def __init__(self, x, y):
+        self.image_path = 'Sprites/Chonk_Zombie.png'
+        self.radius = 0.6
+        super().__init__(x, y, self.image_path)
+        self.max_health = 32
+        self.health = self.max_health
+        self.radius = 0.6
+        self.move_acceleration = 0.0055
+        self.damage = 10
+        self.knockback_resistance = 0
+        self.coin_value = 8

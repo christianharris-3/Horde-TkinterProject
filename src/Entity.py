@@ -14,6 +14,7 @@ class Entity:
         self.move_drag = 0.9
         self.target_move = Vec()
         self.i_frames = -1
+        self.damage_taken = 0
 
         self.knockback_resistance = 0.5
 
@@ -61,7 +62,7 @@ class Entity:
                         if self.team == "Enemy" and e.team == "Player":
                             # Deal Damage to Player
                             dmg = self.damage
-                            kb = 0#self.knockback
+                            kb = 0
                             angle = math.atan2(e.y-self.y, e.x-self.x)
                             particles += e.take_hit(KB_Obj(kb, angle, dmg))
                             shake_camera(self.damage/100)
@@ -106,6 +107,7 @@ class Entity:
 
     def take_damage(self, damage):
         self.health -= damage
+        self.damage_taken += damage
 
     def get_dead(self):
         return self.health <= 0

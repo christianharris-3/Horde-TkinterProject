@@ -16,7 +16,7 @@ class WeaponData:
                     "Bullet_Speed": 0.6, "Shoot_CD": 0.1, "Semi_Auto": True, "Clip_Size": 20, "Reload_Time": 0.8,
                     "Spray_Count": 1, "Spread":0.08, "Speed_Ran":0.05, "Price": 25},
             "Shotgun": {"File": "Sprites/Shotgun.png", "Render_Size": 1.8, "Render_Distance": 1.3, "Projectile": Shotgun_Shell,
-                        "Bullet_Speed": 0.4, "Shoot_CD": 0.2, "Semi_Auto": False, "Clip_Size": 10, "Reload_Time": 1.5,
+                        "Bullet_Speed": 0.4, "Shoot_CD": 0.35, "Semi_Auto": False, "Clip_Size": 10, "Reload_Time": 1.5,
                         "Spray_Count": 8, "Spread":0.2, "Speed_Ran":0.1, "Price": 100},
             "LMG": {"File": "Sprites/LMG.png", "Render_Size": 2, "Render_Distance": 1.5, "Projectile": LMG_Bullet,
                     "Bullet_Speed": 0.65, "Shoot_CD": 0.06, "Semi_Auto": True, "Clip_Size": 30, "Reload_Time": 1.2,
@@ -296,6 +296,7 @@ class Player(Entity):
 
     def take_damage(self, damage):
         if self.i_frames <= 0:
+            self.damage_taken += damage
             if self.shield>damage:
                 self.shield-=damage
                 damage = 0

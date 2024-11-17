@@ -1,7 +1,8 @@
 import tkinter as tk
+from tkinter import ttk
 from PIL import Image, ImageTk
 from src.Player import WeaponData
-import json, os
+import json, os, random
 
 
 # class that fixes a bug when making lots of lambda functions in a loop
@@ -41,9 +42,13 @@ class Menus:
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, rely=0.5, y=-40, width=141, height=78, anchor=tk.CENTER)
 
+        tk.Button(self.frame, text='Load Save', command=lambda: self.set_menu("Load_Gamestate_Menu"),
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.5, rely=0.5, y=60, width=185, height=84, anchor=tk.CENTER)
+
         tk.Button(self.frame, text='Settings', command=lambda: self.set_menu("Settings"),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  ).place(relx=0.5, rely=0.5, y=60, width=178, height=84, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, y=160, width=178, height=84, anchor=tk.CENTER)
 
     def make_settings_menu(self):
         tk.Button(self.frame, text='Back', command=self.menu_back,
@@ -65,7 +70,7 @@ class Menus:
                       font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                       padx=0, pady=0).place(relx=0.53, x=10, y=130 + 65 * i, height=50, width=168, anchor=tk.W)
 
-    def make_pause_menu(self):
+    def make_pause_menu(self,gamefile):
         self.frame.configure(width=270, height=345, highlightbackground="darkgreen", highlightthickness=3)
         self.frame.lift()
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
@@ -76,7 +81,7 @@ class Menus:
         tk.Button(self.frame, text='Settings', width=12, command=lambda: self.set_menu("Settings"),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
                   pady=0).place(relx=0.5, y=100, anchor=tk.N)
-        tk.Button(self.frame, text='Save', width=10, command=lambda: self.menu_funcs["save_game"]('filename'),
+        tk.Button(self.frame, text='Save', width=10, command=lambda: self.set_menu("Save_Game_Menu",data=gamefile),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   padx=0, pady=0).place(relx=0.5, y=180, anchor=tk.N)
         tk.Button(self.frame, text='Exit To Main Menu', width=16, command=self.menu_funcs['end_game'],
@@ -177,6 +182,88 @@ class Menus:
                   font=(self.font, 16), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5,y=120,width=140,height=50,anchor=tk.N)
 
+    def make_save_gamestate_menu(self, gamefile):
+        self.frame.configure(width=400, height=185, highlightbackground="darkgreen", highlightthickness=3)
+        self.frame.lift()
+        self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        tk.Label(self.frame,text='Save Game',font=(self.font,25),  bg="darkolivegreen2",
+                 ).place(relx=0.5, y=5, anchor=tk.N)
+
+        name_entry = tk.Entry(self.frame, bg="darkolivegreen2", borderwidth=3, font=('arial',15))
+        name_entry.place(relx=0.5, x=-50,y=90, width=200, anchor=tk.W)
+        if gamefile:
+            name_entry.insert(0, gamefile)
+        else:
+            with open('Data/fruit_names.json','r') as f:
+                fruit = random.choice(json.load(f))
+            name_entry.insert(0, fruit)
+
+        tk.Label(self.frame, text='Save Name:' ,bg="darkolivegreen2", font=('arial', 15),
+                 ).place(relx=0.5,x=-50, y=90,  anchor=tk.E)
+
+        tk.Button(self.frame, text='Save', command=lambda: self.save_game(self.menu_funcs["game_object"],name_entry),
+                  font=(self.font, 16), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.5,y=120,width=140,height=50,anchor=tk.N)
+
+    def make_load_gamestate_menu(self):
+        tk.Button(self.frame, text='Back', command=self.menu_back,
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
+                  pady=0).place(x=10, y=10, anchor=tk.NW)
+
+        tk.Label(self.frame, text='Game Saves', font=(self.font, 30, "bold"), bg="darkolivegreen2",
+                 ).place(relx=0.5,y=5,anchor=tk.N)
+
+        gamestates = []
+        path = "Data/Game Saves/"
+        for filename in os.listdir(path):
+            with open("Data/Game Saves/"+filename,'r') as f:
+                gamestates.append(json.load(f))
+
+        style = ttk.Style()
+        style.theme_use("clam")
+        style.configure('Treeview.Heading',font=(self.font, 18), background='#060', relief="flat",
+                        borderwidth=0, fieldbackground='#060')
+        style.map('Treeview.Heading', background=[('selected', '#060')],
+                                      foreground=[('selected', '#grey9')])
+        style.configure('Treeview', font=(self.font, 16), rowheight=35, background="green", fieldbackground='darkolivegreen2',
+                        relief='flat',borderwidth=0, bd=0, highlightthickness=0)
+        style.map('Treeview', background=[('selected','green4')],
+                   foreground=[('selected','gray6')])
+        titles = [('Name', 400), ('Score', 150), ('Wave', 150)]
+
+        table = ttk.Treeview(self.frame, columns=[a[0] for a in titles], show='headings', style='Treeview', height=len(gamestates))
+
+        for i,t in enumerate(titles):
+            table.column(t[0], width=t[1], anchor='center')
+            table.heading(t[0], text=t[0])
+
+        for i,state in enumerate(gamestates):
+            if "filename" in state:
+                table.insert('','end',iid=i,values=[state["filename"],state["game_stats"]['Score'],
+                                        state["game_stats"]["Wave Reached"]])
+        table.place(relx=0.5,y=90,anchor=tk.N)
+
+        tk.Button(self.frame, text='Load', command=lambda: self.load_gamestate(table),
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
+                  pady=0).place(relx=0.5, x=450, y=140, anchor=tk.CENTER)
+
+        tk.Button(self.frame, text='Delete', command=lambda: self.delete_gamestate(table),
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
+                  pady=0).place(relx=0.5, x=450, y=240, anchor=tk.CENTER)
+
+    def load_gamestate(self,table):
+        selection = table.selection()
+        if selection != ():
+            self.menu_funcs['start_game'](table.item(selection)["values"][0])
+
+    def delete_gamestate(self,table):
+        selection = table.selection()
+        path = "\\Data\\Game Saves\\"
+        if selection != ():
+            os.remove(os.path.abspath('')+path+table.item(selection)["values"][0]+'.json')
+            self.set_menu('Load_Gamestate_Menu',False)
+
     def save_score(self, game_stats, name_entry):
         game_stats["Username"] = name_entry.get()
         data = [game_stats]
@@ -189,6 +276,10 @@ class Menus:
             json.dump(data,f)
 
         self.menu_funcs["end_game"]()
+
+    def save_game(self, game, name_entry):
+        game.save_game(name_entry.get())
+        self.menu_back()
 
     def set_weapon(self,player_func,new_weapon,shop_data):
         player_func(new_weapon)
@@ -249,19 +340,24 @@ class Menus:
         self.active_menu = menu
         if self.active_menu != "Game":
             if self.active_menu == "Pause_Screen":
-                self.make_pause_menu()
+                self.make_pause_menu(data)
             elif self.active_menu == "Shop_Menu":
                 self.make_shop_menu(data)
             elif self.active_menu == "Death_Screen":
                 self.make_death_screen(data)
             elif self.active_menu == "Score_Entry_Menu":
                 self.make_score_entry_menu(data)
+            elif self.active_menu == "Save_Game_Menu":
+                self.make_save_gamestate_menu(data)
             else:
-                self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2")
+                self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2",
+                                     highlightthickness=0)
                 if self.active_menu == "Start_Screen":
                     self.make_start_screen()
                 elif self.active_menu == "Settings":
                     self.make_settings_menu()
+                elif self.active_menu == "Load_Gamestate_Menu":
+                    self.make_load_gamestate_menu()
 
         else:
             self.frame.lower()

@@ -1,7 +1,7 @@
 import tkinter as tk
 from PIL import ImageTk, Image, ImageDraw, ImageFont
 from src.Player import Player
-from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie
+from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie, Chonk_Zombie
 from src.TileMap import Tilemap
 from src.Utiles import Coords, Vec, RectHitbox
 from src.Projectiles import Grenade
@@ -26,13 +26,23 @@ class ZombieWaves:
                                             {'Num': 1, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.8, 'Spawn_Slower': 0.3},
             {'Title': 'Wave 9', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 15, 'Class': Big_Zombie},
                                             {'Num': 4, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.6, 'Spawn_Slower': 0.2},
-            {'Title': 'Boss Wave', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
+            {'Title': 'Wave 10', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
                                                {'Num': 10, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.5, 'Spawn_Slower': 0.1},
+            {'Title': 'Wave 11', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 10, 'Class': Big_Zombie},
+                                             {'Num': 15, 'Class': Demon_Zombie}, {'Num': 3, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.4, 'Spawn_Slower': 0.1},
+            {'Title': 'Wave 12', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
+                                             {'Num': 30, 'Class': Demon_Zombie}, {'Num': 10, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.3, 'Spawn_Slower': 0.1},
+            {'Title': 'Wave 13', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 30, 'Class': Big_Zombie},
+                                             {'Num': 40, 'Class': Demon_Zombie}, {'Num': 20, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.2, 'Spawn_Slower': 0.05},
+            {'Title': 'Wave 14', 'Zombies': [{'Num': 30, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
+                                             {'Num': 45, 'Class': Demon_Zombie}, {'Num': 30, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.1, 'Spawn_Slower': 0},
+            {'Title': 'Wave 15', 'Zombies': [{'Num': 80, 'Class': Fast_Zombie}, {'Num': 40, 'Class': Big_Zombie},
+                                             {'Num': 100, 'Class': Demon_Zombie}, {'Num': 40, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.05, 'Spawn_Slower': 0},
             ]
 
 
 class Game:
-    def __init__(self, window, inp, screen_width, screen_height, control_map, menus, font):
+    def __init__(self, window, inp, screen_width, screen_height, control_map, menus, font, gamefile):
         self.window = window
         self.inp = inp
         self.menus = menus
@@ -58,7 +68,7 @@ class Game:
         self.shop_data = {'Owned_Guns': ['Pistol'],
                           'Temp_Upgrades': {'Heal': -1, 'Shield': 0, 'Grenade': 0, 'Force Push': 0},
                           'Player_Object': self.player,
-                          'Coins': 1000}
+                          'Coins': 0}
         self.game_stats = {'Zombie Kills': 0,
                            'Coins Earned': 0,
                            'Score': 0,
@@ -66,7 +76,8 @@ class Game:
                            'Rounds Fired': 0,
                            'Grenades Thrown': 0,
                            'Force Pushes Used': 0,
-                           'Damage Dealt': 0}
+                           'Damage Dealt': 0,
+                           'Damage Taken': 0}
 
         self.wave_index = 0
         self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
@@ -97,16 +108,20 @@ class Game:
         self.fps = 0
         self.window.bind('<F3>', self.toggle_debug)
 
-        self.load_game('filename')
+        self.gamefile = gamefile
+        if gamefile:
+            self.load_game(gamefile)
 
     def load_game(self, filename):
         game_data = Load.load(filename, self.control_map, self.screen_width, self.screen_height)
         if game_data:
-            self.player, self.enemies, self.tilemap, self.projectiles, self.particles, self.shop_data, self.game_stats, self.camera_pos = game_data
+            self.player, self.enemies, self.tilemap, self.projectiles, self.particles, self.shop_data, self.game_stats, self.camera_pos, wave_data = game_data
+            self.set_wave([a["Title"] for a in ZombieWaves.data].index(self.game_stats["Wave Reached"]))
+            self.wave_data = wave_data
     def save_game(self, filename):
-        print('saving',filename)
         Save.save(filename, self.player, self.enemies, self.tilemap, self.projectiles,
-                  self.particles, self.shop_data, self.game_stats, self.camera_pos)
+                  self.particles, self.shop_data, self.game_stats, self.camera_pos,
+                  self.wave_data)
 
     def gameloop(self, delta_time):
         self.fps = 60 / delta_time
@@ -115,6 +130,7 @@ class Game:
         self.generate_enemies(delta_time)
         self.wave_manager()
         self.get_collision_hash()
+
 
         # Player Physics and Input control
         open_shop = False
@@ -127,6 +143,7 @@ class Game:
             self.particles += new_particles
             self.player.physics(delta_time, self.tilemap.collision_hash)
             self.player.manage_time(delta_time)
+            self.game_stats["Damage Taken"] = self.player.damage_taken
             if self.player.get_dead():
                 self.player_dead = True
                 for e in self.enemies:
@@ -319,13 +336,17 @@ class Game:
             if self.wave_index >= len(ZombieWaves.data):
                 print('you beat every wave well done')
             else:
-                self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
-                self.wave_title_timer = 2
-                self.zombie_spawn_timer = 0
-                self.zombies_left = -1
-                self.zombies_in_wave = sum([a["Num"] for a in self.wave_data['Zombies']])
-                self.zombies_killed_in_wave = 0
-                self.game_stats["Wave Reached"] = self.wave_data["Title"]
+                self.set_wave(self.wave_index)
+
+    def set_wave(self,wave_index):
+        self.wave_index = wave_index
+        self.wave_data = copy.deepcopy(ZombieWaves.data[wave_index])
+        self.wave_title_timer = 2
+        self.zombie_spawn_timer = 0
+        self.zombies_left = -1
+        self.zombies_in_wave = sum([a["Num"] for a in self.wave_data['Zombies']])
+        self.zombies_killed_in_wave = 0
+        self.game_stats["Wave Reached"] = self.wave_data["Title"]
 
 
     def shake_camera(self, amplitude=0.1):

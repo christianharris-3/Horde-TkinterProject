@@ -83,12 +83,13 @@ class Main:
             if self.game_active:
                 self.game.window_resize(self.window_width,self.window_height)
 
-    def start_game(self):
+    def start_game(self, gamefile=None):
         self.game_paused = False
         self.game_active = True
         self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map, self.menus,
-                         self.font)
+                         self.font, gamefile)
         self.menus.menu_funcs["save_game"] = self.game.save_game
+        self.menus.menu_funcs["game_object"] = self.game
         TC.game_looper(self.game_loop, self.window)
 
 
@@ -104,10 +105,9 @@ class Main:
             self.pause_button_down = True
             self.game_paused = not self.game_paused
             if self.game_paused:
-                self.menus.set_menu("Pause_Screen")
+                self.menus.set_menu("Pause_Screen",data=self.game.gamefile)
             else:
                 self.menus.set_menu("Game")
-
 
 
 if __name__ == "__main__":

@@ -28,14 +28,14 @@ class Save:
                          Force_Push_Effect: "Force_Push_Effect"}
 
     @staticmethod
-    def save(filename, player,enemies,tilemap,projectiles,particles,shop_data,game_stats, camera_pos):
+    def save(filename, player,enemies,tilemap,projectiles,particles,shop_data,game_stats, camera_pos, wave_data):
         shop_data = copy.copy(shop_data)
         shop_data["Player_Object"] = None
         data = {"player":Save.player(player),"enemies":[Save.entity(e) for e in enemies],
                 "game_stats":game_stats,"shop_data":shop_data, "projectiles":[Save.particle(e) for e in projectiles],
                 "particles":[Save.particle(e) for e in particles],"tilemap":Save.tilemap(tilemap),
-                "camera_pos":camera_pos.tuple()}
-        with open(f'Data/{filename}.json','w') as f:
+                "camera_pos":camera_pos.tuple(), "filename":filename, "wave_data":Save.wave_data(wave_data)}
+        with open(f'Data/Game Saves/{filename}.json','w') as f:
             json.dump(data,f)
 
     @staticmethod
@@ -60,12 +60,21 @@ class Save:
     def tilemap(e):
         return {"map_name":e.map_name}
 
+    @staticmethod
+    def wave_data(dat):
+        dat = copy.copy(dat)
+        new_zombies = []
+        for a in range(len(dat["Zombies"])):
+            new_zombies.append({'Num':dat["Zombies"][a]["Num"],
+                                'Class':Save.entity_type_map[dat["Zombies"][a]["Class"]]})
+        dat["Zombies"] = new_zombies
+        return dat
 
 
 class Load:
     @staticmethod
     def load(filename,control_map, screen_width, screen_height):
-        filepath = f'Data/{filename}.json'
+        filepath = f'Data/Game Saves/{filename}.json'
         if os.path.isfile(filepath):
             with open(filepath,'r') as f:
                 data = json.load(f)
@@ -81,7 +90,8 @@ class Load:
         particles = [Load.particle(e) for e in data["particles"]]
         tilemap = Load.tilemap(data["tilemap"])
         camera_pos = Vec(*data["camera_pos"])
-        return player,enemies,tilemap,projectiles,particles,shop_data,game_stats,camera_pos
+        wave_data = Load.wave_data(data["wave_data"])
+        return player,enemies,tilemap,projectiles,particles,shop_data,game_stats,camera_pos,wave_data
 
 
     @staticmethod
@@ -134,3 +144,11 @@ class Load:
         tilemap = Tilemap()
         tilemap.load_map(data["map_name"])
         return tilemap
+
+    @staticmethod
+    def wave_data(data):
+        for a in data["Zombies"]:
+            for typ in Save.entity_type_map:
+                if Save.entity_type_map[typ] == a["Class"]:
+                    a["Class"] = typ
+        return data
