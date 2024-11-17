@@ -84,8 +84,11 @@ class Menus:
             func = funcer(self.start_key_listener, action=action, button=key)
             key.configure(command=func.func)
             func = funcer(self.reset_keybind, action=action)
+            reset_color = 'green'
+            if self.control_map[action]['Key'] != self.control_map_defaults[action]['Key']:
+                reset_color = 'green3'
             tk.Button(self.frame, text='Reset Keybind', command=func.func,
-                      font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                      font=(self.font, 15), bg=reset_color, relief=tk.GROOVE, bd=4, activebackground="green4",
                       padx=0, pady=0).place(relx=0.53, x=10, y=130 + 65 * i, height=50, width=168, anchor=tk.W)
 
     def make_pause_menu(self,gamefile):
@@ -389,12 +392,16 @@ class Menus:
                 self.control_map[self.listening_remap_action]["Key"] = event.keysym
             elif event.num != '??':
                 self.control_map[self.listening_remap_action]["Key"] = event.num
+            with open('Data/control_map.json','w') as f:
+                json.dump(self.control_map,f)
             self.inp.refresh_binding()
             self.set_menu("Settings",False)
             self.listening_remap_action = None
 
     def reset_keybind(self, action):
         self.control_map[action]["Key"] = self.control_map_defaults[action]["Key"]
+        with open('Data/control_map.json', 'w') as f:
+            json.dump(self.control_map, f)
         self.set_menu("Settings",False)
 
     def set_menu(self, menu, add_to_prev_menu=True,data=None):

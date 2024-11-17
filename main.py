@@ -2,7 +2,7 @@ import tkinter as tk
 import src.TkinterController as TC
 from src.Game import Game
 from src.Menus import Menus
-import copy,time
+import copy,time,os,json
 
 #tkinter color list
 #https://www.plus2net.com/python/tkinter-colors.php
@@ -26,7 +26,7 @@ class Main:
                                      'Grenade': {'Key': 3, 'continuous': False},
                                      'Force Push': {'Key': 'space', 'continuous': False},
                                      'Pause': {'Key': 'Escape', 'continuous': False}}
-        self.control_map = copy.deepcopy(self.control_map_defaults)
+        self.load_control_map()
 
         self.game_paused = False
         self.pause_button_down = False
@@ -108,6 +108,15 @@ class Main:
                 self.menus.set_menu("Pause_Screen",data=self.game.gamefile)
             else:
                 self.menus.set_menu("Game")
+
+    def load_control_map(self):
+        if os.path.exists('Data/control_map.json'):
+            with open('Data/control_map.json','r') as f:
+                self.control_map = json.load(f)
+        else:
+            self.control_map = copy.deepcopy(self.control_map_defaults)
+            with open('Data/control_map.json','w') as f:
+                json.dump(self.control_map,f)
 
 
 if __name__ == "__main__":
