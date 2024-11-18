@@ -169,8 +169,8 @@ class Menus:
                           ).place(x=x_pos, y=195, width=100, height=50, anchor=tk.N)
 
         ## Temp Upgrades
-        temp_upgrades = [{'Name':'Heal','Func':Menus.buy_heal,'Counter':-1,'Price':10},
-                         {'Name':'Shield','Func':Menus.buy_shield,'Counter':1, 'Price':20},
+        temp_upgrades = [{'Name':'Heal','Func':self.buy_heal,'Counter':-1,'Price':10},
+                         {'Name':'Shield','Func':self.buy_shield,'Counter':1, 'Price':20},
                          {'Name': 'Force Push', 'Func': self.buy_forcepush, 'Counter': 10, 'Price': 5},
                          {'Name': 'Grenade', 'Func': self.buy_grenade,'Counter':10, 'Price':8}]
         for i,upgrade in enumerate(temp_upgrades):
@@ -448,26 +448,29 @@ class Menus:
             shop_data['Owned_Guns'].append(new_weapon)
             self.set_weapon(player_func,new_weapon,shop_data)
 
-    @staticmethod
-    def buy_heal(price,shop_data,counter):
+    def buy_heal(self,price,shop_data,counter):
         if shop_data['Coins']>=price and shop_data["Player_Object"].health < shop_data["Player_Object"].max_health:
             shop_data['Coins'] -= price
             shop_data["Player_Object"].health = shop_data["Player_Object"].max_health
+            self.set_menu('Shop_Menu', False, shop_data)
 
-    @staticmethod
-    def buy_shield(price,shop_data,counter):
+    def buy_shield(self,price,shop_data,counter):
         if shop_data['Coins'] >= price and shop_data["Player_Object"].shield < shop_data["Player_Object"].max_health:
             shop_data['Coins'] -= price
             shop_data["Player_Object"].shield = shop_data["Player_Object"].max_health
+            self.set_menu('Shop_Menu', False, shop_data)
 
     def buy_grenade(self,price,shop_data,counter):
         if shop_data['Coins'] >= price and shop_data["Temp_Upgrades"]["Grenade"] < counter:
             shop_data['Coins'] -= price
             shop_data["Temp_Upgrades"]["Grenade"] += 1
+            self.set_menu('Shop_Menu', False, shop_data)
+
     def buy_forcepush(self,price,shop_data,counter):
         if shop_data['Coins'] >= price and shop_data["Temp_Upgrades"]["Force Push"] < counter:
             shop_data['Coins'] -= price
             shop_data["Temp_Upgrades"]["Force Push"] += 1
+            self.set_menu('Shop_Menu', False, shop_data)
 
     def start_key_listener(self, action, button):
         if self.listening_remap_action is None:
