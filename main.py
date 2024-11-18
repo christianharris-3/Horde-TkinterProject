@@ -4,6 +4,7 @@ import src.TkinterController as TC
 from src.Game import Game
 from src.Menus import Menus
 import copy,time,os,json
+import webbrowser
 
 #tkinter color list
 #https://www.plus2net.com/python/tkinter-colors.php
@@ -45,6 +46,9 @@ class Main:
                        'end_game':self.end_game}
         self.menus = Menus(self.window, self.input, self.window_width, self.window_height, menu_funcs,
                            self.control_map, self.control_map_defaults, self.font)
+
+        self.window.bind('<Return>',self.boss_key)
+        self.boss_key_active = False
 
         # this thing messes up everything so hard for no reason
         # self.window.bind('<Configure>', self.window_resize)
@@ -118,6 +122,17 @@ class Main:
                 self.menus.set_menu("Pause_Screen",data=self.game.gamefile)
             else:
                 self.menus.set_menu("Game")
+
+    def boss_key(self,event):
+        self.boss_key_active = not self.boss_key_active
+        if self.boss_key_active:
+            self.window.geometry('1x1')
+            self.window.iconify()
+            webbrowser.open('https://en.wikipedia.org/wiki/Boss_key')
+            if self.game_active:
+                self.pause()
+        else:
+            self.window.geometry(f'{self.window_width}x{self.window_height}')
 
     def load_control_map(self):
         if os.path.exists('Data/control_map.json'):
