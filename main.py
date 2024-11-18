@@ -61,6 +61,7 @@ class Main:
             return True
         else:
             if not self.game_paused:
+                # Run main gameloop when not paused
                 done = False
                 player_died, open_shop = self.game.gameloop(delta_time)
                 if player_died:
@@ -70,6 +71,17 @@ class Main:
                     self.menus.set_menu("Shop_Menu",data=self.game.shop_data)
             else:
                 done = False
+
+                ## Code to shut shop with same key that opens it
+                if self.input.get_pressed(self.control_map["Shop"]["Key"]):
+                    if self.menus.active_menu == 'Shop_Menu' and not(self.control_map["Shop"]["Key"] in self.game.player.buttons_down):
+                        self.pause()
+                        self.game.player.buttons_down.append(self.control_map["Shop"]["Key"])
+                else:
+                    try:
+                        self.game.player.buttons_down.remove(self.control_map["Shop"]["Key"])
+                    except:
+                        pass
             if done:
                 self.end_game()
             else:

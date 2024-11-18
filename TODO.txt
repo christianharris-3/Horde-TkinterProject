@@ -13,6 +13,7 @@ DONE - LeaderBoard
 DONE - Save/Load gamestate
 DONE - Boss Key
 - Combo Display
+- x button for shop and way to display if item can be bought
 
 DONE - Cheat Codes
 DONE -- imortality

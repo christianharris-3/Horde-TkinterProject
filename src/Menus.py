@@ -121,11 +121,20 @@ class Menus:
                       padx=0, pady=0).place(relx=0.5, y=340, anchor=tk.N)
 
     def make_shop_menu(self,shop_data):
-        self.frame.configure(width=500, height=319, highlightbackground="darkgreen", highlightthickness=3)
+        self.frame.configure(width=500, height=375, highlightbackground="darkgreen", highlightthickness=3)
         self.frame.lift()
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         self.image_storer = []
         player = shop_data["Player_Object"]
+
+        ## title/coins/exit button
+        tk.Label(self.frame,text='Shop',font=(self.font, 24, "bold"),bg="darkolivegreen2"
+                 ).place(relx=0.5,anchor=tk.N)
+        tk.Button(self.frame, text='Done', font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4,
+                  activebackground="green4", command=self.menu_funcs['pause'],
+                  ).place(relx=1,x=-10, y=10, anchor=tk.NE, height=50, width=100)
+        tk.Label(self.frame,text=f'Coins: {shop_data["Coins"]}',font=(self.font, 20),bg="darkolivegreen2"
+                 ).place(x=10,y=10, anchor=tk.NW)
 
         ## Weapon Shop
         for i,weapon in enumerate(WeaponData.data):
@@ -139,18 +148,25 @@ class Menus:
             else:
                 label_font = (self.font,13)
             tk.Label(self.frame, text=weapon, image=self.image_storer[-1],compound="top",highlightbackground="darkgreen", highlightthickness=3,
-                      bg="darkolivegreen2",width=100,height=151,font=label_font,anchor=tk.N,pady=10).place(x=x_pos,y=10,anchor=tk.N)
+                      bg="darkolivegreen2",width=100,height=151,font=label_font,anchor=tk.N,pady=10).place(x=x_pos,y=70,anchor=tk.N)
             if not(weapon in shop_data['Owned_Guns']):
                 func = funcer(self.buy_weapon, player_func=player.set_weapon, new_weapon=weapon, shop_data=shop_data,
                               price=WeaponData.data[weapon]["Price"])
+                if WeaponData.data[weapon]["Price"] <= shop_data["Coins"]:
+                    col = 'green'
+                    state = 'active'
+                else:
+                    col = '#484'
+                    state = 'disabled'
                 tk.Button(self.frame, text=f'Buy: {WeaponData.data[weapon]["Price"]}', command=func.func,
-                          font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                          ).place(x=x_pos,y=135,width=100,height=50,anchor=tk.N)
+                          font=(self.font, 14), bg=col, relief=tk.GROOVE, bd=4, activebackground="green4",state=state,
+                          disabledforeground='#333'
+                          ).place(x=x_pos,y=195,width=100,height=50,anchor=tk.N)
             else:
                 func = funcer(self.set_weapon,player_func=player.set_weapon,new_weapon=weapon,shop_data=shop_data)
                 tk.Button(self.frame, text='Equip', command=func.func,
                           font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                          ).place(x=x_pos, y=135, width=100, height=50, anchor=tk.N)
+                          ).place(x=x_pos, y=195, width=100, height=50, anchor=tk.N)
 
         ## Temp Upgrades
         temp_upgrades = [{'Name':'Heal','Func':Menus.buy_heal,'Counter':-1,'Price':10},
@@ -161,12 +177,19 @@ class Menus:
             x_pos = i*120+70
             tk.Label(self.frame, text=upgrade['Name'],highlightbackground="darkgreen", highlightthickness=3,
                       bg="darkolivegreen2",font=(self.font,14),anchor=tk.N,pady=0
-                     ).place(x=x_pos,y=200,width=112,height=96,anchor=tk.N)
+                     ).place(x=x_pos,y=260,width=112,height=96,anchor=tk.N)
             func = funcer(upgrade['Func'],price=upgrade["Price"],shop_data=shop_data,counter=upgrade["Counter"])
             txt = f'Buy: {upgrade["Price"]}'
-            tk.Button(self.frame, text=txt, command=func.func,
-                      font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                      ).place(x=x_pos, y=240, width=100, height=50, anchor=tk.N)
+            if upgrade["Price"]<=shop_data["Coins"]:
+                col = 'green'
+                state = 'active'
+            else:
+                col = '#484'
+                state = 'disabled'
+            tk.Button(self.frame, text=txt, command=func.func, disabledforeground='#333',
+                      font=(self.font, 14), bg=col, relief=tk.GROOVE, bd=4, activebackground="green4",state=state,
+                      ).place(x=x_pos, y=300, width=100, height=50, anchor=tk.N)
+
 
     def make_death_screen(self,game_stats):
         self.frame.configure(width=400, height=530, highlightbackground="darkgreen", highlightthickness=3)
@@ -302,7 +325,7 @@ class Menus:
 
         self.score_info_display = tk.Frame(self.frame, highlightbackground="darkgreen", highlightthickness=3,
                                            background='darkolivegreen2')
-        self.score_info_display.place(relx=0.5,x=230,y=90,width=270,height=370,anchor=tk.NW)
+        self.score_info_display.place(relx=0.5,x=230,y=90,width=270,height=420,anchor=tk.NW)
 
 
         self.leaderboard_table.bind('<1>',self.detect_selected_leaderboard_entry)
@@ -327,7 +350,6 @@ class Menus:
             toggle.configure(command=func.func)
             if cheat_info[t.lower()]:
                 toggle.select()
-
 
         self.cheat_info = cheat_info
         sliders = [{'title':'Damage\nMultiplier','key':'damage multiplier','from':1,'to':32,'res':1,'func':self.move_slider_damage},
@@ -360,7 +382,8 @@ class Menus:
         if self.leaderboard_table.selection() != ():
             for widget in self.score_info_display.winfo_children():
                 widget.destroy()
-            data = self.leaderboard_data[int(self.leaderboard_table.selection()[0])]
+            index = int(self.leaderboard_table.selection()[0])
+            data = self.leaderboard_data[index]
 
             tk.Label(self.score_info_display,text=data["Username"],font=(self.font,17), bg="darkolivegreen2"
                      ).place(relx=0.5,y=5,anchor=tk.N)
@@ -371,6 +394,15 @@ class Menus:
                 if d == "Damage Dealt": txt = f'{d}: {int(data[d])}'
                 tk.Label(self.score_info_display,text=txt,font=(self.font,13), bg="darkolivegreen2"
                          ).place(x=20,y=50+i*30,anchor=tk.NW)
+
+            tk.Button(self.score_info_display,text='Delete',font=(self.font,17), background='red',
+                      activebackground='red4', command=lambda: self.delete_leaderboard_item(index),
+                      ).place(relx=0.5,y=360,anchor=tk.N,width=100,height=40)
+    def delete_leaderboard_item(self,index):
+        del self.leaderboard_data[index]
+        with open('Data/player_scores.json', 'w') as f:
+            json.dump(self.leaderboard_data,f)
+        self.set_menu("Leaderboard_Menu",False)
 
     def load_gamestate(self,table):
         selection = table.selection()
