@@ -123,8 +123,8 @@ class Main:
                 self.menus.set_menu("Pause_Screen",data=self.game.gamefile)
             else:
                 self.menus.set_menu("Game")
-z`
-    def boss_key(self,event):
+
+    def boss_key(self,_):
         self.boss_key_active = not self.boss_key_active
         if self.boss_key_active:
             webbrowser.open('https://en.wikipedia.org/wiki/Boss_key')

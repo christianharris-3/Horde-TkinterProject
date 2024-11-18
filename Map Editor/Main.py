@@ -23,6 +23,17 @@ while not done:
             done = True 
         if event.type == pygame.VIDEORESIZE:
             game.resize()
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_TAB:
+                game.table_move_input([0,1])
+            elif event.key == pygame.K_DOWN:
+                game.table_move_input([0,1])
+            elif event.key == pygame.K_UP:
+                game.table_move_input([0,-1])
+            elif event.key == pygame.K_LEFT:
+                game.table_move_input([-1,0])
+            elif event.key == pygame.K_RIGHT:
+                game.table_move_input([1,0])
     game.game_tick(screen)
     
     ui.rendergui(screen)

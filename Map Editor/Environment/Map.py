@@ -206,7 +206,7 @@ class Map:
             self.entity_data = dat['entities']
         else:
             grid = info
-        self.tilemap = TileMap(grid,self.cell_size,pos[0],pos[1])
+        self.tilemap = TileMap(grid,self.cell_size,pos[0]*64,pos[1]*64)
 
 
 

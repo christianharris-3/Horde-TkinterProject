@@ -28,6 +28,7 @@ class Menus:
         self.frame.place(relx=0.5,rely=0.5,anchor=tk.CENTER)
         self.active_menu = ''
         self.prev_menu = []
+        self.set_menu_data_cache = []
         self.set_menu('Start_Screen')
 
         self.listening_remap_action = None
@@ -96,7 +97,9 @@ class Menus:
                       padx=0, pady=0).place(relx=0.53, x=10, y=130 + 65 * i, height=50, width=168, anchor=tk.W)
 
     def make_pause_menu(self,gamefile):
-        self.frame.configure(width=270, height=345, highlightbackground="darkgreen", highlightthickness=3)
+        save_and_quit = os.path.exists(os.path.abspath(f'Data/Game Saves/{gamefile}.json'))
+
+        self.frame.configure(width=270, height=345+80*save_and_quit, highlightbackground="darkgreen", highlightthickness=3)
         self.frame.lift()
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
@@ -112,6 +115,10 @@ class Menus:
         tk.Button(self.frame, text='Exit To Main Menu', width=16, command=self.menu_funcs['end_game'],
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   padx=0, pady=0).place(relx=0.5, y=260, anchor=tk.N)
+        if save_and_quit:
+            tk.Button(self.frame, text='Save and Exit', width=14, command=self.save_and_quit,
+                      font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                      padx=0, pady=0).place(relx=0.5, y=340, anchor=tk.N)
 
     def make_shop_menu(self,shop_data):
         self.frame.configure(width=500, height=319, highlightbackground="darkgreen", highlightthickness=3)
@@ -219,12 +226,6 @@ class Menus:
         name_entry.place(relx=0.5, x=-50,y=90, width=200, anchor=tk.W)
         if gamefile:
             name_entry.insert(0, gamefile)
-        else:
-            # fruit names source
-            # https://www.goodgoodgood.co/articles/list-of-fruits
-            with open('Data/fruit_names.json','r') as f:
-                fruit = random.choice(json.load(f))
-            name_entry.insert(0, fruit)
 
         tk.Label(self.frame, text='Save Name:' ,bg="darkolivegreen2", font=('arial', 15),
                  ).place(relx=0.5,x=-50, y=90,  anchor=tk.E)
@@ -246,6 +247,7 @@ class Menus:
         for filename in os.listdir(path):
             with open("Data/Game Saves/"+filename,'r') as f:
                 gamestates.append(json.load(f))
+        gamestates.sort(reverse=True,key=lambda x: x["save_timestamp"]["unix_time"])
 
         titles = [('Name', 400), ('Date', 150), ('Time', 140), ('Score', 130), ('Wave', 130)]
 
@@ -399,7 +401,11 @@ class Menus:
 
     def save_game(self, game, name_entry):
         game.save_game(name_entry.get())
-        self.menu_back()
+        self.window.after(1,self.menu_back)
+
+    def save_and_quit(self):
+        self.menu_funcs["game_object"].save_game()
+        self.menu_funcs['end_game']()
 
     def set_weapon(self,player_func,new_weapon,shop_data):
         player_func(new_weapon)
@@ -461,6 +467,7 @@ class Menus:
             widget.destroy()
         if add_to_prev_menu:
             self.prev_menu.append(self.active_menu)
+            self.set_menu_data_cache.append(data)
         self.active_menu = menu
         if self.active_menu != "Game":
             if self.active_menu == "Pause_Screen":
@@ -491,7 +498,8 @@ class Menus:
             self.frame.lower()
 
     def menu_back(self):
-        self.set_menu(self.prev_menu.pop(-1), False)
+        del self.set_menu_data_cache[-1]
+        self.set_menu(self.prev_menu.pop(-1), False, data = self.set_menu_data_cache.pop(-1))
 
     def start_game(self):
         self.set_menu("Game")

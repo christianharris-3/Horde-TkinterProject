@@ -4,7 +4,7 @@ from src.TileMap import Tilemap
 from src.Projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
 from src.Particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect
 from src.Utiles import Vec, get_now
-import json, copy, os
+import json, copy, os, time
 
 ### Player
 ### Shop data
@@ -37,7 +37,7 @@ class Save:
                 "game_stats":game_stats,"shop_data":shop_data, "projectiles":[Save.particle(e) for e in projectiles],
                 "particles":[Save.particle(e) for e in particles],"tilemap":Save.tilemap(tilemap),
                 "camera_pos":camera_pos.tuple(), "filename":filename, "wave_data":Save.wave_data(wave_data),
-                'save_timestamp':{'date':get_now()[0], 'time':get_now()[1]},'cheat_info':cheat_info}
+                'save_timestamp':{'date':get_now()[0], 'time':get_now()[1], 'unix_time':time.time()},'cheat_info':cheat_info}
         with open(f'Data/Game Saves/{filename}.json','w') as f:
             json.dump(data,f)
 
@@ -145,8 +145,7 @@ class Load:
 
     @staticmethod
     def tilemap(data):
-        tilemap = Tilemap()
-        tilemap.load_map(data["map_name"])
+        tilemap = Tilemap(data["map_name"])
         return tilemap
 
     @staticmethod

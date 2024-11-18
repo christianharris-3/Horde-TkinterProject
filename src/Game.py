@@ -6,39 +6,39 @@ from src.TileMap import Tilemap
 from src.Utiles import Coords, Vec, RectHitbox
 from src.Projectiles import Grenade
 from src.SaveLoad import Save, Load
-import random, math, copy
+import random, math, copy, json
 
 
-class ZombieWaves:
-    data = [{'Title': 'Wave 1', 'Zombies': [{'Num': 4, 'Class': Slow_Zombie}], 'Spawn_Rate': 4, 'Spawn_Slower': 0.5},
-            {'Title': 'Wave 2', 'Zombies': [{'Num': 8, 'Class': Slow_Zombie}], 'Spawn_Rate': 3.5, 'Spawn_Slower': 0.5},
-            {'Title': 'Wave 3', 'Zombies': [{'Num': 5, 'Class': Slow_Zombie}, {'Num': 3, 'Class': Fast_Zombie}],
-             'Spawn_Rate': 3, 'Spawn_Slower': 0.5},
-            {'Title': 'Wave 4', 'Zombies': [{'Num': 10, 'Class': Slow_Zombie}, {'Num': 6, 'Class': Fast_Zombie}],
-             'Spawn_Rate': 2, 'Spawn_Slower': 0.5},
-            {'Title': 'Wave 5', 'Zombies': [{'Num': 6, 'Class': Slow_Zombie}, {'Num': 10, 'Class': Fast_Zombie}],
-             'Spawn_Rate': 1.5, 'Spawn_Slower': 0.5},
-            {'Title': 'Wave 6', 'Zombies': [{'Num': 4, 'Class': Slow_Zombie}, {'Num': 10, 'Class': Fast_Zombie},
-                                            {'Num': 3, 'Class': Big_Zombie}], 'Spawn_Rate': 1, 'Spawn_Slower': 0.5},
-            {'Title': 'Wave 7', 'Zombies': [{'Num': 2, 'Class': Slow_Zombie}, {'Num': 12, 'Class': Fast_Zombie},
-                                            {'Num': 8, 'Class': Big_Zombie}], 'Spawn_Rate': 1, 'Spawn_Slower': 0.4},
-            {'Title': 'Wave 8', 'Zombies': [{'Num': 12, 'Class': Fast_Zombie}, {'Num': 12, 'Class': Big_Zombie},
-                                            {'Num': 1, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.8, 'Spawn_Slower': 0.3},
-            {'Title': 'Wave 9', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 15, 'Class': Big_Zombie},
-                                            {'Num': 4, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.6, 'Spawn_Slower': 0.2},
-            {'Title': 'Wave 10', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
-                                               {'Num': 10, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.5, 'Spawn_Slower': 0.1},
-            {'Title': 'Wave 11', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 10, 'Class': Big_Zombie},
-                                             {'Num': 15, 'Class': Demon_Zombie}, {'Num': 3, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.4, 'Spawn_Slower': 0.1},
-            {'Title': 'Wave 12', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
-                                             {'Num': 30, 'Class': Demon_Zombie}, {'Num': 10, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.3, 'Spawn_Slower': 0.1},
-            {'Title': 'Wave 13', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 30, 'Class': Big_Zombie},
-                                             {'Num': 40, 'Class': Demon_Zombie}, {'Num': 20, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.2, 'Spawn_Slower': 0.05},
-            {'Title': 'Wave 14', 'Zombies': [{'Num': 30, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
-                                             {'Num': 45, 'Class': Demon_Zombie}, {'Num': 30, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.1, 'Spawn_Slower': 0},
-            {'Title': 'Wave 15', 'Zombies': [{'Num': 80, 'Class': Fast_Zombie}, {'Num': 40, 'Class': Big_Zombie},
-                                             {'Num': 100, 'Class': Demon_Zombie}, {'Num': 40, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.05, 'Spawn_Slower': 0},
-            ]
+# class ZombieWaves:
+#     data = [{'Title': 'Wave 1', 'Zombies': [{'Num': 4, 'Class': Slow_Zombie}], 'Spawn_Rate': 4, 'Spawn_Slower': 0.5},
+#             {'Title': 'Wave 2', 'Zombies': [{'Num': 8, 'Class': Slow_Zombie}], 'Spawn_Rate': 3.5, 'Spawn_Slower': 0.5},
+#             {'Title': 'Wave 3', 'Zombies': [{'Num': 5, 'Class': Slow_Zombie}, {'Num': 3, 'Class': Fast_Zombie}],
+#              'Spawn_Rate': 3, 'Spawn_Slower': 0.5},
+#             {'Title': 'Wave 4', 'Zombies': [{'Num': 10, 'Class': Slow_Zombie}, {'Num': 6, 'Class': Fast_Zombie}],
+#              'Spawn_Rate': 2, 'Spawn_Slower': 0.5},
+#             {'Title': 'Wave 5', 'Zombies': [{'Num': 6, 'Class': Slow_Zombie}, {'Num': 10, 'Class': Fast_Zombie}],
+#              'Spawn_Rate': 1.5, 'Spawn_Slower': 0.5},
+#             {'Title': 'Wave 6', 'Zombies': [{'Num': 4, 'Class': Slow_Zombie}, {'Num': 10, 'Class': Fast_Zombie},
+#                                             {'Num': 3, 'Class': Big_Zombie}], 'Spawn_Rate': 1, 'Spawn_Slower': 0.5},
+#             {'Title': 'Wave 7', 'Zombies': [{'Num': 2, 'Class': Slow_Zombie}, {'Num': 12, 'Class': Fast_Zombie},
+#                                             {'Num': 8, 'Class': Big_Zombie}], 'Spawn_Rate': 1, 'Spawn_Slower': 0.4},
+#             {'Title': 'Wave 8', 'Zombies': [{'Num': 12, 'Class': Fast_Zombie}, {'Num': 12, 'Class': Big_Zombie},
+#                                             {'Num': 1, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.8, 'Spawn_Slower': 0.3},
+#             {'Title': 'Wave 9', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 15, 'Class': Big_Zombie},
+#                                             {'Num': 4, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.6, 'Spawn_Slower': 0.2},
+#             {'Title': 'Wave 10', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
+#                                                {'Num': 10, 'Class': Demon_Zombie}], 'Spawn_Rate': 0.5, 'Spawn_Slower': 0.1},
+#             {'Title': 'Wave 11', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 10, 'Class': Big_Zombie},
+#                                              {'Num': 15, 'Class': Demon_Zombie}, {'Num': 3, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.4, 'Spawn_Slower': 0.1},
+#             {'Title': 'Wave 12', 'Zombies': [{'Num': 15, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
+#                                              {'Num': 30, 'Class': Demon_Zombie}, {'Num': 10, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.3, 'Spawn_Slower': 0.1},
+#             {'Title': 'Wave 13', 'Zombies': [{'Num': 20, 'Class': Fast_Zombie}, {'Num': 30, 'Class': Big_Zombie},
+#                                              {'Num': 40, 'Class': Demon_Zombie}, {'Num': 20, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.2, 'Spawn_Slower': 0.05},
+#             {'Title': 'Wave 14', 'Zombies': [{'Num': 30, 'Class': Fast_Zombie}, {'Num': 20, 'Class': Big_Zombie},
+#                                              {'Num': 45, 'Class': Demon_Zombie}, {'Num': 30, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.1, 'Spawn_Slower': 0},
+#             {'Title': 'Wave 15', 'Zombies': [{'Num': 80, 'Class': Fast_Zombie}, {'Num': 40, 'Class': Big_Zombie},
+#                                              {'Num': 100, 'Class': Demon_Zombie}, {'Num': 40, 'Class': Chonk_Zombie}], 'Spawn_Rate': 0.05, 'Spawn_Slower': 0},
+#             ]
 
 
 class Game:
@@ -62,7 +62,10 @@ class Game:
                            'spawn time multiplier':1,
                            'speed of time': 1}
 
-        self.tilemap = Tilemap()
+        self.tilemap = Tilemap('first2')
+        self.allwaves_data = self.load_waves_data()
+
+
         self.player = Player(self.tilemap.entity_data[0]["x_pos"], self.tilemap.entity_data[0]["y_pos"],
                              self.control_map, self.cheat_info, self.screen_width, self.screen_height)
         self.enemies = []
@@ -86,7 +89,7 @@ class Game:
                            'Damage Taken': 0}
 
         self.wave_index = 0
-        self.wave_data = copy.deepcopy(ZombieWaves.data[self.wave_index])
+        self.wave_data = copy.deepcopy(self.allwaves_data[self.wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
         self.zombies_in_wave = sum([a["Num"] for a in self.wave_data['Zombies']])
@@ -117,18 +120,38 @@ class Game:
         self.gamefile = gamefile
         if gamefile:
             self.load_game(gamefile)
+        else:
+            # fruit names source
+            # https://www.goodgoodgood.co/articles/list-of-fruits
+            with open('Data/fruit_names.json', 'r') as f:
+                fruit = random.choice(json.load(f))
+            self.gamefile = fruit
 
     def load_game(self, filename):
         game_data = Load.load(filename, self.control_map, self.screen_width, self.screen_height)
         if game_data:
             self.player, self.enemies, self.tilemap, self.projectiles, self.particles, self.shop_data, self.game_stats, self.camera_pos, wave_data, cheat_info = game_data
-            self.set_wave([a["Title"] for a in ZombieWaves.data].index(self.game_stats["Wave Reached"]))
+            self.allwaves_data = self.load_waves_data()
+            self.set_wave([a["Title"] for a in self.allwaves_data].index(self.game_stats["Wave Reached"]))
             self.wave_data = wave_data
             self.cheat_info = cheat_info
-    def save_game(self, filename):
+    def save_game(self, filename=None):
+        if filename:
+            self.gamefile = filename
+        else:
+            filename = self.gamefile
         Save.save(filename, self.player, self.enemies, self.tilemap, self.projectiles,
                   self.particles, self.shop_data, self.game_stats, self.camera_pos,
                   self.wave_data, self.cheat_info)
+
+    def load_waves_data(self):
+        dat = self.tilemap.wave_data
+        for wave in dat:
+            for z in wave["Zombies"]:
+                for typ in Save.entity_type_map:
+                    if Save.entity_type_map[typ] == z["Class"]:
+                        z["Class"] = typ
+        return dat
 
     def gameloop(self, delta_time):
         self.fps = 60 / delta_time
@@ -342,14 +365,14 @@ class Game:
     def wave_manager(self):
         if self.zombies_left == 0 and len(self.enemies) == 0:
             self.wave_index += 1
-            if self.wave_index >= len(ZombieWaves.data):
+            if self.wave_index >= len(self.allwaves_data):
                 print('you beat every wave well done')
             else:
                 self.set_wave(self.wave_index)
 
     def set_wave(self,wave_index):
         self.wave_index = wave_index
-        self.wave_data = copy.deepcopy(ZombieWaves.data[wave_index])
+        self.wave_data = copy.deepcopy(self.allwaves_data[wave_index])
         self.wave_title_timer = 2
         self.zombie_spawn_timer = 0
         self.zombies_left = -1

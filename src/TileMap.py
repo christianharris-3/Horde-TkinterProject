@@ -51,7 +51,7 @@ class Tile:
 class Tilemap:
     pos_value_convert = 100000
 
-    def __init__(self):
+    def __init__(self,levelname):
         self.pixels_per_unit = Coords.scale_factor
         self.tiles = {}
         self.collision_hash = {}
@@ -60,7 +60,7 @@ class Tilemap:
 
         TileData.image_load()
 
-        self.load_map("Maps/first.json")
+        self.load_map(f"Data/Maps/{levelname.removesuffix('.json').split('/')[-1]}.json")
         self.load_collision_hash()
 
     def load_map(self,map_name):
@@ -74,6 +74,7 @@ class Tilemap:
         self.pos = Vec(*data["map"]["pos"])
         self.tilemap_width = len(data["map"]["tilemap"][0])
         self.tilemap_height = len(data["map"]["tilemap"])
+        self.wave_data = data["wave_data"]
 
         for y in range(self.tilemap_height):
             for x in range(self.tilemap_width):
