@@ -11,7 +11,7 @@ DONE - Death screen
 DONE - LeaderBoard
 - add multiple levels/difficulties. easy,normal,hard, current game is hard.
 DONE - Save/Load gamestate
-- Boss Key
+DONE - Boss Key
 - Combo Display
 
 DONE - Cheat Codes

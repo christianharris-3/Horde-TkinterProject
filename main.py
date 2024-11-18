@@ -47,8 +47,9 @@ class Main:
         self.menus = Menus(self.window, self.input, self.window_width, self.window_height, menu_funcs,
                            self.control_map, self.control_map_defaults, self.font)
 
-        self.window.bind('<Return>',self.boss_key)
+        self.window.bind('<Tab>',self.boss_key)
         self.boss_key_active = False
+        self.boss_key_image = ImageTk.PhotoImage(file='Sprites/Boss Key.png')
 
         # this thing messes up everything so hard for no reason
         # self.window.bind('<Configure>', self.window_resize)
@@ -122,17 +123,21 @@ class Main:
                 self.menus.set_menu("Pause_Screen",data=self.game.gamefile)
             else:
                 self.menus.set_menu("Game")
-
+z`
     def boss_key(self,event):
         self.boss_key_active = not self.boss_key_active
         if self.boss_key_active:
-            self.window.geometry('1x1')
-            self.window.iconify()
             webbrowser.open('https://en.wikipedia.org/wiki/Boss_key')
-            if self.game_active:
+            self.window.geometry('120x26')
+            self.window.iconify()
+            if self.game_active and not self.game_paused:
                 self.pause()
+            self.boss_key_label = tk.Label(self.window,image=self.boss_key_image,borderwidth=0)
+            self.boss_key_label.pack()
+            self.boss_key_label.tkraise(self.menus.frame)
         else:
             self.window.geometry(f'{self.window_width}x{self.window_height}')
+            self.boss_key_label.destroy()
 
     def load_control_map(self):
         if os.path.exists('Data/control_map.json'):
