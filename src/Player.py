@@ -25,7 +25,7 @@ class WeaponData:
 
 
 class Player(Entity):
-    def __init__(self, x, y, control_map, screen_width, screen_height):
+    def __init__(self, x, y, control_map, cheat_info, screen_width, screen_height):
         super().__init__(x, y)
         self.team = 'Player'
         self.radius = 0.45
@@ -37,6 +37,7 @@ class Player(Entity):
         self.recent_shield = self.shield
 
         self.control_map = control_map
+        self.cheat_info = cheat_info
 
         self.active_weapon = "Pistol"
         self.weapon_data = WeaponData.data[self.active_weapon]
@@ -235,13 +236,16 @@ class Player(Entity):
         # Abilities
         new_projectiles = []
         new_particles = []
-        if self.get_pressed(inp, "Grenade") and shop_data["Temp_Upgrades"]["Grenade"]>0:
+        if self.get_pressed(inp, "Grenade") and (shop_data["Temp_Upgrades"]["Grenade"]>0 or self.cheat_info['infinite abilities']):
             new_projectiles = [Grenade(self.x,self.y,*mpos.tuple(),self.team)]
-            shop_data["Temp_Upgrades"]["Grenade"]-=1
+            new_projectiles[-1].damage*=self.cheat_info['damage multiplier']
+            if not self.cheat_info['infinite abilities']:
+                shop_data["Temp_Upgrades"]["Grenade"]-=1
             game_stats["Grenades Thrown"]+=1
 
-        if self.get_pressed(inp, "Force Push") and shop_data["Temp_Upgrades"]["Force Push"]>0:
-            shop_data["Temp_Upgrades"]["Force Push"]-=1
+        if self.get_pressed(inp, "Force Push") and (shop_data["Temp_Upgrades"]["Force Push"]>0 or self.cheat_info['infinite abilities']):
+            if not self.cheat_info['infinite abilities']:
+                shop_data["Temp_Upgrades"]["Force Push"]-=1
             new_particles += self.force_push(enemies)
             game_stats["Force Pushes Used"] += 1
 
@@ -266,14 +270,18 @@ class Player(Entity):
 
     def shoot(self):
         if self.ammo_left > 0 and not self.reloading:
-            self.ammo_left -= 1
+            if not self.cheat_info['infinite ammo']:
+                self.ammo_left -= 1
             if self.ammo_left == 0:
                 self.reload()
-            return [
-                self.weapon_data["Projectile"](self.x, self.y, random.gauss(self.angle, self.weapon_data["Spread"]),
-                                               max(random.gauss(self.weapon_data["Bullet_Speed"],
-                                                                self.weapon_data["Speed_Ran"]), 0.1), self.team)
-                for b in range(self.weapon_data["Spray_Count"])]
+            projectiles = []
+            for b in range(self.weapon_data["Spray_Count"]):
+                projectiles.append(self.weapon_data["Projectile"](self.x, self.y,
+                                                                  random.gauss(self.angle, self.weapon_data["Spread"]),
+                                                                  max(random.gauss(self.weapon_data["Bullet_Speed"],
+                                                                  self.weapon_data["Speed_Ran"]), 0.1), self.team))
+                projectiles[-1].damage*=self.cheat_info['damage multiplier']
+            return projectiles
         else:
             return []
 
@@ -295,7 +303,7 @@ class Player(Entity):
         self.reload_timer = self.weapon_data["Reload_Time"]
 
     def take_damage(self, damage):
-        if self.i_frames <= 0:
+        if self.i_frames <= 0 and not self.cheat_info['immortal']:
             self.damage_taken += damage
             if self.shield>damage:
                 self.shield-=damage

@@ -1,4 +1,5 @@
 import tkinter as tk
+from PIL import ImageTk
 import src.TkinterController as TC
 from src.Game import Game
 from src.Menus import Menus
@@ -14,6 +15,9 @@ class Main:
 
         self.window = tk.Tk()
         self.window.geometry(f'{self.window_width}x{self.window_height}')
+        self.window.title("Horde")
+        self.icon = ImageTk.PhotoImage(file="Sprites/Player.png")
+        self.window.wm_iconphoto(False, self.icon)
         self.input = TC.Input(self.window)
 
         self.control_map_defaults = {'Left': {'Key': 'a', 'continuous': True},
@@ -33,6 +37,8 @@ class Main:
         self.game_active = False
         self.game = None
         self.font = 'Segoe Print'
+
+        self.target_fps = [60]
 
         menu_funcs  = {'start_game':self.start_game,
                        'pause':self.pause,
@@ -71,6 +77,9 @@ class Main:
                         self.end_game()
                 else:
                     self.pause_button_down = False
+                if self.input.get_cheatcode_active():
+                    self.game_paused = True
+                    self.menus.set_menu('CheatCode_Menu',data=self.game.cheat_info)
             return done
 
 
@@ -90,7 +99,7 @@ class Main:
                          self.font, gamefile)
         self.menus.menu_funcs["save_game"] = self.game.save_game
         self.menus.menu_funcs["game_object"] = self.game
-        TC.game_looper(self.game_loop, self.window)
+        TC.game_looper(self.game_loop, self.window, self.target_fps)
 
 
     def end_game(self):
@@ -102,6 +111,7 @@ class Main:
 
     def pause(self):
         if not self.pause_button_down:
+            self.target_fps[0] = int(60*self.game.cheat_info["speed of time"])
             self.pause_button_down = True
             self.game_paused = not self.game_paused
             if self.game_paused:

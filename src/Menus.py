@@ -25,7 +25,7 @@ class Menus:
         self.font = font
 
         self.frame = tk.Frame(self.window)
-        self.frame.pack()
+        self.frame.place(relx=0.5,rely=0.5,anchor=tk.CENTER)
         self.active_menu = ''
         self.prev_menu = []
         self.set_menu('Start_Screen')
@@ -50,23 +50,27 @@ class Menus:
         self.image = ImageTk.PhotoImage(image)
         title = tk.Canvas(self.frame, width=300, height=150, bg="darkolivegreen2", bd=0, highlightthickness=0)
         title.create_image(0, 0, image=self.image, anchor=tk.NW)
-        title.place(relx=0.5, rely=0.5, y=-100, anchor=tk.S)
+        title.place(relx=0.5, rely=0.5, y=-180, anchor=tk.S)
 
         tk.Button(self.frame, text='Start', command=self.start_game,
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  ).place(relx=0.5, rely=0.5, y=-40, width=141, height=78, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, y=-100, width=141, height=78, anchor=tk.CENTER)
 
         tk.Button(self.frame, text='Load Save', command=lambda: self.set_menu("Load_Gamestate_Menu"),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  ).place(relx=0.5, rely=0.5, y=60, width=185, height=84, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, width=185, height=84, anchor=tk.CENTER)
 
         tk.Button(self.frame, text='LeaderBoard', command=lambda: self.set_menu("Leaderboard_Menu"),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  ).place(relx=0.5, rely=0.5, y=160, width=220, height=84, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, y=100, width=220, height=84, anchor=tk.CENTER)
 
         tk.Button(self.frame, text='Settings', command=lambda: self.set_menu("Settings"),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  ).place(relx=0.5, rely=0.5, y=260, width=178, height=84, anchor=tk.CENTER)
+                  ).place(relx=0.5, rely=0.5, y=200, width=178, height=84, anchor=tk.CENTER)
+
+        tk.Button(self.frame, text='Quit', command=self.window.destroy,
+                  font=(self.font, 20), bg="red", relief=tk.GROOVE, bd=4, activebackground="red4",
+                  ).place(relx=0.5, rely=0.5, y=300, width=100, height=84, anchor=tk.CENTER)
 
     def make_settings_menu(self):
         tk.Button(self.frame, text='Back', command=self.menu_back,
@@ -232,7 +236,7 @@ class Menus:
     def make_load_gamestate_menu(self):
         tk.Button(self.frame, text='Back', command=self.menu_back,
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
-                  pady=0).place(x=10, y=10, anchor=tk.NW)
+                  pady=0).place(x=10, y=10, height=70, anchor=tk.NW)
 
         tk.Label(self.frame, text='Game Saves', font=(self.font, 30, "bold"), bg="darkolivegreen2",
                  ).place(relx=0.5,y=5,anchor=tk.N)
@@ -243,7 +247,7 @@ class Menus:
             with open("Data/Game Saves/"+filename,'r') as f:
                 gamestates.append(json.load(f))
 
-        titles = [('Name', 400), ('Score', 150), ('Wave', 150)]
+        titles = [('Name', 400), ('Date', 150), ('Time', 140), ('Score', 130), ('Wave', 130)]
 
         table = ttk.Treeview(self.frame, columns=[a[0] for a in titles], show='headings', style='Treeview', height=len(gamestates))
 
@@ -253,17 +257,18 @@ class Menus:
 
         for i,state in enumerate(gamestates):
             if "filename" in state:
-                table.insert('','end',iid=i,values=[state["filename"],state["game_stats"]['Score'],
-                                        state["game_stats"]["Wave Reached"]])
-        table.place(relx=0.5,y=90,anchor=tk.N)
+                table.insert('','end',iid=i,values=[state["filename"],state["save_timestamp"]["date"],
+                                                    state["save_timestamp"]["time"],state["game_stats"]['Score'],
+                                                    state["game_stats"]["Wave Reached"]])
+        table.place(relx=0.5,x=-80,y=90,anchor=tk.N)
 
         tk.Button(self.frame, text='Load', command=lambda: self.load_gamestate(table),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
-                  pady=0).place(relx=0.5, x=450, y=140, anchor=tk.CENTER)
+                  pady=0).place(relx=0.5, x=500, y=140, anchor=tk.CENTER)
 
         tk.Button(self.frame, text='Delete', command=lambda: self.delete_gamestate(table),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
-                  pady=0).place(relx=0.5, x=450, y=240, anchor=tk.CENTER)
+                  pady=0).place(relx=0.5, x=500, y=240, anchor=tk.CENTER)
 
     def make_leaderboard_menu(self):
         tk.Button(self.frame, text='Back', command=self.menu_back,
@@ -299,6 +304,53 @@ class Menus:
 
 
         self.leaderboard_table.bind('<1>',self.detect_selected_leaderboard_entry)
+
+    def make_cheatcode_menu(self, cheat_info):
+        self.frame.configure(width=400, height=425, highlightbackground="darkgreen", highlightthickness=3)
+        self.frame.lift()
+        self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        tk.Label(self.frame,text='Cheat Menu', font=(self.font, 20), bg="darkolivegreen2",
+                 ).place(relx=0.5,y=5,anchor=tk.N)
+
+        titles = ["Immortal", "Infinite Ammo", "Infinite Abilities"]
+        self.cheatcode_tkvars = []
+        for i,t in enumerate(titles):
+            self.cheatcode_tkvars.append(tk.IntVar())
+            toggle = tk.Checkbutton(self.frame,text=t, font=(self.font, 15), bg="darkolivegreen2",
+                                    variable=self.cheatcode_tkvars[i])
+            toggle.place(x=20,y=60+i*50,anchor=tk.NW)
+            func = funcer(self.cheat_widget_input,variable=self.cheatcode_tkvars[i],
+                          cheat_info=cheat_info,info_type=t.lower())
+            toggle.configure(command=func.func)
+            if cheat_info[t.lower()]:
+                toggle.select()
+
+
+        self.cheat_info = cheat_info
+        sliders = [{'title':'Damage\nMultiplier','key':'damage multiplier','from':1,'to':32,'res':1,'func':self.move_slider_damage},
+                   {'title':'Spawn Time\nMultiplier','key':'spawn time multiplier','from':0,'to':5,'res':0.1,'func':self.move_slider_spawntime},
+                   {'title':'Time\nMultiplier','key':'speed of time','from':0.1,'to':3,'res':0.1,'func':self.move_slider_timespeed}]
+
+        for i,info in enumerate(sliders):
+            self.cheatcode_tkvars.append(tk.DoubleVar())
+            tk.Label(self.frame,text=info['title'], font=(self.font, 13), bg="darkolivegreen2"
+                     ).place(x=60,y=200+i*70,anchor=tk.N)
+            slider = tk.Scale(self.frame,from_=info['from'],to=info['to'],orient=tk.HORIZONTAL, font=(self.font, 13),
+                              bg="darkolivegreen2",length=240,borderwidth=0,relief=tk.FLAT, resolution=info['res'],
+                              variable=self.cheatcode_tkvars[i+3],command=info['func'])
+            slider.place(x=120,y=210+i*70,anchor=tk.NW)
+            slider.set(self.cheat_info[info["key"]])
+
+
+    def cheat_widget_input(self,variable,cheat_info,info_type):
+        cheat_info[info_type] = bool(variable.get())
+    def move_slider_damage(self,val):
+        self.cheat_info["damage multiplier"] = int(val)
+    def move_slider_spawntime(self, val):
+        self.cheat_info["spawn time multiplier"] = float(val)
+    def move_slider_timespeed(self, val):
+        self.cheat_info["speed of time"] = float(val)
 
     def detect_selected_leaderboard_entry(self,event):
         self.leaderboard_table.after(1,self.detect_selected_leaderboard_entry_delayed)
@@ -421,6 +473,8 @@ class Menus:
                 self.make_score_entry_menu(data)
             elif self.active_menu == "Save_Game_Menu":
                 self.make_save_gamestate_menu(data)
+            elif self.active_menu == "CheatCode_Menu":
+                self.make_cheatcode_menu(data)
             else:
                 self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2",
                                      highlightthickness=0)

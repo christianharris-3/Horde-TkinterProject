@@ -58,14 +58,17 @@ class Entity:
             if code in collision_hash:
                 for e in collision_hash[code]:
                     if not (e is self) and ownhitbox.Get_Collide(e.get_hitbox()):
-                        self.vel += Vec(self.x - e.x, self.y - e.y).normalized() / 100
                         if self.team == "Enemy" and e.team == "Player":
-                            # Deal Damage to Player
-                            dmg = self.damage
-                            kb = 0
-                            angle = math.atan2(e.y-self.y, e.x-self.x)
-                            particles += e.take_hit(KB_Obj(kb, angle, dmg))
-                            shake_camera(self.damage/100)
+                            if not(e.cheat_info["immortal"]):
+                                # Deal Damage to Player
+                                e.vel -= Vec(self.x - e.x, self.y - e.y).normalized() / 100
+                                dmg = self.damage
+                                kb = 0
+                                angle = math.atan2(e.y-self.y, e.x-self.x)
+                                particles += e.take_hit(KB_Obj(kb, angle, dmg))
+                                shake_camera(self.damage/100)
+                        else:
+                            e.vel -= Vec(self.x - e.x, self.y - e.y).normalized() / 100
         return particles
 
     def tilemap_collision(self, collision_hash):
@@ -91,7 +94,7 @@ class Entity:
                 self.stun_timer = 2
             self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
             self.take_damage(projectile.damage)
-            particle_num = round(projectile.damage*2)
+            particle_num = round(min(projectile.damage,self.max_health)*2)
             if self.get_dead():
                 particle_num*=4
                 particles += [Blood_Splat(self.x+(random.random()*1.4-0.7)*self.radius,

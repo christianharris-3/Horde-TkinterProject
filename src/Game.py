@@ -55,10 +55,16 @@ class Game:
         self.screen.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         self.control_map = control_map
+        self.cheat_info = {'immortal': False,
+                           'infinite ammo': False,
+                           'infinite abilities': False,
+                           'damage multiplier': 1,
+                           'spawn time multiplier':1,
+                           'speed of time': 1}
 
         self.tilemap = Tilemap()
         self.player = Player(self.tilemap.entity_data[0]["x_pos"], self.tilemap.entity_data[0]["y_pos"],
-                             self.control_map, self.screen_width, self.screen_height)
+                             self.control_map, self.cheat_info, self.screen_width, self.screen_height)
         self.enemies = []
         self.projectiles = []
         self.particles = []
@@ -115,13 +121,14 @@ class Game:
     def load_game(self, filename):
         game_data = Load.load(filename, self.control_map, self.screen_width, self.screen_height)
         if game_data:
-            self.player, self.enemies, self.tilemap, self.projectiles, self.particles, self.shop_data, self.game_stats, self.camera_pos, wave_data = game_data
+            self.player, self.enemies, self.tilemap, self.projectiles, self.particles, self.shop_data, self.game_stats, self.camera_pos, wave_data, cheat_info = game_data
             self.set_wave([a["Title"] for a in ZombieWaves.data].index(self.game_stats["Wave Reached"]))
             self.wave_data = wave_data
+            self.cheat_info = cheat_info
     def save_game(self, filename):
         Save.save(filename, self.player, self.enemies, self.tilemap, self.projectiles,
                   self.particles, self.shop_data, self.game_stats, self.camera_pos,
-                  self.wave_data)
+                  self.wave_data, self.cheat_info)
 
     def gameloop(self, delta_time):
         self.fps = 60 / delta_time
@@ -304,7 +311,9 @@ class Game:
             self.zombie_spawn_timer -= delta_time / 60
             if self.zombie_spawn_timer <= 0:
                 # Slows down zombie spawns when more zombies are alive
-                self.zombie_spawn_timer = self.wave_data['Spawn_Rate']*max((len(self.enemies)*self.wave_data["Spawn_Slower"]+1),1)
+                self.zombie_spawn_timer = self.wave_data['Spawn_Rate']
+                self.zombie_spawn_timer*=max((len(self.enemies)*self.wave_data["Spawn_Slower"]+1),1)
+                self.zombie_spawn_timer*=self.cheat_info["spawn time multiplier"]
 
                 def make_zombie(z_class):
                     angle = math.pi * (random.random() * 2 - 1)

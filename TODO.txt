@@ -8,17 +8,18 @@ DONE - Bullets collide with tilemap
 DONE - Wave Display
 DONE- Money/Score
 DONE - Death screen
-- LeaderBoard
+DONE - LeaderBoard
 - add multiple levels/difficulties. easy,normal,hard, current game is hard.
 DONE - Save/Load gamestate
 - Boss Key
 - Combo Display
-- Cheat Codes
- - imortality
- - infinite ammo/grenades
- - insta kill
- - edit speed of time
- - max shop/give coins
+
+DONE - Cheat Codes
+DONE -- imortality
+DONE -- infinite ammo/grenades
+DONE -- insta kill
+DONE -- edit speed of time
+ -- max shop/give coins
 
 (less important)
 DONE - particle effects

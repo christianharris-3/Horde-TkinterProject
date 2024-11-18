@@ -29,14 +29,15 @@ class Save:
                          Force_Push_Effect: "Force_Push_Effect"}
 
     @staticmethod
-    def save(filename, player,enemies,tilemap,projectiles,particles,shop_data,game_stats, camera_pos, wave_data):
+    def save(filename, player,enemies,tilemap,projectiles,particles,shop_data,game_stats, camera_pos, wave_data,
+             cheat_info):
         shop_data = copy.copy(shop_data)
         shop_data["Player_Object"] = None
         data = {"player":Save.player(player),"enemies":[Save.entity(e) for e in enemies],
                 "game_stats":game_stats,"shop_data":shop_data, "projectiles":[Save.particle(e) for e in projectiles],
                 "particles":[Save.particle(e) for e in particles],"tilemap":Save.tilemap(tilemap),
                 "camera_pos":camera_pos.tuple(), "filename":filename, "wave_data":Save.wave_data(wave_data),
-                'save_timestamp':{'date':get_now()[0], 'time':get_now()[1]}}
+                'save_timestamp':{'date':get_now()[0], 'time':get_now()[1]},'cheat_info':cheat_info}
         with open(f'Data/Game Saves/{filename}.json','w') as f:
             json.dump(data,f)
 
@@ -83,7 +84,8 @@ class Load:
         else:
             print('Failed to Load',filepath)
             return None
-        player = Load.player(data["player"],control_map, screen_width, screen_height)
+        cheat_info = data["cheat_info"]
+        player = Load.player(data["player"],control_map, cheat_info, screen_width, screen_height)
         enemies = [Load.enemy(e) for e in data["enemies"]]
         shop_data = data["shop_data"]
         shop_data["Player_Object"] = player
@@ -93,7 +95,7 @@ class Load:
         tilemap = Load.tilemap(data["tilemap"])
         camera_pos = Vec(*data["camera_pos"])
         wave_data = Load.wave_data(data["wave_data"])
-        return player,enemies,tilemap,projectiles,particles,shop_data,game_stats,camera_pos,wave_data
+        return player,enemies,tilemap,projectiles,particles,shop_data,game_stats,camera_pos,wave_data,cheat_info
 
 
     @staticmethod
@@ -108,8 +110,8 @@ class Load:
         return False
 
     @staticmethod
-    def player(data, control_map, screen_width, screen_height):
-        e = Player(data["x"],data["y"], control_map, screen_width, screen_height)
+    def player(data, control_map, cheat_info, screen_width, screen_height):
+        e = Player(data["x"],data["y"], control_map, cheat_info, screen_width, screen_height)
         e.vel = Vec(*data["vel"])
         e.shield = data["shield"]
         e.set_weapon(data["weapon"])
