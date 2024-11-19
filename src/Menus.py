@@ -1,9 +1,9 @@
+import json, os
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 from src.Player import WeaponData
 from src.Utiles import get_now
-import json, os, random
 
 
 # class that fixes a bug when making lots of lambda functions in a loop
@@ -374,6 +374,7 @@ class Menus:
                  ).place(relx=0.5, y=5, anchor=tk.N)
 
         levels = [{'Title': 'Level 1: Easy', 'file': 'test'},
+                  {'Title': 'Level 2: Normal', 'file': 'test2'},
                   {'Title': 'Level 3: Hard', 'file': 'level 3'}]
 
         for i,level in enumerate(levels):

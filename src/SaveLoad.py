@@ -1,18 +1,11 @@
+import json, copy, os, time
 from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie, Chonk_Zombie
 from src.Player import Player
 from src.TileMap import Tilemap
 from src.Projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
 from src.Particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect
 from src.Utiles import Vec, get_now, get_difficulty_data
-import json, copy, os, time
 
-### Player
-### Shop data
-### game stats
-### entities
-# Projectiles
-# Particles?
-# Tilemap
 
 class Save:
     entity_type_map = {Slow_Zombie: 'Slow_Zombie',

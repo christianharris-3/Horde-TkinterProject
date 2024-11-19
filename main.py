@@ -1,10 +1,12 @@
+import copy
+import os
+import json
+import webbrowser
 import tkinter as tk
 from PIL import ImageTk
 import src.TkinterController as TC
 from src.Game import Game
 from src.Menus import Menus
-import copy,time,os,json
-import webbrowser
 
 #tkinter color list
 #https://www.plus2net.com/python/tkinter-colors.php
@@ -50,6 +52,7 @@ class Main:
         self.window.bind('<Tab>',self.boss_key)
         self.boss_key_active = False
         self.boss_key_image = ImageTk.PhotoImage(file='Sprites/Boss Key.png')
+        self.boss_key_label = None
 
         # this thing messes up everything so hard for no reason
         # self.window.bind('<Configure>', self.window_resize)
@@ -58,30 +61,27 @@ class Main:
 
     def game_loop(self, delta_time):
         if not self.game_active:
-            return True
+            return self.game_active
+        if not self.game_paused:
+            # Run main gameloop when not paused
+            done = False
+            player_died, open_shop = self.game.gameloop(delta_time)
+            if player_died:
+                self.menus.set_menu("Death_Screen",data=self.game.game_stats)
+            elif open_shop:
+                self.game_paused = True
+                self.menus.set_menu("Shop_Menu",data=self.game.shop_data)
         else:
-            if not self.game_paused:
-                # Run main gameloop when not paused
-                done = False
-                player_died, open_shop = self.game.gameloop(delta_time)
-                if player_died:
-                    self.menus.set_menu("Death_Screen",data=self.game.game_stats)
-                elif open_shop:
-                    self.game_paused = True
-                    self.menus.set_menu("Shop_Menu",data=self.game.shop_data)
-            else:
-                done = False
+            done = False
 
-                ## Code to shut shop with same key that opens it
-                if self.input.get_pressed(self.control_map["Shop"]["Key"]):
-                    if self.menus.active_menu == 'Shop_Menu' and not(self.control_map["Shop"]["Key"] in self.game.player.buttons_down):
-                        self.pause()
-                        self.game.player.buttons_down.append(self.control_map["Shop"]["Key"])
-                else:
-                    try:
-                        self.game.player.buttons_down.remove(self.control_map["Shop"]["Key"])
-                    except:
-                        pass
+            ## Code to shut shop with same key that opens it
+            if self.input.get_pressed(self.control_map["Shop"]["Key"]):
+                if self.menus.active_menu == 'Shop_Menu' and (self.control_map["Shop"]["Key"] not in self.game.player.buttons_down):
+                    self.pause()
+                    self.game.player.buttons_down.append(self.control_map["Shop"]["Key"])
+            else:
+                if self.control_map["Shop"]["Key"] in self.game.player.buttons_down:
+                    self.game.player.buttons_down.remove(self.control_map["Shop"]["Key"])
             if done:
                 self.end_game()
             else:
@@ -100,14 +100,14 @@ class Main:
             return done
 
 
-    def window_resize(self,event):
-        if self.window_resize_timestamp+0.1 < time.perf_counter():
-            self.window_resize_timestamp = time.perf_counter()
-            self.window_width = event.width
-            self.window_height = event.height
-            self.menus.window_resize(self.window_width, self.window_height)
-            if self.game_active:
-                self.game.window_resize(self.window_width,self.window_height)
+    # def window_resize(self,event):
+    #     if self.window_resize_timestamp+0.1 < time.perf_counter():
+    #         self.window_resize_timestamp = time.perf_counter()
+    #         self.window_width = event.width
+    #         self.window_height = event.height
+    #         self.menus.window_resize(self.window_width, self.window_height)
+    #         if self.game_active:
+    #             self.game.window_resize(self.window_width,self.window_height)
 
     def start_game(self,gamefile=None,level='Level 3'):
         self.game_paused = False
@@ -153,11 +153,11 @@ class Main:
 
     def load_control_map(self):
         if os.path.exists('Data/control_map.json'):
-            with open('Data/control_map.json','r') as f:
+            with open('Data/control_map.json','r',encoding='utf-8') as f:
                 self.control_map = json.load(f)
         else:
             self.control_map = copy.deepcopy(self.control_map_defaults)
-            with open('Data/control_map.json','w') as f:
+            with open('Data/control_map.json','w',encoding='utf-8') as f:
                 json.dump(self.control_map,f)
 
 

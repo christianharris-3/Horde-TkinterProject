@@ -1,7 +1,7 @@
-from src.Entity import Entity
-from PIL import Image, ImageDraw
-from src.Utiles import Coords, Vec
 import random, math
+from PIL import Image, ImageDraw
+from src.Entity import Entity
+from src.Utiles import Coords, Vec
 
 
 class Enemy(Entity):

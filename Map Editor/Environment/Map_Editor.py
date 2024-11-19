@@ -123,8 +123,8 @@ class Map_Editor:
             self.ui.maketext(155,15,'Difficulty:'),
             self.ui.maketextbox(260,10,'1',ID='difficultyinput',numsonly=True,commandifkey=True,command=self.store_difficulty),
 
-            self.ui.maketext(155, 15, 'Level Title:'),
-            self.ui.maketextbox(260, 10, '1', ID='titleinput', numsonly=True, commandifkey=True,
+            self.ui.maketext(505, 15, 'Level Title:'),
+            self.ui.maketextbox(625, 10, '1', ID='titleinput', commandifkey=True,
                                 command=self.store_level_title),
             ])
 

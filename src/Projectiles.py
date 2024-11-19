@@ -1,8 +1,8 @@
+import math, random
+import tkinter as tk
 from src.Utiles import ListHitbox, Vec, CircleHitbox
 from src.Particles import Particle, Bullet_Hit_Particle, Explosion, Grenade_Fragment
 from PIL import Image, ImageTk
-import tkinter as tk
-import math, random
 
 
 class Projectile(Particle):

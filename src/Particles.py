@@ -1,7 +1,6 @@
-from src.Utiles import Vec, CircleHitbox, Coords
-from PIL import Image, ImageTk
+import random
 import tkinter as tk
-import math, random
+from src.Utiles import Vec, CircleHitbox, Coords
 
 
 class Particle:

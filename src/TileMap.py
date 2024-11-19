@@ -1,7 +1,7 @@
+import json
+import tkinter as tk
 from src.Utiles import Vec, RectHitbox, CircleHitbox, Coords
 from PIL import Image, ImageTk
-import tkinter as tk
-import json
 
 class TileData:
 

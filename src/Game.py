@@ -1,3 +1,4 @@
+import random, math, copy, json
 import tkinter as tk
 from PIL import ImageTk, Image, ImageDraw, ImageFont
 from src.Player import Player
@@ -5,7 +6,6 @@ from src.TileMap import Tilemap
 from src.Utiles import Coords, Vec, RectHitbox, get_difficulty_data
 from src.Projectiles import Grenade
 from src.SaveLoad import Save, Load
-import random, math, copy, json
 
 
 
