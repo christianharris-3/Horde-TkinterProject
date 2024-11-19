@@ -63,18 +63,20 @@ class Tilemap:
         self.load_map(f"Data/Maps/{levelname.removesuffix('.json').split('/')[-1]}.json")
         self.load_collision_hash()
 
-    def load_map(self,map_name):
+    def load_map(self,level_path):
         self.tiles = {}
-        self.map_name = map_name
+        self.level_path = level_path
         self.outside_tile = Tile(-1, -1, self.pixels_per_unit, 'Cobble')
 
-        with open(map_name, 'r') as f:
+        with open(level_path, 'r') as f:
             data = json.load(f)
         self.entity_data = data["entities"]
         self.pos = Vec(*data["map"]["pos"])
         self.tilemap_width = len(data["map"]["tilemap"][0])
         self.tilemap_height = len(data["map"]["tilemap"])
         self.wave_data = data["wave_data"]
+        self.difficulty = data["difficulty"]
+        self.level_title = data["level_title"]
 
         for y in range(self.tilemap_height):
             for x in range(self.tilemap_width):

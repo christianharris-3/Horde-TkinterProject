@@ -57,6 +57,8 @@ class Map_Editor:
         self.entities = []
         self.entity_data = []
         self.wave_data = []
+        self.difficulty = 1
+        self.level_title = 'Title'
         self.controller = Editor_Controller(ui,0,0)
         self.camera = Camera(self.controller,pygame.Rect(200,10,990,880),True)
 
@@ -113,10 +115,17 @@ class Map_Editor:
         
         
     
-        ### Objects
+        ### Wave Data
         self.wave_editor = self.ui.makewindow(10,50,1000,600,autoshutwindows=['tilemap_editor','entity_editor','wave_editor'],ID='wave_editor',bounditems=[
             self.ui.makescrollertable(10,50,data=[],titles=['Wave Title',"Spawn Rate",'Spawn Slower','Slow Z','Fast Z','Big Z','Demon Z','Chonk Z'],ID='wavetable',pageheight=500),
-            self.ui.makebutton(10,10,'add row',command=self.add_wave)
+            self.ui.makebutton(10,10,'add row',command=self.add_wave),
+
+            self.ui.maketext(155,15,'Difficulty:'),
+            self.ui.maketextbox(260,10,'1',ID='difficultyinput',numsonly=True,commandifkey=True,command=self.store_difficulty),
+
+            self.ui.maketext(155, 15, 'Level Title:'),
+            self.ui.maketextbox(260, 10, '1', ID='titleinput', numsonly=True, commandifkey=True,
+                                command=self.store_level_title),
             ])
 
         self.swap_menu()
@@ -152,6 +161,13 @@ class Map_Editor:
                     self.wave_data[-1]["Zombies"].append({'Class':z,'Num':int(row[3+i].text)})
             except:
                 pass
+    def store_difficulty(self):
+        try:
+            self.difficulty = float(self.ui.IDs["difficultyinput"].text)
+        except:
+            pass
+    def store_level_title(self):
+        self.level_title = self.ui.IDs['titleinput'].text
 
     def table_move_input(self,move=(0,1)):
         if self.edit_swapper.active == 'Waves':
@@ -162,11 +178,11 @@ class Map_Editor:
 
     def open_menu_init(self):
         table = self.ui.IDs['files_open_table']
-        files = os.listdir(resourcepath('Maps'))
+        files = os.listdir(resourcepath('Data/Maps'))
         data = []
         for f in files:
             if '.json' in f:
-                func = pyui.funcer(self.open_file,name=resourcepath('Maps\\'+f))
+                func = pyui.funcer(self.open_file,name=resourcepath('Data\\Maps\\'+f))
                 data.append([self.ui.makebutton(0,0,f.removesuffix('.json'),command=func.func)])
         table.data = data
         table.refresh()
@@ -182,9 +198,11 @@ class Map_Editor:
         #     a["y_pos"] /= 64
         dat = {'map':self.map.get_storable_map(),
                'entities':e_data,
-               'wave_data':self.wave_data}
+               'wave_data':self.wave_data,
+               'difficulty':self.difficulty,
+               'level_title':self.level_title}
         
-        with open(resourcepath('Maps\\'+self.ui.IDs['save_textbox'].text+'.json'),'w') as f:
+        with open(resourcepath('Data\\Maps\\'+self.ui.IDs['save_textbox'].text+'.json'),'w') as f:
             json.dump(dat,f)
             
         self.ui.menuback()
@@ -202,6 +220,8 @@ class Map_Editor:
         self.map.load_map(dat['map']['tilemap'],dat['map']['pos'])
         self.entity_data = dat['entities']
         self.wave_data = dat['wave_data']
+        self.difficulty = dat['difficulty']
+        self.level_title = dat['level_title']
         self.refresh_entities()
         self.ui.menuback()
 
@@ -215,6 +235,8 @@ class Map_Editor:
             self.ui.IDs['wavetable'].wipe(False)
             for a in self.wave_data:
                 self.add_wave(a)
+            self.ui.IDs['difficultyinput'].settext(str(self.difficulty))
+            self.ui.IDs['titleinput'].settext(str(self.level_title))
 
     def refresh_entities(self):
         data = []

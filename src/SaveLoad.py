@@ -3,7 +3,7 @@ from src.Player import Player
 from src.TileMap import Tilemap
 from src.Projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
 from src.Particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect
-from src.Utiles import Vec, get_now
+from src.Utiles import Vec, get_now, get_difficulty_data
 import json, copy, os, time
 
 ### Player
@@ -35,9 +35,10 @@ class Save:
         shop_data["Player_Object"] = None
         data = {"player":Save.player(player),"enemies":[Save.entity(e) for e in enemies],
                 "game_stats":game_stats,"shop_data":shop_data, "projectiles":[Save.particle(e) for e in projectiles],
-                "particles":[Save.particle(e) for e in particles],"tilemap":Save.tilemap(tilemap),
-                "camera_pos":camera_pos.tuple(), "filename":filename, "wave_data":Save.wave_data(wave_data),
-                'save_timestamp':{'date':get_now()[0], 'time':get_now()[1], 'unix_time':time.time()},'cheat_info':cheat_info}
+                "particles":[Save.particle(e) for e in particles],"camera_pos":camera_pos.tuple(),
+                "filename":filename, "wave_data":Save.wave_data(wave_data),
+                'save_timestamp':{'date':get_now()[0], 'time':get_now()[1], 'unix_time':time.time()},
+                'cheat_info':cheat_info,'level':{'path':tilemap.level_path,'title':tilemap.level_title}}
         with open(f'Data/Game Saves/{filename}.json','w') as f:
             json.dump(data,f)
 
@@ -61,7 +62,7 @@ class Save:
 
     @staticmethod
     def tilemap(e):
-        return {"map_name":e.map_name}
+        return {"level_path":e.level_path}
 
     @staticmethod
     def wave_data(dat):
@@ -85,25 +86,26 @@ class Load:
             print('Failed to Load',filepath)
             return None
         cheat_info = data["cheat_info"]
+        tilemap = Tilemap(data["level"]["path"])
+        difficulty_data = get_difficulty_data(tilemap.difficulty)
         player = Load.player(data["player"],control_map, cheat_info, screen_width, screen_height)
-        enemies = [Load.enemy(e) for e in data["enemies"]]
+        enemies = [Load.enemy(e,difficulty_data) for e in data["enemies"]]
         shop_data = data["shop_data"]
         shop_data["Player_Object"] = player
         game_stats = data["game_stats"]
         projectiles = [Load.particle(e,True) for e in data["projectiles"]]
         particles = [Load.particle(e) for e in data["particles"]]
-        tilemap = Load.tilemap(data["tilemap"])
         camera_pos = Vec(*data["camera_pos"])
         wave_data = Load.wave_data(data["wave_data"])
         return player,enemies,tilemap,projectiles,particles,shop_data,game_stats,camera_pos,wave_data,cheat_info
 
 
     @staticmethod
-    def enemy(data):
+    def enemy(data,difficulty_data):
         for typ in Save.entity_type_map:
             if Save.entity_type_map[typ] == data["class"]:
                 if data["class"] != 'Player':
-                    e = typ(data["x"],data["y"])
+                    e = typ(data["x"],data["y"],difficulty_data)
                     e.vel = Vec(*data["vel"])
                     e.health = data["health"]
                     return e
@@ -142,11 +144,6 @@ class Load:
                 e.radius = data["radius"]
                 e.time_kill_cutoff = data["time_kill_cutoff"]
         return e
-
-    @staticmethod
-    def tilemap(data):
-        tilemap = Tilemap(data["map_name"])
-        return tilemap
 
     @staticmethod
     def wave_data(data):

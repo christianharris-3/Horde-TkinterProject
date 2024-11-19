@@ -58,8 +58,15 @@ class Enemy(Entity):
                 self.passive_ai_move_timer = 1000
                 self.passive_ai_wait_timer = random.random()*4+0.5
 
+    def apply_difficulty(self,difficulty_data):
+        self.max_health *= difficulty_data["Zombie_Health"]
+        self.health = self.max_health
+        self.move_acceleration *= difficulty_data["Zombie_Speed"]
+        self.damage *= difficulty_data["Zombie_Damage"]
+
+
 class Slow_Zombie(Enemy):
-    def __init__(self, x, y):
+    def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Slow_Zombie.png'
         self.radius = 0.4
         super().__init__(x, y, self.image_path)
@@ -69,9 +76,10 @@ class Slow_Zombie(Enemy):
         self.move_acceleration = 0.005
         self.damage = 2
         self.coin_value = 1
+        self.apply_difficulty(difficulty_data)
 
 class Fast_Zombie(Enemy):
-    def __init__(self, x, y):
+    def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Fast_Zombie.png'
         self.radius = 0.35
         super().__init__(x, y, self.image_path)
@@ -82,9 +90,10 @@ class Fast_Zombie(Enemy):
         self.damage = 1
         self.knockback_resistance = 0.8
         self.coin_value = 2
+        self.apply_difficulty(difficulty_data)
 
 class Big_Zombie(Enemy):
-    def __init__(self, x, y):
+    def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Big_Zombie.png'
         self.radius = 0.48
         super().__init__(x, y, self.image_path)
@@ -95,9 +104,10 @@ class Big_Zombie(Enemy):
         self.damage = 5
         self.knockback_resistance = 0.05
         self.coin_value = 3
+        self.apply_difficulty(difficulty_data)
 
 class Demon_Zombie(Enemy):
-    def __init__(self, x, y):
+    def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Demon_Zombie.png'
         self.radius = 0.3
         super().__init__(x, y, self.image_path)
@@ -108,9 +118,10 @@ class Demon_Zombie(Enemy):
         self.damage = 8
         self.knockback_resistance = 0.5
         self.coin_value = 3
+        self.apply_difficulty(difficulty_data)
 
 class Chonk_Zombie(Enemy):
-    def __init__(self, x, y):
+    def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Chonk_Zombie.png'
         self.radius = 0.6
         super().__init__(x, y, self.image_path)
@@ -121,3 +132,4 @@ class Chonk_Zombie(Enemy):
         self.damage = 10
         self.knockback_resistance = 0.001
         self.coin_value = 8
+        self.apply_difficulty(difficulty_data)

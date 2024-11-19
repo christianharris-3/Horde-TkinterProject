@@ -1,0 +1,797 @@
+{
+  "map": {
+    "tilemap": [
+      [
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "Rock",
+        "Rock",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "Rock",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "Rock",
+        "None",
+        "None",
+        "Grass",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "Rock",
+        "Rock",
+        "Rock",
+        "Rock",
+        "Rock",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None"
+      ],
+      [
+        "None",
+        "None",
+        "Rock",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock"
+      ],
+      [
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Rock",
+        "None"
+      ]
+    ],
+    "pos": [
+      -8.0,
+      -8.0
+    ]
+  },
+  "entities": [
+    {
+      "ID": "Player",
+      "x_pos": 2,
+      "y_pos": 2
+    }
+  ],
+  "wave_data": [
+    {
+      "Title": "Wave 1",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 4
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 2",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 10
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 3",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 15
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 4",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 20
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 5",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 30
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 6",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 10
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 7",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 10
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 8",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 10
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 9",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 10
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    },
+    {
+      "Title": "Wave 10",
+      "Spawn_Rate": 1.0,
+      "Spawn_Slower": 0.5,
+      "Zombies": [
+        {
+          "Class": "Slow_Zombie",
+          "Num": 10
+        },
+        {
+          "Class": "Fast_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Big_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Demon_Zombie",
+          "Num": 0
+        },
+        {
+          "Class": "Chonk_Zombie",
+          "Num": 0
+        }
+      ]
+    }
+  ],
+  "difficulty": 0.4,
+  "level_title": "Level 1"
+}

@@ -109,11 +109,11 @@ class Main:
             if self.game_active:
                 self.game.window_resize(self.window_width,self.window_height)
 
-    def start_game(self, gamefile=None):
+    def start_game(self,gamefile=None,level='Level 3'):
         self.game_paused = False
         self.game_active = True
         self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map, self.menus,
-                         self.font, gamefile)
+                         self.font, gamefile, level)
         self.menus.menu_funcs["save_game"] = self.game.save_game
         self.menus.menu_funcs["game_object"] = self.game
         TC.game_looper(self.game_loop, self.window, self.target_fps)

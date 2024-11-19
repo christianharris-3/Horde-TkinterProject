@@ -323,3 +323,9 @@ def get_now():
     timelist = str(timestamp.time()).split('.')[0].split(':')[:2]
     timestr = str(int(timelist[0])%12)+':'+timelist[1]+['am','pm'][int(timelist[0])//12]
     return datestr, timestr
+
+def get_difficulty_data(difficulty=1):
+    return {'Zombie_Damage': 1 * difficulty,
+            'Zombie_Health': 1 * difficulty,
+            'Zombie_Speed': 1 * difficulty,
+            'Natural Healing': False}
