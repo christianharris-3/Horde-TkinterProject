@@ -38,8 +38,10 @@ class Projectile(Particle):
             particles += entity.take_hit(self)
             damage += self.damage
             self.hits_to_live -= 1
-            particles += [Bullet_Hit_Particle(self.x,self.y,random.gauss(self.angle,0.2),
-                                        max(random.gauss(self.vel.length(),0.2),0.1)) for _ in range(round(min(self.damage*2,entity.max_health)))]
+            for _ in range(round(min(self.damage * 2, entity.max_health))):
+                particles.append(Bullet_Hit_Particle(self.x,self.y,
+                                                     random.gauss(self.angle,0.2),
+                                        max(random.gauss(self.vel.length(),0.2),0.1)))
 
         return particles, damage
 

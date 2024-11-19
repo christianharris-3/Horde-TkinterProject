@@ -373,9 +373,9 @@ class Menus:
         tk.Label(self.frame, text='Level Select', font=(self.font, 30, "bold"), bg="darkolivegreen2",
                  ).place(relx=0.5, y=5, anchor=tk.N)
 
-        levels = [{'Title': 'Level 1: Easy', 'file': 'test'},
-                  {'Title': 'Level 2: Normal', 'file': 'test2'},
-                  {'Title': 'Level 3: Hard', 'file': 'level 3'}]
+        levels = [{'Title': 'Level 1: Easy', 'file': 'Level 1'},
+                  {'Title': 'Level 2: Normal', 'file': 'Level 2'},
+                  {'Title': 'Level 3: Hard', 'file': 'Level 3'}]
 
         for i,level in enumerate(levels):
             func = funcer(self.menu_funcs['start_game'],level=level['file'])

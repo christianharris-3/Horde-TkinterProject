@@ -135,7 +135,7 @@ class Hitbox:
 
     @staticmethod
     def _collide_circle_point(circle, point):
-        return (circle.x - point.x) ** 2 + (circle.y - point.y) ** 2 < (circle.radius) ** 2
+        return (circle.x - point.x) ** 2 + (circle.y - point.y) ** 2 < circle.radius** 2
 
     @staticmethod
     def _collide_hitbox_list(hitbox, list_):
@@ -328,4 +328,5 @@ def get_difficulty_data(difficulty=1):
     return {'Zombie_Damage': 1 * difficulty,
             'Zombie_Health': 1 * difficulty,
             'Zombie_Speed': 1 * difficulty,
+            'Coin_Multiplier': round(1/max([difficulty,0.01])),
             'Natural Healing': False}

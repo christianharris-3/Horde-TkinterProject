@@ -26,9 +26,8 @@ class Entity:
     def get_hitbox(self,circle=False):
         if circle:
             return CircleHitbox(self.x, self.y, self.radius)
-        else:
-            f = 1.4
-            return RectHitbox(self.x-self.radius/2*f,self.y-self.radius/2*f,self.radius*f,self.radius*f)
+        f = 1.4
+        return RectHitbox(self.x-self.radius/2*f,self.y-self.radius/2*f,self.radius*f,self.radius*f)
 
     def physics(self, delta_time, tilemap_collision_hash):
         self.target_move.normalize()
@@ -59,7 +58,7 @@ class Entity:
                 for e in collision_hash[code]:
                     if not (e is self) and ownhitbox.Get_Collide(e.get_hitbox()):
                         if self.team == "Enemy" and e.team == "Player":
-                            if not(e.cheat_info["immortal"]):
+                            if not e.cheat_info["immortal"]:
                                 # Deal Damage to Player
                                 e.vel -= Vec(self.x - e.x, self.y - e.y).normalized() / 100
                                 dmg = self.damage
@@ -92,20 +91,26 @@ class Entity:
             if projectile.stuns:
                 self.stunned = True
                 self.stun_timer = 2
-            self.vel += Vec.make_from_angle(projectile.angle, projectile.knockback * self.knockback_resistance)
+            self.vel += Vec.make_from_angle(projectile.angle,
+                                            projectile.knockback * self.knockback_resistance)
             self.take_damage(projectile.damage)
             particle_num = round(min(projectile.damage,self.max_health)*2)
             if self.get_dead():
                 particle_num*=4
-                particles += [Blood_Splat(self.x+(random.random()*1.4-0.7)*self.radius,
+                for _ in range(round(self.radius*10)):
+                    particles.append(Blood_Splat(self.x+(random.random()*1.4-0.7)*self.radius,
                                           self.y+(random.random()*1.4-0.7)*self.radius,
-                                          random.gauss(projectile.angle,0.2), max(random.gauss(0,0.1),0.01),
-                                          random.random()/10+0.01)
-                              for _ in range(round(self.radius*10))]
-            particles += [Blood_Particle(random.gauss(self.x,self.radius/3),random.gauss(self.y,self.radius/3),
+                                          random.gauss(projectile.angle,0.2),
+                                                 max(random.gauss(0,0.1),0.01),
+                                          random.random()/10+0.01))
+
+            for _ in range(particle_num):
+                particles.append(Blood_Particle(random.gauss(self.x,self.radius/3),
+                                                random.gauss(self.y,self.radius/3),
                                    random.gauss(projectile.angle,0.3),
-                                   max(random.gauss(projectile.knockback*self.knockback_resistance,0.4),0.1),
-                                   random.random()/15+0.01) for a in range(particle_num)]
+                                   max(random.gauss(projectile.knockback*self.knockback_resistance,
+                                                    0.4),0.1),
+                                   random.random()/15+0.01))
         return particles
 
     def take_damage(self, damage):

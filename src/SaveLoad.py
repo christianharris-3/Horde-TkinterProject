@@ -1,5 +1,8 @@
-import json, copy, os, time
-from src.Enemy import Slow_Zombie, Fast_Zombie, Big_Zombie, Demon_Zombie, Chonk_Zombie
+import json
+import copy
+import os
+import time
+from src.enemy import SlowZombie, FastZombie, BigZombie, DemonZombie, ChonkZombie
 from src.Player import Player
 from src.TileMap import Tilemap
 from src.Projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
@@ -8,11 +11,11 @@ from src.Utiles import Vec, get_now, get_difficulty_data
 
 
 class Save:
-    entity_type_map = {Slow_Zombie: 'Slow_Zombie',
-                       Fast_Zombie: 'Fast_Zombie',
-                       Big_Zombie: 'Big_Zombie',
-                       Demon_Zombie: 'Demon_Zombie',
-                       Chonk_Zombie: 'Chonk_Zombie',
+    entity_type_map = {SlowZombie: 'Slow_Zombie',
+                       FastZombie: 'Fast_Zombie',
+                       BigZombie: 'Big_Zombie',
+                       DemonZombie: 'Demon_Zombie',
+                       ChonkZombie: 'Chonk_Zombie',
                        Player: 'Player'}
     particle_type_map = {Bullet: 'Bullet', SMG_Bullet: 'SMG_Bullet', Shotgun_Shell: 'Shotgun_Shell',
                          LMG_Bullet: 'LMG_Bullet', Grenade: 'Grenade',
@@ -22,7 +25,8 @@ class Save:
                          Force_Push_Effect: "Force_Push_Effect"}
 
     @staticmethod
-    def save(filename, player,enemies,tilemap,projectiles,particles,shop_data,game_stats, camera_pos, wave_data,
+    def save(filename, player,enemies,tilemap,projectiles,particles,
+             shop_data,game_stats, camera_pos, wave_data,
              cheat_info):
         shop_data = copy.copy(shop_data)
         shop_data["Player_Object"] = None

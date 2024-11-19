@@ -9,7 +9,8 @@ class Enemy(Entity):
         self.team = 'Enemy'
 
         self.image_base = Image.open(image_path).resize(
-            Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)
+            Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True),
+            resample=Image.Resampling.BOX)
 
     def get_image(self):
         img_s = int(3.5*Coords.scale_factor)
@@ -18,16 +19,22 @@ class Enemy(Entity):
         if self.target_move[0] > 0:
             enemy_image = enemy_image.transpose(Image.FLIP_LEFT_RIGHT)
         image.paste(enemy_image,
-                    (int(img_s / 2 - self.image_base.width / 2), int(img_s / 2 - self.image_base.height / 2)))
+                    (int(img_s / 2 - self.image_base.width / 2),
+                     int(img_s / 2 - self.image_base.height / 2)))
 
         # Draw health bar
         drawer = ImageDraw.Draw(image)
-        drawer.rectangle((img_s / 2 - self.image_base.width * 0.6, img_s / 2 - self.image_base.height * 0.7,
-                          img_s / 2 + self.image_base.width * 0.6, img_s / 2 - self.image_base.height * 0.55),
+        drawer.rectangle((img_s / 2 - self.image_base.width * 0.6,
+                          img_s / 2 - self.image_base.height * 0.7,
+                          img_s / 2 + self.image_base.width * 0.6,
+                          img_s / 2 - self.image_base.height * 0.55),
                          fill=(100, 100, 100))
-        drawer.rectangle((img_s / 2 - self.image_base.width * 0.6 + 1, img_s / 2 - self.image_base.height * 0.7 + 1,
-                          img_s / 2 - self.image_base.width * 0.6 + 1 + (self.image_base.width * 1.2 - 2) * (
-                                  self.health / self.max_health), img_s / 2 - self.image_base.height * 0.55 - 1),
+        drawer.rectangle((img_s / 2 - self.image_base.width * 0.6 + 1,
+                          img_s / 2 - self.image_base.height * 0.7 + 1,
+                          img_s / 2 - self.image_base.width * 0.6 + 1 + (
+                                  self.image_base.width * 1.2 - 2) * (
+                                  self.health / self.max_health),
+                          img_s / 2 - self.image_base.height * 0.55 - 1),
                          fill=(200, 0, 0))
 
         return image, Vec(self.x, self.y)

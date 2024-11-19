@@ -1,6 +1,7 @@
-import random, math
+import random
+import math
 from PIL import Image, ImageDraw
-from src.Entity import Entity
+from src.entity import Entity
 from src.Utiles import Coords, Vec
 
 
@@ -11,7 +12,8 @@ class Enemy(Entity):
         self.facing_left = True
 
         self.image_base = Image.open(image_path).resize(
-            Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)
+            Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True),
+            resample=Image.Resampling.BOX)
 
     def get_image(self):
         img_s = int(3.5*Coords.scale_factor)
@@ -27,17 +29,22 @@ class Enemy(Entity):
                 angle = 360-angle
             enemy_image = enemy_image.rotate(angle)
         image.paste(enemy_image,
-                    (int(img_s / 2 - self.image_base.width / 2), int(img_s / 2 - self.image_base.height / 2)))
+                    (int(img_s / 2 - self.image_base.width / 2),
+                     int(img_s / 2 - self.image_base.height / 2)))
 
         # Draw health bar
         drawer = ImageDraw.Draw(image)
-        drawer.rectangle((img_s / 2 - self.image_base.width * 0.6, img_s / 2 - self.image_base.height * 0.7,
-                          img_s / 2 + self.image_base.width * 0.6, img_s / 2 - self.image_base.height * 0.55),
+        drawer.rectangle((img_s / 2 - self.image_base.width * 0.6,
+                          img_s / 2 - self.image_base.height * 0.7,
+                          img_s / 2 + self.image_base.width * 0.6,
+                          img_s / 2 - self.image_base.height * 0.55),
                          fill=(100, 100, 100))
         health_terp = self.health / self.max_health
         if health_terp>0:
-            drawer.rectangle((img_s / 2 - self.image_base.width * 0.6 + 1, img_s / 2 - self.image_base.height * 0.7 + 1,
-                            img_s / 2 - self.image_base.width * 0.6 + 1 + (self.image_base.width * 1.2 - 2) * (
+            drawer.rectangle((img_s / 2 - self.image_base.width * 0.6 + 1,
+                              img_s / 2 - self.image_base.height * 0.7 + 1,
+                            img_s / 2 - self.image_base.width * 0.6 + 1 + (
+                                      self.image_base.width * 1.2 - 2) * (
                                     health_terp), img_s / 2 - self.image_base.height * 0.55 - 1),
                             fill=(200, 0, 0))
 
@@ -65,7 +72,7 @@ class Enemy(Entity):
         self.damage *= difficulty_data["Zombie_Damage"]
 
 
-class Slow_Zombie(Enemy):
+class SlowZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Slow_Zombie.png'
         self.radius = 0.4
@@ -78,7 +85,7 @@ class Slow_Zombie(Enemy):
         self.coin_value = 1
         self.apply_difficulty(difficulty_data)
 
-class Fast_Zombie(Enemy):
+class FastZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Fast_Zombie.png'
         self.radius = 0.35
@@ -92,7 +99,7 @@ class Fast_Zombie(Enemy):
         self.coin_value = 2
         self.apply_difficulty(difficulty_data)
 
-class Big_Zombie(Enemy):
+class BigZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Big_Zombie.png'
         self.radius = 0.48
@@ -106,7 +113,7 @@ class Big_Zombie(Enemy):
         self.coin_value = 3
         self.apply_difficulty(difficulty_data)
 
-class Demon_Zombie(Enemy):
+class DemonZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Demon_Zombie.png'
         self.radius = 0.3
@@ -120,7 +127,7 @@ class Demon_Zombie(Enemy):
         self.coin_value = 3
         self.apply_difficulty(difficulty_data)
 
-class Chonk_Zombie(Enemy):
+class ChonkZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
         self.image_path = 'Sprites/Chonk_Zombie.png'
         self.radius = 0.6

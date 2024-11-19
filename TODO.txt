@@ -9,11 +9,11 @@ DONE - Wave Display
 DONE- Money/Score
 DONE - Death screen
 DONE - LeaderBoard
-- add multiple levels/difficulties. easy,normal,hard, current game is hard.
+DONE - add multiple levels/difficulties. easy,normal,hard, current game is hard.
 DONE - Save/Load gamestate
 DONE - Boss Key
 - Combo Display
-- x button for shop and way to display if item can be bought
+DONE - x button for shop and way to display if item can be bought
 
 DONE - Cheat Codes
 DONE -- imortality

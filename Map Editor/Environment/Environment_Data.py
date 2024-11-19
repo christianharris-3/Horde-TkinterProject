@@ -10,7 +10,8 @@ class Data:
             'Grass':{'File':'Sprites\Grass.png','Hitbox':()},
             'Rock':{'File':'Sprites\Rock.png','Hitbox':(0.1,0.4,0.8,0.6)},
             'Cobble':{'File':'Sprites\Cobble2.png','Hitbox':(0,0,1,1)},
-            'Shop':{'File':'Sprites/Shop.png','Hitbox':(0.5,0.5,0.5)}}
+            'Shop':{'File':'Sprites/Shop.png','Hitbox':(0.5,0.5,0.5)},
+            'Tree': {'File': 'Sprites/Tree.png', 'Hitbox': (0.3, 0.5, 0.4, 0.5)}}
 
 
     for obj in data:

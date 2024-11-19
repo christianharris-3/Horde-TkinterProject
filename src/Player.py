@@ -1,7 +1,7 @@
 import math, random
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
-from src.Entity import Entity
+from src.entity import Entity
 from src.Utiles import Coords, Vec
 from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade, KB_Obj
 from src.Particles import Force_Push_Effect
@@ -60,6 +60,7 @@ class Player(Entity):
 
         self.can_open_shop = False
         self.closest_shop = Tile(-1, -1, 40, "Shop")
+        self.closest_shop.team = None
 
         self.auto_fire_cooldown = 0
         self.reload_timer = 0
@@ -101,7 +102,7 @@ class Player(Entity):
         self.closest_shop.can_be_opened = self.can_open_shop
         self.closest_shop.open_shop_text = f"Click {self.control_map['Shop']['Key'].upper()} To Open Shop"
 
-    def get_image(self, enemies, screen_hitbox):
+    def get_image(self, enemies, screen_hitbox, inbetween_waves):
         img_s = int(3.5 * Coords.scale_factor)
         image = Image.new("RGBA", (img_s, img_s), (0, 0, 0, 0))
 
@@ -128,16 +129,24 @@ class Player(Entity):
                 self.radius / 10))),
                     weapon_img)
 
+        # Function for drawing arrows
+        def draw_arrow(target_x,target_y,surf,col):
+            angle = math.atan2(target_y-self.y,target_x-self.x)
+            dis = Coords.world_to_pixel(self.radius*2)
+            draw = ImageDraw.Draw(surf)
+            center = Vec(img_s/2,img_s/2)
+            draw.polygon([(Vec.make_from_angle(angle)*dis+center).tuple(),
+                          (Vec.make_from_angle(angle+0.1)*(dis-5)+center).tuple(),
+                          (Vec.make_from_angle(angle-0.1)*(dis-5)+center).tuple()],fill=col)
+
         # Draw arrows to all off screen enemies
         for e in enemies:
             if not e.get_hitbox(True).Get_Collide(screen_hitbox):
-                angle = math.atan2(e.y-self.y,e.x-self.x)
-                dis = Coords.world_to_pixel(self.radius*2)
-                draw = ImageDraw.Draw(image)
-                center = Vec(img_s/2,img_s/2)
-                draw.polygon([(Vec.make_from_angle(angle)*dis+center).tuple(),
-                              (Vec.make_from_angle(angle+0.1)*(dis-5)+center).tuple(),
-                              (Vec.make_from_angle(angle-0.1)*(dis-5)+center).tuple()],fill='#f22')
+                draw_arrow(e.x,e.y,image,'#f22')
+
+        # Draw arrow to shop if a closest shop exists
+        if inbetween_waves and self.closest_shop.team and not self.closest_shop.can_be_opened:
+            draw_arrow(self.closest_shop.x+0.5,self.closest_shop.y+0.5,image,'#275324')
 
         return image, Vec(self.x, self.y)
 

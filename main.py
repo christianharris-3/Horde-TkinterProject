@@ -46,8 +46,8 @@ class Main:
         menu_funcs  = {'start_game':self.start_game,
                        'pause':self.pause,
                        'end_game':self.end_game}
-        self.menus = Menus(self.window, self.input, self.window_width, self.window_height, menu_funcs,
-                           self.control_map, self.control_map_defaults, self.font)
+        self.menus = Menus(self.window, self.input, self.window_width, self.window_height,
+                           menu_funcs, self.control_map, self.control_map_defaults, self.font)
 
         self.window.bind('<Tab>',self.boss_key)
         self.boss_key_active = False
@@ -61,43 +61,35 @@ class Main:
 
     def game_loop(self, delta_time):
         if not self.game_active:
-            return self.game_active
+            return True
+        done = False
         if not self.game_paused:
             # Run main gameloop when not paused
-            done = False
             player_died, open_shop = self.game.gameloop(delta_time)
             if player_died:
-                self.menus.set_menu("Death_Screen",data=self.game.game_stats)
+                self.menus.set_menu("Death_Screen", data=self.game.game_stats)
             elif open_shop:
                 self.game_paused = True
-                self.menus.set_menu("Shop_Menu",data=self.game.shop_data)
+                self.menus.set_menu("Shop_Menu", data=self.game.shop_data)
         else:
-            done = False
-
             ## Code to shut shop with same key that opens it
-            if self.input.get_pressed(self.control_map["Shop"]["Key"]):
-                if self.menus.active_menu == 'Shop_Menu' and (self.control_map["Shop"]["Key"] not in self.game.player.buttons_down):
+            self.detect_shut_shop()
+        if done:
+            self.end_game()
+        else:
+            self.game.render_frame()
+            if self.input.get_pressed(self.control_map["Pause"]["Key"]):
+                if self.menus.active_menu != "Death_Screen":
                     self.pause()
-                    self.game.player.buttons_down.append(self.control_map["Shop"]["Key"])
-            else:
-                if self.control_map["Shop"]["Key"] in self.game.player.buttons_down:
-                    self.game.player.buttons_down.remove(self.control_map["Shop"]["Key"])
-            if done:
-                self.end_game()
-            else:
-                self.game.render_frame()
-                if self.input.get_pressed(self.control_map["Pause"]["Key"]):
-                    if self.menus.active_menu != "Death_Screen":
-                        self.pause()
-                    else:
-                        done = True
-                        self.end_game()
                 else:
-                    self.pause_button_down = False
-                if self.input.get_cheatcode_active():
-                    self.game_paused = True
-                    self.menus.set_menu('CheatCode_Menu',data=self.game.cheat_info)
-            return done
+                    done = True
+                    self.end_game()
+            else:
+                self.pause_button_down = False
+            if self.input.get_cheatcode_active():
+                self.game_paused = True
+                self.menus.set_menu('CheatCode_Menu', data=self.game.cheat_info)
+        return done
 
 
     # def window_resize(self,event):
@@ -112,8 +104,8 @@ class Main:
     def start_game(self,gamefile=None,level='Level 3'):
         self.game_paused = False
         self.game_active = True
-        self.game = Game(self.window, self.input, self.window_width, self.window_height, self.control_map, self.menus,
-                         self.font, gamefile, level)
+        self.game = Game(self.window, self.input, self.window_width, self.window_height,
+                         self.control_map, self.menus, self.font, gamefile, level)
         self.menus.menu_funcs["save_game"] = self.game.save_game
         self.menus.menu_funcs["game_object"] = self.game
         TC.game_looper(self.game_loop, self.window, self.target_fps)
@@ -150,6 +142,16 @@ class Main:
         else:
             self.window.geometry(f'{self.window_width}x{self.window_height}')
             self.boss_key_label.destroy()
+
+    def detect_shut_shop(self):
+        if self.input.get_pressed(self.control_map["Shop"]["Key"]):
+            if self.menus.active_menu == 'Shop_Menu' and (
+                    self.control_map["Shop"]["Key"] not in self.game.player.buttons_down):
+                self.pause()
+                self.game.player.buttons_down.append(self.control_map["Shop"]["Key"])
+        else:
+            if self.control_map["Shop"]["Key"] in self.game.player.buttons_down:
+                self.game.player.buttons_down.remove(self.control_map["Shop"]["Key"])
 
     def load_control_map(self):
         if os.path.exists('Data/control_map.json'):
