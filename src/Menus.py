@@ -103,22 +103,22 @@ class Menus:
         self.frame.lift()
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        tk.Button(self.frame, text="Resume", width=15, command=self.menu_funcs['pause'],
-                  font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
-                  pady=0).place(relx=0.5, y=20, anchor=tk.N)
-        tk.Button(self.frame, text='Settings', width=12, command=lambda: self.set_menu("Settings"),
-                  font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=0,
-                  pady=0).place(relx=0.5, y=100, anchor=tk.N)
-        tk.Button(self.frame, text='Save', width=10, command=lambda: self.set_menu("Save_Game_Menu",data=gamefile),
+        tk.Button(self.frame, text="Resume", command=self.menu_funcs['pause'],
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  padx=0, pady=0).place(relx=0.5, y=180, anchor=tk.N)
-        tk.Button(self.frame, text='Exit To Main Menu', width=16, command=self.menu_funcs['end_game'],
+                  ).place(relx=0.5, y=20, anchor=tk.N, width=207, height=63)
+        tk.Button(self.frame, text='Settings', command=lambda: self.set_menu("Settings"),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                  padx=0, pady=0).place(relx=0.5, y=260, anchor=tk.N)
+                  ).place(relx=0.5, y=100, anchor=tk.N, width=168, height=63)
+        tk.Button(self.frame, text='Save', command=lambda: self.set_menu("Save_Game_Menu",data=gamefile),
+                  font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.5, y=180, anchor=tk.N, width=142, height=63)
+        tk.Button(self.frame, text='Exit To Main Menu', command=self.menu_funcs['end_game'],
+                  font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.5, y=260, anchor=tk.N, width=220, height=63)
         if save_and_quit:
-            tk.Button(self.frame, text='Save and Exit', width=14, command=self.save_and_quit,
+            tk.Button(self.frame, text='Save and Exit', command=self.save_and_quit,
                       font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
-                      padx=0, pady=0).place(relx=0.5, y=340, anchor=tk.N)
+                      ).place(relx=0.5, y=340, anchor=tk.N, width=194, height=63)
 
     def make_shop_menu(self,shop_data):
         self.frame.configure(width=500, height=375, highlightbackground="darkgreen", highlightthickness=3)
@@ -288,12 +288,12 @@ class Menus:
         table.place(relx=0.5,x=-80,y=90,anchor=tk.N)
 
         tk.Button(self.frame, text='Load', command=lambda: self.load_gamestate(table),
-                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
-                  pady=0).place(relx=0.5, x=500, y=140, anchor=tk.CENTER)
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4"
+                  ).place(relx=0.5, x=500, y=140, anchor=tk.CENTER, width=104, height=84)
 
         tk.Button(self.frame, text='Delete', command=lambda: self.delete_gamestate(table),
-                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
-                  pady=0).place(relx=0.5, x=500, y=240, anchor=tk.CENTER)
+                  font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
+                  ).place(relx=0.5, x=500, y=240, anchor=tk.CENTER, width=122, height=84)
 
     def make_leaderboard_menu(self):
         tk.Button(self.frame, text='Back', command=self.menu_back,

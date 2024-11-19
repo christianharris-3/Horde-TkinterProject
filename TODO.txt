@@ -34,9 +34,9 @@ DONE - grenades
 
 - score based on time since last took damage
 
-- Menu widgets to set size of explicitely
- -- load/delete in game saves menu
- -- pause menu buttons
+DONE- Menu widgets to set size of explicitely
+DONE -- load/delete in game saves menu
+DONE -- pause menu buttons
 
 
 

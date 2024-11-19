@@ -121,7 +121,11 @@ class Game:
             titles = [a["Title"] for a in self.allwaves_data]
             wave_index = titles.index(self.game_stats["Wave Reached"])
             self.set_wave(wave_index)
+            self.inbetween_wave_timer = 0
+            numlist_full = [a["Num"] for a in self.wave_data['Zombies']]
             self.wave_data = wave_data
+            numlist = [a["Num"] for a in self.wave_data['Zombies']]
+            self.zombies_killed_in_wave = sum(numlist_full) - sum(numlist) - len(self.enemies)
             self.cheat_info = cheat_info
             self.difficulty_data = get_difficulty_data(self.tilemap.difficulty)
     def save_game(self, filename=None):
@@ -407,8 +411,8 @@ class Game:
         self.game_stats["Wave Reached"] = self.wave_data["Title"]
 
         self.inbetween_wave = True
-        self.inbetween_wave_timer_total = self.zombies_in_wave*self.wave_data["Spawn_Rate"]/3/(
-                                          self.wave_index+1)
+        self.inbetween_wave_timer_total = max([self.zombies_in_wave*self.wave_data["Spawn_Rate"]/2/(
+                                          self.wave_index+1),3])
         self.inbetween_wave_timer = self.inbetween_wave_timer_total
 
 
