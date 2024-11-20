@@ -81,13 +81,27 @@ class Menus:
         tk.Label(self.frame, text="Edit Keybinds", bg="darkolivegreen2", font=(self.font, 40, "bold")
                  ).place(relx=0.5, y=50, anchor=tk.CENTER)
 
+
+        ## Detects 2 controls with same input
+        used = []
+        conflicts = []
+        for action in self.control_map:
+            if self.control_map[action]['Key'] in used:
+                conflicts.append(self.control_map[action]['Key'])
+            else:
+                used.append(self.control_map[action]['Key'])
+
         for i, action in enumerate(self.control_map):
             txt = f"{action}: {self.control_map[action]['Key']}".replace('1', 'Left Click').replace('3', 'Right Click')
-            key = tk.Button(self.frame, text=txt,
-                            font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4")
+            swap_col = 'green'
+            if self.control_map[action]['Key'] in conflicts:
+                swap_col = 'red3'
+            key = tk.Button(self.frame, text=txt, font=(self.font, 15), bg=swap_col,
+                            relief=tk.GROOVE, bd=4, activebackground="green4")
             key.place(relx=0.53, x=-10, y=130 + 65 * i, height=50, width=246, anchor=tk.E)
             func = funcer(self.start_key_listener, action=action, button=key)
             key.configure(command=func.func)
+
             func = funcer(self.reset_keybind, action=action)
             reset_color = 'green'
             if self.control_map[action]['Key'] != self.control_map_defaults[action]['Key']:

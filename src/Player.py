@@ -265,7 +265,8 @@ class Player(Entity):
         if self.reload_timer <= 0 and self.reloading:
             self.reloading = False
             self.ammo_left = self.weapon_data["Clip_Size"]
-        if self.get_pressed(inp, "Shoot") and self.auto_fire_cooldown < 0:
+        out = self.get_pressed(inp, "Shoot")
+        if out and self.auto_fire_cooldown < 0:
             new_projectiles = self.shoot()
             self.auto_fire_cooldown = self.weapon_data["Shoot_CD"]
 
