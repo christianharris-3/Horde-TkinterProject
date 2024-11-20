@@ -28,7 +28,7 @@ class Save:
     @staticmethod
     def save(filename, player,enemies,tilemap,projectiles,particles,
              shop_data,game_stats, camera_pos, wave_data,
-             cheat_info):
+             cheat_info, score_add_timer):
         shop_data = copy.copy(shop_data)
         shop_data["Player_Object"] = None
         data = {"player":Save.player(player),"enemies":[Save.entity(e) for e in enemies],
@@ -36,7 +36,8 @@ class Save:
                 "particles":[Save.particle(e) for e in particles],"camera_pos":camera_pos.tuple(),
                 "filename":filename, "wave_data":Save.wave_data(wave_data),
                 'save_timestamp':{'date':get_now()[0], 'time':get_now()[1], 'unix_time':time.time()},
-                'cheat_info':cheat_info,'level':{'path':tilemap.level_path,'title':tilemap.level_title}}
+                'cheat_info':cheat_info,'level':{'path':tilemap.level_path,'title':tilemap.level_title},
+                'score_add_timer':score_add_timer}
         with open(f'Data/Game Saves/{filename}.json','w') as f:
             json.dump(data,f)
 
@@ -49,7 +50,7 @@ class Save:
     def player(e):
         data = Save.entity(e)
         data.update({"shield":e.shield, "weapon":e.active_weapon, "ammo_left":e.ammo_left, "reloading":e.reloading,
-                     "reload_timer":e.reload_timer})
+                     "reload_timer":e.reload_timer, "time_since_hit":e.time_since_hit})
         return data
 
     @staticmethod
@@ -98,7 +99,8 @@ class Load:
         particles = [Load.particle(e) for e in data["particles"]]
         camera_pos = Vec(*data["camera_pos"])
         wave_data = Load.wave_data(data["wave_data"])
-        return player,enemies,tilemap,projectiles,particles,shop_data,game_stats,camera_pos,wave_data,cheat_info
+        score_add_timer = data["score_add_timer"]
+        return player,enemies,tilemap,projectiles,particles,shop_data,game_stats,camera_pos,wave_data,cheat_info,score_add_timer
 
 
     @staticmethod
@@ -121,6 +123,7 @@ class Load:
         e.reloading = data["reloading"]
         e.reload_timer = data["reload_timer"]
         e.ammo_left = data["ammo_left"]
+        e.time_since_hit = data["time_since_hit"]
         return e
 
     @staticmethod

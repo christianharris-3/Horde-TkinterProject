@@ -83,8 +83,8 @@ class Game:
 
         self.combo = 0
         self.combo_timer = 0
-        self.score_add_intival = 5
-        self.score_add_timer = self.score_add_intival
+        self.score_add_interval = 5
+        self.score_add_timer = self.score_add_interval
 
         self.camera_pos = Vec(self.player.x, self.player.y)
         self.camera_target_pos = Vec()
@@ -119,7 +119,7 @@ class Game:
         game_data = Load.load(filename, self.control_map, self.screen_width, self.screen_height)
         if game_data:
             self.player, self.enemies, self.tilemap, self.projectiles,self.particles = game_data[:5]
-            self.shop_data, self.game_stats, self.camera_pos, wave_data, cheat_info = game_data[5:]
+            self.shop_data, self.game_stats, self.camera_pos, wave_data, cheat_info, self.score_add_timer = game_data[5:]
             self.allwaves_data = self.load_waves_data()
             titles = [a["Title"] for a in self.allwaves_data]
             wave_index = titles.index(self.game_stats["Wave Reached"])
@@ -138,7 +138,7 @@ class Game:
             filename = self.gamefile
         Save.save(filename, self.player, self.enemies, self.tilemap, self.projectiles,
                   self.particles, self.shop_data, self.game_stats, self.camera_pos,
-                  self.wave_data, self.cheat_info)
+                  self.wave_data, self.cheat_info, self.score_add_timer)
 
     def load_waves_data(self):
         dat = self.tilemap.wave_data
@@ -158,16 +158,15 @@ class Game:
         self.get_collision_hash()
 
         # Add score for not taking damage
-        if not self.inbetween_wave:
-            self.score_add_timer -= delta_time / 60
-            if self.score_add_timer<0 and self.player.time_since_hit > 5:
-                added_score = int((self.player.time_since_hit-5)**0.3)
-                if added_score>0:
-                    self.game_stats["Score"]+=added_score
-                    self.score_add_timer = self.score_add_intival
-                    self.particles.append(Text_Particle(self.player.x,self.player.y,0.3,
-                        f'+{added_score} Score ({int(self.player.time_since_hit)}s Since Hit)',
-                                                        self.font))
+        self.score_add_timer -= delta_time / 60
+        if self.score_add_timer<0 and self.player.time_since_hit > 5:
+            added_score = int((self.player.time_since_hit-4)**0.5)
+            self.score_add_timer = self.score_add_interval
+            if added_score>0:
+                self.game_stats["Score"]+=added_score
+                self.particles.append(Text_Particle(self.player.x,self.player.y,0.3,
+                    f'+{added_score} Score ({int(self.player.time_since_hit)}s Since Hit)',
+                                                    self.font))
 
         # Player Physics and Input control
         open_shop = False

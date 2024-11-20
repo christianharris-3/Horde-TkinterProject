@@ -148,7 +148,7 @@ class Player(Entity):
 
         # Draw arrow to shop if a closest shop exists
         if inbetween_waves and self.closest_shop.team and not self.closest_shop.can_be_opened:
-            draw_arrow(self.closest_shop.x+0.5,self.closest_shop.y+0.5,image,'#275324')
+            draw_arrow(self.closest_shop.x+0.5,self.closest_shop.y+0.5,image,'#275384')
 
         return image, Vec(self.x, self.y)
 
@@ -183,14 +183,14 @@ class Player(Entity):
 
         # Ammo Display
         ammo_x = (screen.winfo_width()+w) / 2+20
-        ammo_y = screen.winfo_height()-20
+        ammo_y = screen.winfo_height()-55
         if self.reloading:
             output = "Clip: Reloading"
-            screen.create_rectangle(ammo_x, ammo_y-15, ammo_x + max(self.reload_timer, 0) / self.weapon_data["Reload_Time"] * 300,
-                                    ammo_y-10, fill="#803310", outline="#803310", tag="game_image")
+            screen.create_rectangle(ammo_x, ammo_y+20, ammo_x + max(self.reload_timer, 0) / self.weapon_data["Reload_Time"] * 300,
+                                    ammo_y+25, fill="#803310", outline="#803310", tag="game_image")
         else:
             output = f"Clip: {self.ammo_left}/{self.weapon_data['Clip_Size']}"
-        screen.create_text(ammo_x, ammo_y, text=output, anchor=tk.SW, tags='game_image', font=(font, 30))
+        screen.create_text(ammo_x, ammo_y, text=output, anchor=tk.W, tags='game_image', font=(font, 30))
 
         # Grenade/Force Push Display
         grenade_x = (screen.winfo_width() - w) / 2 - 150

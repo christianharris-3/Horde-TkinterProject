@@ -179,7 +179,7 @@ class Menus:
                       bg="darkolivegreen2",font=(self.font,14),anchor=tk.N,pady=0
                      ).place(x=x_pos,y=260,width=112,height=96,anchor=tk.N)
             func = funcer(upgrade['Func'],price=upgrade["Price"],shop_data=shop_data,counter=upgrade["Counter"])
-            txt = f'Buy: {upgrade["Price"]}'
+            txt = f'Buy:{upgrade["Price"]}'
             if upgrade["Price"]<=shop_data["Coins"]:
                 col = 'green'
                 state = 'active'
