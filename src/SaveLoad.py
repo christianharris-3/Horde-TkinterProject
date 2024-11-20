@@ -6,7 +6,7 @@ from src.enemy import SlowZombie, FastZombie, BigZombie, DemonZombie, ChonkZombi
 from src.Player import Player
 from src.TileMap import Tilemap
 from src.Projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
-from src.Particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect
+from src.Particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect, Text_Particle
 from src.Utiles import Vec, get_now, get_difficulty_data
 
 
@@ -22,7 +22,8 @@ class Save:
                          Blood_Splat: "Blood_Splat", Blood_Particle: "Blood_Particle",
                          Bullet_Hit_Particle: "Bullet_Hit_Particle",
                          Grenade_Fragment: "Grenade_Fragment", Explosion: "Explosion",
-                         Force_Push_Effect: "Force_Push_Effect"}
+                         Force_Push_Effect: "Force_Push_Effect",
+                         Text_Particle: "Text_Particle"}
 
     @staticmethod
     def save(filename, player,enemies,tilemap,projectiles,particles,
@@ -55,6 +56,9 @@ class Save:
     def particle(e):
         data = {"x":e.x,"y":e.y,"vel":e.vel.tuple(),"time_alive":e.time_alive,"radius":e.radius,
                 "class":Save.particle_type_map[type(e)],"team":e.team,"time_kill_cutoff":e.time_kill_cutoff}
+        if data["class"] == "Text_Particle":
+            data["font"] = e.font
+            data["text"] = e.shape
         return data
 
     @staticmethod
@@ -134,6 +138,8 @@ class Load:
                         e = typ(data["x"],data["y"],data["vel"].length())
                     elif typ in [Blood_Particle,Blood_Splat]:
                         e = typ(data["x"],data["y"],data["vel"].angle(),data["vel"].length(),data["radius"])
+                    elif typ in [Text_Particle]:
+                        e = typ(data["x"], data["y"], data["vel"].length(), data["text"], data["font"])
                     else:
                         e = typ(data["x"], data["y"], data["vel"].angle(), data["vel"].length())
                 e.vel = data["vel"]
