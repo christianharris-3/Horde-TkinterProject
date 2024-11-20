@@ -338,6 +338,13 @@ class Menus:
         tk.Label(self.frame,text='Cheat Menu', font=(self.font, 20), bg="darkolivegreen2",
                  ).place(relx=0.5,y=5,anchor=tk.N)
 
+        ## Give money button
+        tk.Button(self.frame, text='+100\nCoins', command=self.cheat_add_coins,
+                  font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4,
+                  activebackground="green4",
+                  ).place(x=240, y=90, height=80, width=100, anchor=tk.NW)
+
+        ## Toggles
         titles = ["Immortal", "Infinite Ammo", "Infinite Abilities"]
         self.cheatcode_tkvars = []
         for i,t in enumerate(titles):
@@ -351,6 +358,8 @@ class Menus:
             if cheat_info[t.lower()]:
                 toggle.select()
 
+
+        ## Sliders
         self.cheat_info = cheat_info
         sliders = [{'title':'Damage\nMultiplier','key':'damage multiplier','from':1,'to':32,'res':1,'func':self.move_slider_damage},
                    {'title':'Spawn Time\nMultiplier','key':'spawn time multiplier','from':0,'to':5,'res':0.1,'func':self.move_slider_spawntime},
@@ -383,6 +392,8 @@ class Menus:
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   ).place(relx=0.5, y=100+i*80, height=70, anchor=tk.N)
 
+    def cheat_add_coins(self):
+        self.menu_funcs["game_object"].shop_data["Coins"]+=100
     def cheat_widget_input(self,variable,cheat_info,info_type):
         cheat_info[info_type] = bool(variable.get())
     def move_slider_damage(self,val):

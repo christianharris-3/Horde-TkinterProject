@@ -32,7 +32,7 @@ DONE - grenades
 
 
 
-- score based on time since last took damage
+DONE - score based on time since last took damage
 
 DONE- Menu widgets to set size of explicitely
 DONE -- load/delete in game saves menu

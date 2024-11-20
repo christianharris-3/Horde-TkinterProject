@@ -1,4 +1,5 @@
 import random
+import math
 import tkinter as tk
 from src.Utiles import Vec, CircleHitbox, Coords
 
@@ -40,6 +41,9 @@ class Particle:
             screen.create_oval(*coord_mapper(Vec(self.start_x - ring_rad, self.start_y - ring_rad)),
                                *coord_mapper(Vec(self.start_x + ring_rad, self.start_y + ring_rad)),
                                outline=self.outline_col, width=int(self.vel.length()*self.radius) ,tag='game_image')
+        else:
+            screen.create_text(*coord_mapper(Vec(self.x, self.y)),text=self.shape,anchor=tk.CENTER,
+                              tags='game_image', font=(self.font, 15))
 
     def physics(self, delta_time):
         self.prev_x = self.x
@@ -98,3 +102,12 @@ class Force_Push_Effect(Particle):
         self.radius = 40
         self.outline_col = '#d6bad6'
         self.move_drag=0.78
+
+class Text_Particle(Particle):
+    def __init__(self,x,y,speed,text,font):
+        super().__init__(x, y, -math.pi/2, speed)
+        self.shape = text
+        self.font = font
+        self.move_drag=0.8
+        self.velocity_kill_cutoff = -1
+        self.time_kill_cutoff = 2

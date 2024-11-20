@@ -57,6 +57,7 @@ class Player(Entity):
         self.hurt_image = 0
         self.hurt_frames_counter = 0
         self.screen_resize(screen_width, screen_height)
+        self.time_since_hit = 0
 
         self.can_open_shop = False
         self.closest_shop = Tile(-1, -1, 40, "Shop")
@@ -98,6 +99,7 @@ class Player(Entity):
         self.i_frames -= delta_time / 60
         self.auto_fire_cooldown -= delta_time / 60
         self.reload_timer -= delta_time / 60
+        self.time_since_hit += delta_time / 60
 
         self.closest_shop.can_be_opened = self.can_open_shop
         self.closest_shop.open_shop_text = f"Click {self.control_map['Shop']['Key'].upper()} To Open Shop"
@@ -324,3 +326,4 @@ class Player(Entity):
             if self.team == "Player":
                 self.i_frames = 0.3
             self.hurt_frames_counter = 3
+            self.time_since_hit = 0

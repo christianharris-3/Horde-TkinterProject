@@ -8,6 +8,7 @@ from src.Player import Player
 from src.TileMap import Tilemap
 from src.Utiles import Coords, Vec, RectHitbox, get_difficulty_data
 from src.Projectiles import Grenade
+from src.Particles import Text_Particle
 from src.SaveLoad import Save, Load
 
 
@@ -82,6 +83,8 @@ class Game:
 
         self.combo = 0
         self.combo_timer = 0
+        self.score_add_intival = 5
+        self.score_add_timer = self.score_add_intival
 
         self.camera_pos = Vec(self.player.x, self.player.y)
         self.camera_target_pos = Vec()
@@ -154,6 +157,17 @@ class Game:
         self.wave_manager(delta_time)
         self.get_collision_hash()
 
+        # Add score for not taking damage
+        if not self.inbetween_wave:
+            self.score_add_timer -= delta_time / 60
+            if self.score_add_timer<0 and self.player.time_since_hit > 5:
+                added_score = int((self.player.time_since_hit-5)**0.3)
+                if added_score>0:
+                    self.game_stats["Score"]+=added_score
+                    self.score_add_timer = self.score_add_intival
+                    self.particles.append(Text_Particle(self.player.x,self.player.y,0.3,
+                        f'+{added_score} Score ({int(self.player.time_since_hit)}s Since Hit)',
+                                                        self.font))
 
         # Player Physics and Input control
         open_shop = False
@@ -189,8 +203,13 @@ class Game:
                 self.combo = 0
             else:
                 self.combo += 1
-            self.game_stats["Score"] += (10 + self.combo) * r.coin_value
-            self.combo_timer = 1
+            added_score = (10 + self.combo * 2) * r.coin_value
+            self.game_stats["Score"] += added_score
+            text = f'+{added_score} Score'
+            if self.combo>0:
+                text+=f' ({self.combo}x Combo)'
+            self.particles.append(Text_Particle(r.x, r.y, 0.3, text, self.font))
+            self.combo_timer = 1.5
             self.enemies.remove(r)
 
         # Player + Entity Collision
