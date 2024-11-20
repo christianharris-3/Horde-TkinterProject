@@ -106,6 +106,7 @@ class Main:
         self.game_active = True
         self.game = Game(self.window, self.input, self.window_width, self.window_height,
                          self.control_map, self.menus, self.font, gamefile, level)
+        self.target_fps[0] = int(60 * self.game.cheat_info["speed of time"])
         self.menus.menu_funcs["save_game"] = self.game.save_game
         self.menus.menu_funcs["game_object"] = self.game
         TC.game_looper(self.game_loop, self.window, self.target_fps)

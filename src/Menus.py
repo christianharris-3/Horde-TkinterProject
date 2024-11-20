@@ -29,9 +29,17 @@ class Menus:
         self.active_menu = ''
         self.prev_menu = []
         self.set_menu_data_cache = []
+        self.title_image = None
         self.set_menu('Start_Screen')
 
         self.listening_remap_action = None
+        self.leaderboard_filter = 'All'
+        self.leaderboard_data = []
+        self.leaderboard_table_indexes = []
+        self.leaderboard_table = None
+        self.image_storer = []
+        self.score_info_display = None
+        self.cheatcode_tkvars = []
 
         # style for tables
         style = ttk.Style()
@@ -48,9 +56,9 @@ class Menus:
 
     def make_start_screen(self):
         image = Image.open('Sprites/Title.png').resize((300, 150), resample=Image.Resampling.BOX)
-        self.image = ImageTk.PhotoImage(image)
+        self.title_image = ImageTk.PhotoImage(image)
         title = tk.Canvas(self.frame, width=300, height=150, bg="darkolivegreen2", bd=0, highlightthickness=0)
-        title.create_image(0, 0, image=self.image, anchor=tk.NW)
+        title.create_image(0, 0, image=self.title_image, anchor=tk.NW)
         title.place(relx=0.5, rely=0.5, y=-180, anchor=tk.S)
 
         tk.Button(self.frame, text='Start', command=lambda:self.set_menu("Level_Select"),
@@ -309,13 +317,19 @@ class Menus:
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, x=500, y=240, anchor=tk.CENTER, width=122, height=84)
 
-    def make_leaderboard_menu(self):
+    def make_leaderboard_menu(self,filter_):
+        if not filter_:
+            filter_ = 'All'
+        self.leaderboard_filter = filter_
+
+        # back button and title
         tk.Button(self.frame, text='Back', command=self.menu_back,
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, height=70, anchor=tk.NW)
         tk.Label(self.frame, text='Leaderboard', font=(self.font, 30, "bold"), bg="darkolivegreen2",
                  ).place(relx=0.5, y=5, anchor=tk.N)
 
+        # load leaderboard data
         if os.path.exists('Data/player_scores.json'):
             with open('Data/player_scores.json', 'r') as f:
                 self.leaderboard_data = json.load(f)
@@ -323,23 +337,46 @@ class Menus:
             self.leaderboard_data = []
         self.leaderboard_data.sort(reverse=True,key=lambda x: x["Score"])
 
+        # filter select
+        options = ['All','Level 1','Level 2','Level 3']
+        tk.Label(self.frame,text='Filter:',font=(self.font, 20),bg='darkolivegreen2',
+                 ).place(x=80,y=125, anchor=tk.W)
+        for i,o in enumerate(options):
+            col = 'green'
+            if o == filter_:
+                col = 'green3'
+            func = funcer(self.set_menu,menu='Leaderboard_Menu',add_to_prev_menu=False,data=o)
+            tk.Button(self.frame, text=o, command=func.func,
+                      font=(self.font, 14), bg=col, relief=tk.GROOVE, bd=4,
+                      activebackground="green4",
+                      ).place(x=180+i*150, y=125, height=50, width=120, anchor=tk.W)
+
+
+        # Leaderboard table
+        rows = []
+        self.leaderboard_table_indexes = []
+        for i,score in enumerate(self.leaderboard_data):
+            if filter_ == 'All' or filter_ == score["Level"]:
+                self.leaderboard_table_indexes.append(i)
+                rows.append([score["Username"],score["Level"],score['Score'],score["Wave Reached"]])
+
         titles = [('Username', 350), ('Level', 150), ('Score', 150), ('Wave', 150)]
         self.leaderboard_table = ttk.Treeview(self.frame, columns=[a[0] for a in titles], show='headings', style='Treeview',
-                             height=len(self.leaderboard_data))
+                             height=len(rows))
 
         for i, t in enumerate(titles):
             self.leaderboard_table.column(t[0], width=t[1], anchor='center')
             self.leaderboard_table.heading(t[0], text=t[0])
 
-        for i, score in enumerate(self.leaderboard_data):
-            self.leaderboard_table.insert('', 'end', iid=i, values=[score["Username"], score["Level"], score['Score'], score["Wave Reached"]])
+        for i, row in enumerate(rows):
+            self.leaderboard_table.insert('', 'end', iid=i, values=row)
 
+        self.leaderboard_table.place(relx=0.5,x=-150, y=160, anchor=tk.N)
 
-        self.leaderboard_table.place(relx=0.5,x=-150, y=90, anchor=tk.N)
-
+        # frame for displaying info
         self.score_info_display = tk.Frame(self.frame, highlightbackground="darkgreen", highlightthickness=3,
                                            background='darkolivegreen2')
-        self.score_info_display.place(relx=0.5,x=280,y=90,width=270,height=450,anchor=tk.NW)
+        self.score_info_display.place(relx=0.5,x=280,y=160,width=270,height=450,anchor=tk.NW)
 
 
         self.leaderboard_table.bind('<1>',self.detect_selected_leaderboard_entry)
@@ -417,13 +454,13 @@ class Menus:
     def move_slider_timespeed(self, val):
         self.cheat_info["speed of time"] = float(val)
 
-    def detect_selected_leaderboard_entry(self,event):
+    def detect_selected_leaderboard_entry(self,_):
         self.leaderboard_table.after(1,self.detect_selected_leaderboard_entry_delayed)
     def detect_selected_leaderboard_entry_delayed(self):
         if self.leaderboard_table.selection() != ():
             for widget in self.score_info_display.winfo_children():
                 widget.destroy()
-            index = int(self.leaderboard_table.selection()[0])
+            index = self.leaderboard_table_indexes[int(self.leaderboard_table.selection()[0])]
             data = self.leaderboard_data[index]
 
             tk.Button(self.score_info_display, text='Delete', font=(self.font, 17), background='red',
@@ -444,7 +481,7 @@ class Menus:
         del self.leaderboard_data[index]
         with open('Data/player_scores.json', 'w') as f:
             json.dump(self.leaderboard_data,f)
-        self.set_menu("Leaderboard_Menu",False)
+        self.set_menu("Leaderboard_Menu",False,self.leaderboard_filter)
 
     def load_gamestate(self,table):
         selection = table.selection()
@@ -472,6 +509,7 @@ class Menus:
             json.dump(data,f)
 
         self.menu_funcs["end_game"]()
+        self.set_menu('Leaderboard_Menu',data=game_stats["Level"])
 
     def save_game(self, game, name_entry):
         game.save_game(name_entry.get())
@@ -569,7 +607,7 @@ class Menus:
                 elif self.active_menu == "Load_Gamestate_Menu":
                     self.make_load_gamestate_menu()
                 elif self.active_menu == "Leaderboard_Menu":
-                    self.make_leaderboard_menu()
+                    self.make_leaderboard_menu(data)
                 elif self.active_menu == "Level_Select":
                     self.make_level_select_menu()
 
