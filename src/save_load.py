@@ -11,6 +11,25 @@ from src.utiles import Vec, get_now, get_difficulty_data
 
 
 class Save:
+    """
+    Save object takes lots of game variables and converts them to one dictionary to be store in json
+    This object stores:
+     - player data     : position, velocity, health, shield, weapon, current ammo, reload state/timer, time since hit
+     - enemy data      : position, velocity, health, enemy type
+     - projectile data : position, velocity, size, projectile type
+     - particle data   : position, velocity, size, particle type
+     - camera data     : position
+     - game stats      : current stats about the game, e.g. score, damage dealt, current wave
+     - shop data       : coins, what guns are owned, num of grenades/force pushes owned
+     - cheat info      : immortal, inf ammo, inf abilities, damage/spawn time/speed of time multipler
+     - current wave    : zombies left of each type in the current wave
+     - level           : the current level being played
+     - timestamp       : a timestamp of when the save occured
+
+    --- import methods and attributes ---
+    method    : save     The main and only method used externally to this class, used to store a gamestate
+    """
+
     entity_type_map = {SlowZombie: 'Slow_Zombie',
                        FastZombie: 'Fast_Zombie',
                        BigZombie: 'Big_Zombie',
@@ -78,6 +97,14 @@ class Save:
 
 
 class Load:
+    """
+    Load object unpacks all of the info from a given json file and loads the gamestate
+    Loads all data stored by Save class
+
+    --- import methods and attributes ---
+    function : load     The main and only method used externally to this class, used to load a gamestate
+    """
+
     @staticmethod
     def load(filename,control_map, screen_width, screen_height):
         filepath = f'Data/Game Saves/{filename}.json'

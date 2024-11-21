@@ -6,6 +6,11 @@ from src.utiles import Coords, Vec
 
 
 class Enemy(Entity):
+    """
+    Enemy object inherites from Entity class in src/entity.py, it manages
+     - enemy rendering, sprite and health bar
+     - enemy ai
+    """
     def __init__(self, x, y, image_path):
         super().__init__(x, y)
         self.team = 'Enemy'
@@ -71,6 +76,14 @@ class Enemy(Entity):
         self.move_acceleration *= difficulty_data["Zombie_Speed"]
         self.damage *= difficulty_data["Zombie_Damage"]
 
+### All following clases are all the different enemies, each storing different:
+###  - radii
+###  - damage
+###  - max health
+###  - move speed
+###  - coin value
+###  - knockback resistance
+###  - Image file paths
 
 class SlowZombie(Enemy):
     def __init__(self, x, y, difficulty_data):

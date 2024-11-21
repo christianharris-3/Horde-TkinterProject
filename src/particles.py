@@ -5,6 +5,15 @@ from src.utiles import Vec, CircleHitbox, Coords
 
 
 class Particle:
+    """
+    Object that is never instantiated itself, it is inherited by:
+     - Projectile class in src/Projectiles.py
+     - all other particle objects in this file: Blood_Particle, Bullet_Hit_Particle, etc
+
+     This object manages:
+     - drawing all particles
+     - movement physics, no collisions
+    """
     def __init__(self, x, y, angle, speed):
         self.team = "Neutral"
         self.x = x
@@ -56,6 +65,15 @@ class Particle:
 
     def get_dead(self):
         return self.vel.length() < self.velocity_kill_cutoff or self.time_alive > self.time_kill_cutoff
+
+### All following classes are all the different particles, each storing different:
+###  - radii
+###  - fill colour
+###  - outline colour
+###  - render shape
+###  - move drag
+###  - kill cutoff time
+
 
 class Blood_Particle(Particle):
     def __init__(self,x,y,angle,speed, size):

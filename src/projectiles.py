@@ -6,6 +6,11 @@ from PIL import Image, ImageTk
 
 
 class Projectile(Particle):
+    """
+    Projectile object inherites from Particle in src/particle.py
+    it manages:
+    - collision with an entities
+    """
     def __init__(self, x, y, angle, speed, team):
         super().__init__(x, y, angle, speed)
         self.team = team
@@ -45,6 +50,10 @@ class Projectile(Particle):
 
         return particles, damage
 
+### All following clases are all the different projectiles, each storing different:
+###  - radii
+###  - damage
+###  - colour
 
 class Bullet(Projectile):
     def __init__(self, x, y, angle, speed, team):
@@ -76,6 +85,10 @@ class LMG_Bullet(Projectile):
 
 
 class KB_Obj:
+    """
+    Damage can only be dealt through projectiles, so this class is created to act as a projectile
+    it deals damage for grenades and for melee hits by zombies
+    """
     def __init__(self, kb, angle, damage, stuns=False):
         self.knockback = kb
         self.angle = angle
@@ -84,6 +97,15 @@ class KB_Obj:
 
 
 class Grenade:
+    """
+    Grenade class uses polymorphism to act as a projectile
+    The grenade physics works so that when the projectile finishes it is exactly where the player clicked
+    it cant follow the same physics as normal projectiles as this would not work with them.
+    This class manages:
+    - grenade physics
+    - drawing
+    - exploding: creating particle effects and dealing damage
+    """
     def __init__(self, x, y, target_x, target_y, team):
         self.x = x
         self.y = y

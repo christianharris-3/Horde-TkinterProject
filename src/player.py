@@ -9,6 +9,9 @@ from src.tilemap import Tile
 
 
 class WeaponData:
+    """
+    Object to store const data about weapons
+    """
     data = {"Pistol": {"File": "Sprites/Pistol.png", "Render_Size": 1, "Render_Distance": 1, "Projectile": Bullet,
                        "Bullet_Speed": 0.5, "Shoot_CD": 0.2, "Semi_Auto": False, "Clip_Size": 5, "Reload_Time": 1,
                        "Spray_Count": 1, "Spread":0.05, "Speed_Ran":0.05, "Price": 0},
@@ -26,7 +29,11 @@ class WeaponData:
 
 class Player(Entity):
     """
-    The Player object inherites from entity in
+    The Player object inherites from Entity which handles physics, movement and collisions
+    This object manages:
+     - player inputs
+     - player image+ui drawing
+     - weapon management, e.g. reloading/ammo/creating projectile objects
     """
     def __init__(self, x, y, control_map, cheat_info, screen_width, screen_height):
         super().__init__(x, y)

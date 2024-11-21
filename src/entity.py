@@ -5,6 +5,16 @@ from src.projectiles import KB_Obj
 
 
 class Entity:
+    """
+    Entity object is never instantiated itself, it is inherited by:
+     - Enemy class in src/enemy.py
+     - Player class in src/player.py
+    Entity object manages:
+     - collision with other entities
+     - collision with the tilemap
+     - taking damage/creating particles when taking damage
+     - its own physics
+    """
     def __init__(self, x, y):
         self.team = 'Neutral'
         self.x = x

@@ -4,7 +4,9 @@ from src.utiles import Vec, RectHitbox, CircleHitbox, Coords
 from PIL import Image, ImageTk
 
 class TileData:
-
+    """
+    data class to store tiledata
+    """
     data = {'Grass':{'File':'Sprites/Grass.png','Hitbox':()},
             'Rock':{'File':'Sprites/Rock.png','Hitbox':(0.1,0.4,0.8,0.6)},
             'Mossy_Rock': {'File': 'Sprites/Mossy_Rock.png', 'Hitbox': (0.1, 0.2, 0.8, 0.8)},
@@ -23,6 +25,15 @@ class TileData:
             TileData.data[t]["Image"] = ImageTk.PhotoImage(image)
 
 class Tile:
+    """
+    Tile class stores data about the tile, it stores:
+    - position
+    - hitbox
+    - image
+    - tile type
+    - if it is a shop tile, data about shop
+
+    """
     def __init__(self, x, y, pixels_per_unit, tile_type):
         self.x = x
         self.y = y
@@ -54,6 +65,12 @@ class Tile:
 
 
 class Tilemap:
+    """
+    Tilemap is a class to manage:
+    - rendering the tilemap
+    - generating a collision hash
+    - loading a tilemap from a file
+    """
     pos_value_convert = 100000
 
     def __init__(self,levelname):
@@ -90,6 +107,12 @@ class Tilemap:
 
 
     def load_collision_hash(self):
+        """
+        A collision hash is a dictionary that stores all the tiles by there "colcode",
+        which is a unique int created from the (x,y) position of the tile. When collision is
+        calculated the entity calculates its on colcode and then checks collisions with only tiles
+        in the dictionary sharing that colcode. This greatly increases speed of collision detection.
+        """
         self.collision_hash = {}
         for t in self.tiles:
             hitbox = self.tiles[t].get_hitbox()

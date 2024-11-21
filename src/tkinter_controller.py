@@ -38,9 +38,9 @@ class Input:
         else:
             self.cheat_code_progress = 0
 
-        self.kprs.add(event.keysym)
+        self.kprs.add(self.pars_input(event.keysym))
     def key_release(self,event):
-        self.kprs.discard(event.keysym)
+        self.kprs.discard(self.pars_input(event.keysym))
     def button_press(self,event):
         self.kprs.add(event.num)
     def button_release(self,event):
@@ -52,6 +52,12 @@ class Input:
         return key in self.kprs
     def get_mpos(self):
         return self.mpos
+
+    def pars_input(self,key):
+        # fixes bug where if capslock is on input not registered as "W" != "w" etc
+        if isinstance(key,str) and len(key) == 1:
+            key = key.lower()
+        return key
 
     def get_cheatcode_active(self):
         if self.cheat_code_active:

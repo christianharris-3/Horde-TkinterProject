@@ -1,1 +1,187 @@
-{"player": {"x": 5.214931454602807, "y": -3.855155331729991, "vel": [-3.1128122614786264e-07, 0.030982255208408385], "health": 15.799999999999999, "class": "Player", "shield": 0, "weapon": "LMG", "ammo_left": 11, "reloading": false, "reload_timer": -2.5111476999998557, "time_since_hit": 2.8977261999971233}, "enemies": [{"x": 2.244074212936941, "y": -0.7439642751046146, "vel": [0.02802447499189688, -0.033585738051453276], "health": 2.4, "class": "Fast_Zombie"}, {"x": 0.15554160895008892, "y": 3.8457216133567473, "vel": [0.016699073597310075, -0.02603246884907776], "health": 2.4, "class": "Fast_Zombie"}], "game_stats": {"Zombie Kills": 171, "Coins Earned": 270, "Score": 4204, "Wave Reached": "Wave 11", "Rounds Fired": 1060, "Grenades Thrown": 0, "Force Pushes Used": 0, "Damage Dealt": 633.0, "Damage Taken": 4.2, "Level": "Level 1"}, "shop_data": {"Owned_Guns": ["Pistol", "SMG", "LMG"], "Temp_Upgrades": {"Heal": -1, "Shield": 0, "Grenade": 5, "Force Push": 0}, "Player_Object": null, "Coins": 325}, "projectiles": [], "particles": [{"x": 8.479063063244084, "y": -4.793432913006128, "vel": [1.4266294637119088e-08, 4.1498360671114864e-09], "time_alive": 2.1228041000140365, "radius": 0.077071549682755, "class": "Blood_Splat", "team": "Neutral", "time_kill_cutoff": 2.3856244141297607}, {"x": 2.705088658560366, "y": -3.8083832153352906, "vel": [-1.5471997951452393e-05, 1.7778560303692025e-05], "time_alive": 1.3300087000243366, "radius": 0.0853228217249738, "class": "Blood_Splat", "team": "Neutral", "time_kill_cutoff": 2.642403770438344}, {"x": 2.806297942502445, "y": -4.228400376660471, "vel": [-9.629785261246412e-06, 7.062346539239442e-06], "time_alive": 1.3300087000243366, "radius": 0.01760416410862438, "class": "Blood_Splat", "team": "Neutral", "time_kill_cutoff": 2.6939949331813873}, {"x": 2.969989546068858, "y": -4.040283647538445, "vel": [-1.024482789012797e-05, 9.339541025731089e-06], "time_alive": 1.3300087000243366, "radius": 0.10007886817620495, "class": "Blood_Splat", "team": "Neutral", "time_kill_cutoff": 2.195710187200395}, {"x": 3.0915290713389982, "y": -5.762217037667682, "vel": [4.0639701236449297e-25, -6.636966881348033e-09], "time_alive": 1.3165394999959972, "radius": 0.1, "class": "Text_Particle", "team": "Neutral", "time_kill_cutoff": 2, "font": "Segoe Print", "text": "+24 Score (1x Combo)"}], "camera_pos": [5.214933230200054, -4.135575330541026], "filename": "Soursop", "wave_data": {"Title": "Wave 11", "Spawn_Rate": 1.2, "Spawn_Slower": 0.3, "Zombies": [{"Num": 1, "Class": "Slow_Zombie"}, {"Num": 2, "Class": "Fast_Zombie"}, {"Num": 2, "Class": "Big_Zombie"}, {"Num": 0, "Class": "Demon_Zombie"}, {"Num": 0, "Class": "Chonk_Zombie"}]}, "save_timestamp": {"date": "20/11/2024", "time": "5:25pm", "unix_time": 1732123549.376534}, "cheat_info": {"immortal": false, "infinite ammo": false, "infinite abilities": false, "damage multiplier": 1, "spawn time multiplier": 1.0, "speed of time": 1.0}, "level": {"path": "Data/Maps/Level 1.json", "title": "Level 1"}, "score_add_timer": 1.6453602999972645}
+{
+  "player": {
+    "x": 5.214931454602807,
+    "y": -3.855155331729991,
+    "vel": [
+      -3.1128122614786264e-07,
+      0.030982255208408385
+    ],
+    "health": 15.799999999999999,
+    "class": "Player",
+    "shield": 0,
+    "weapon": "LMG",
+    "ammo_left": 11,
+    "reloading": false,
+    "reload_timer": -2.5111476999998557,
+    "time_since_hit": 2.8977261999971233
+  },
+  "enemies": [
+    {
+      "x": 2.244074212936941,
+      "y": -0.7439642751046146,
+      "vel": [
+        0.02802447499189688,
+        -0.033585738051453276
+      ],
+      "health": 2.4,
+      "class": "Fast_Zombie"
+    },
+    {
+      "x": 0.15554160895008892,
+      "y": 3.8457216133567473,
+      "vel": [
+        0.016699073597310075,
+        -0.02603246884907776
+      ],
+      "health": 2.4,
+      "class": "Fast_Zombie"
+    }
+  ],
+  "game_stats": {
+    "Zombie Kills": 171,
+    "Coins Earned": 270,
+    "Score": 4204,
+    "Wave Reached": "Wave 11",
+    "Rounds Fired": 1060,
+    "Grenades Thrown": 0,
+    "Force Pushes Used": 0,
+    "Damage Dealt": 633.0,
+    "Damage Taken": 4.2,
+    "Level": "Level 1"
+  },
+  "shop_data": {
+    "Owned_Guns": [
+      "Pistol",
+      "SMG",
+      "LMG"
+    ],
+    "Temp_Upgrades": {
+      "Heal": -1,
+      "Shield": 0,
+      "Grenade": 5,
+      "Force Push": 0
+    },
+    "Player_Object": null,
+    "Coins": 325
+  },
+  "projectiles": [],
+  "particles": [
+    {
+      "x": 8.479063063244084,
+      "y": -4.793432913006128,
+      "vel": [
+        1.4266294637119088e-08,
+        4.1498360671114864e-09
+      ],
+      "time_alive": 2.1228041000140365,
+      "radius": 0.077071549682755,
+      "class": "Blood_Splat",
+      "team": "Neutral",
+      "time_kill_cutoff": 2.3856244141297607
+    },
+    {
+      "x": 2.705088658560366,
+      "y": -3.8083832153352906,
+      "vel": [
+        -1.5471997951452393e-05,
+        1.7778560303692025e-05
+      ],
+      "time_alive": 1.3300087000243366,
+      "radius": 0.0853228217249738,
+      "class": "Blood_Splat",
+      "team": "Neutral",
+      "time_kill_cutoff": 2.642403770438344
+    },
+    {
+      "x": 2.806297942502445,
+      "y": -4.228400376660471,
+      "vel": [
+        -9.629785261246412e-06,
+        7.062346539239442e-06
+      ],
+      "time_alive": 1.3300087000243366,
+      "radius": 0.01760416410862438,
+      "class": "Blood_Splat",
+      "team": "Neutral",
+      "time_kill_cutoff": 2.6939949331813873
+    },
+    {
+      "x": 2.969989546068858,
+      "y": -4.040283647538445,
+      "vel": [
+        -1.024482789012797e-05,
+        9.339541025731089e-06
+      ],
+      "time_alive": 1.3300087000243366,
+      "radius": 0.10007886817620495,
+      "class": "Blood_Splat",
+      "team": "Neutral",
+      "time_kill_cutoff": 2.195710187200395
+    },
+    {
+      "x": 3.0915290713389982,
+      "y": -5.762217037667682,
+      "vel": [
+        4.0639701236449297e-25,
+        -6.636966881348033e-09
+      ],
+      "time_alive": 1.3165394999959972,
+      "radius": 0.1,
+      "class": "Text_Particle",
+      "team": "Neutral",
+      "time_kill_cutoff": 2,
+      "font": "Segoe Print",
+      "text": "+24 Score (1x Combo)"
+    }
+  ],
+  "camera_pos": [
+    5.214933230200054,
+    -4.135575330541026
+  ],
+  "filename": "Soursop",
+  "wave_data": {
+    "Title": "Wave 11",
+    "Spawn_Rate": 1.2,
+    "Spawn_Slower": 0.3,
+    "Zombies": [
+      {
+        "Num": 1,
+        "Class": "Slow_Zombie"
+      },
+      {
+        "Num": 2,
+        "Class": "Fast_Zombie"
+      },
+      {
+        "Num": 2,
+        "Class": "Big_Zombie"
+      },
+      {
+        "Num": 0,
+        "Class": "Demon_Zombie"
+      },
+      {
+        "Num": 0,
+        "Class": "Chonk_Zombie"
+      }
+    ]
+  },
+  "save_timestamp": {
+    "date": "20/11/2024",
+    "time": "5:25pm",
+    "unix_time": 1732123549.376534
+  },
+  "cheat_info": {
+    "immortal": false,
+    "infinite ammo": false,
+    "infinite abilities": false,
+    "damage multiplier": 1,
+    "spawn time multiplier": 1.0,
+    "speed of time": 1.0
+  },
+  "level": {
+    "path": "Data/Maps/Level 1.json",
+    "title": "Level 1"
+  },
+  "score_add_timer": 1.6453602999972645
+}

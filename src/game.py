@@ -296,7 +296,7 @@ class Game:
         for par in self.projectiles + self.particles:
             par.draw_image(self.screen, self.get_render_coords)
 
-        ### UI Rendering
+        ## UI Rendering
         if not self.player_dead:
             self.player.draw_ui(self.screen, self.shop_data["Temp_Upgrades"], self.font)
 
@@ -467,6 +467,12 @@ class Game:
                                            random.gauss(0, self.camera_shake_intensity))
 
     def get_collision_hash(self):
+        """
+        A collision hash is a dictionary that stores all the entities by there "colcode",
+        which is a unique int created from the (x,y) position of the tile. When collision is
+        calculated the entity calculates its on colcode and then checks collisions with only other entities
+        in the dictionary sharing that colcode. This greatly increases speed of collision detection.
+        """
         self.collision_hash = {}
         entities = self.enemies[:]
         if not self.player_dead:
