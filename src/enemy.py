@@ -2,7 +2,7 @@ import random
 import math
 from PIL import Image, ImageDraw
 from src.entity import Entity
-from src.Utiles import Coords, Vec
+from src.utiles import Coords, Vec
 
 
 class Enemy(Entity):

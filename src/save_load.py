@@ -3,11 +3,11 @@ import copy
 import os
 import time
 from src.enemy import SlowZombie, FastZombie, BigZombie, DemonZombie, ChonkZombie
-from src.Player import Player
-from src.TileMap import Tilemap
-from src.Projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
-from src.Particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect, Text_Particle
-from src.Utiles import Vec, get_now, get_difficulty_data
+from src.player import Player
+from src.tilemap import Tilemap
+from src.projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
+from src.particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect, Text_Particle
+from src.utiles import Vec, get_now, get_difficulty_data
 
 
 class Save:

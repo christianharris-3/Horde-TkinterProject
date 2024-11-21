@@ -1,7 +1,7 @@
 import random, math
-from src.Utiles import CircleHitbox, Vec, RectHitbox
-from src.Particles import Blood_Particle, Blood_Splat
-from src.Projectiles import KB_Obj
+from src.utiles import CircleHitbox, Vec, RectHitbox
+from src.particles import Blood_Particle, Blood_Splat
+from src.projectiles import KB_Obj
 
 
 class Entity:

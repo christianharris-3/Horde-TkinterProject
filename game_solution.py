@@ -4,14 +4,19 @@ import json
 import webbrowser
 import tkinter as tk
 from PIL import ImageTk
-import src.TkinterController as TC
-from src.Game import Game
-from src.Menus import Menus
-
-#tkinter color list
-#https://www.plus2net.com/python/tkinter-colors.php
+import src.tkinter_controller as TC
+from src.game import Game
+from src.menus import Menus
 
 class Main:
+    """
+    This Main object controls:
+     - operating the menus through the Menus object in src/menus.py
+     - stoping and starting the game, and creating a Game object from src/game.py
+     - Running the game loop
+     - game pausing
+     - The boss key
+    """
     def __init__(self):
         self.window_width = 1200
         self.window_height = 800
@@ -60,6 +65,13 @@ class Main:
 
 
     def game_loop(self, delta_time):
+        '''
+        This function is run by game_looper function in src/tkinter_controller.py
+        When this function returns True the gameloop is ended by game_looper function
+
+        delta_time is a float that accounts for fps varing
+        '''
+
         if not self.game_active:
             return True
         done = False

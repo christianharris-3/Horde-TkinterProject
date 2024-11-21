@@ -12,7 +12,7 @@ DONE - LeaderBoard
 DONE - add multiple levels/difficulties. easy,normal,hard, current game is hard.
 DONE - Save/Load gamestate
 DONE - Boss Key
-- Combo Display
+DONE - Combo Display
 DONE - x button for shop and way to display if item can be bought
 
 DONE - Cheat Codes
@@ -20,7 +20,7 @@ DONE -- imortality
 DONE -- infinite ammo/grenades
 DONE -- insta kill
 DONE -- edit speed of time
- -- max shop/give coins
+DONE -- max shop/give coins
 
 (less important)
 DONE - particle effects

@@ -4,16 +4,31 @@ import copy
 import json
 import tkinter as tk
 from PIL import ImageTk, Image, ImageDraw, ImageFont
-from src.Player import Player
-from src.TileMap import Tilemap
-from src.Utiles import Coords, Vec, RectHitbox, get_difficulty_data
-from src.Projectiles import Grenade
-from src.Particles import Text_Particle
-from src.SaveLoad import Save, Load
+from src.player import Player
+from src.tilemap import Tilemap
+from src.utiles import Coords, Vec, RectHitbox, get_difficulty_data
+from src.projectiles import Grenade
+from src.particles import Text_Particle
+from src.save_load import Save, Load
 
 
 
 class Game:
+    """
+    Game object manages all game objects including:
+     - player
+     - enemies
+     - projectiles
+     - particles
+     - tilemap
+
+    --- import methods and attributes ---
+    method   : save_game     Passes all relevant data to Save object in src/save_load.py for converting to json format and storing
+    method   : load_game     Uses Load object in src/save_load.py for loading all game data back from json format
+    method   : game_loop     Deals with all game object movement, physics, collisions, as well as wave loading, enemy spawning, player input
+    method   : render_frame  Draws all game objects and game ui, acts completely independent of game_loop so game can be paused easily
+    attribute: game_stats    Stores all stats about the current game, this data is stored in the leaderboard when game ends
+    """
     def __init__(self, window, inp, screen_width, screen_height,
                  control_map, menus, font, gamefile, level):
         self.window = window

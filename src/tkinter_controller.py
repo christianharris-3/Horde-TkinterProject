@@ -1,8 +1,17 @@
 import time
-from src.Utiles import Vec
+from src.utiles import Vec
 
 
 class Input:
+    """
+    Input object is used to detect inputs as well as detect the cheat code being used
+
+    --- import methods and attributes ---
+    attribute: kprs                     A set that stores all current keys pressed, including mouse buttons
+    method   : get_pressed              Returns True if a given key is being pressed
+    method   : get_cheatcode_active     Returns True if the cheatcode has been entered
+
+    """
     def __init__(self,window):
         self.kprs = set()
         self.mpos = Vec()
@@ -52,6 +61,12 @@ class Input:
 
 # Function to create a game loop with delta time
 def game_looper(loop_function, window, target_fps):
+    """
+    Function that starts a game loop
+    :param loop_function: The function that is run every frame
+    :param window:        The Tk root so the Tk.after method can be used
+    :param target_fps:    The fps that delta time will account for
+    """
     __game_loop(loop_function, window, target_fps, time.perf_counter())
 
 def __game_loop(loop_function, window, target_fps, tick_start_time):

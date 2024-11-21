@@ -2,17 +2,42 @@ import json, os
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
-from src.Player import WeaponData
-from src.Utiles import get_now
+from src.player import WeaponData
+from src.utiles import get_now
 
 
-# class that fixes a bug when making lots of lambda functions in a loop
 class funcer:
+    """
+    this class fixes a bug when making lots of lambda functions in a loop
+
+    example of the bug that this class fixes:
+
+    ## all button will print 9 instead of the numbers 0-9
+    ## by storing lambda function in this object they will print 0-9
+    def example_function(i):
+        print(i)
+    for i in range(10):
+        tk.Button(root,text=str(i),command=lambda: example_function(i)).pack()
+    """
     def __init__(self, func, **args):
         self.func = lambda: func(**args)
 
+# tkinter color list for reference
+# https://www.plus2net.com/python/tkinter-colors.php
+
 
 class Menus:
+    """
+    Menu object creates and manages all tkinter widgets in the program
+
+    --- import methods and attributes ---
+    attribute:  active_menu   Stores the current displayed menu.
+    attribute:  frame         Stores a tkinter frame that is used by every menu.
+    method   :  set_menu      Deletes all widgets on the frame, then runs the make function
+                              for the given menu passing through any data needed.
+    methods  : make_          All functions starting with make_ create all widgets for their given
+                              menu.
+    """
     def __init__(self, window, inp, window_width, window_height, menu_funcs, control_map, control_map_defaults, font):
         self.window = window
         self.inp = inp
@@ -53,6 +78,51 @@ class Menus:
                         relief='flat', borderwidth=0, bd=0, highlightthickness=0)
         style.map('Treeview', background=[('selected', 'green4')],
                   foreground=[('selected', 'gray6')])
+
+    def set_menu(self, menu, add_to_prev_menu=True,data=None):
+        for widget in self.frame.winfo_children():
+            widget.destroy()
+        if add_to_prev_menu:
+            self.prev_menu.append(self.active_menu)
+            self.set_menu_data_cache.append(data)
+        self.active_menu = menu
+        if self.active_menu != "Game":
+            if self.active_menu == "Pause_Screen":
+                self.make_pause_menu(data)
+            elif self.active_menu == "Shop_Menu":
+                self.make_shop_menu(data)
+            elif self.active_menu == "Death_Screen":
+                self.make_death_screen(data)
+            elif self.active_menu == "Score_Entry_Menu":
+                self.make_score_entry_menu(data)
+            elif self.active_menu == "Save_Game_Menu":
+                self.make_save_gamestate_menu(data)
+            elif self.active_menu == "CheatCode_Menu":
+                self.make_cheatcode_menu(data)
+            else:
+                self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2",
+                                     highlightthickness=0)
+                if self.active_menu == "Start_Screen":
+                    self.make_start_screen()
+                elif self.active_menu == "Settings":
+                    self.make_settings_menu()
+                elif self.active_menu == "Load_Gamestate_Menu":
+                    self.make_load_gamestate_menu()
+                elif self.active_menu == "Leaderboard_Menu":
+                    self.make_leaderboard_menu(data)
+                elif self.active_menu == "Level_Select":
+                    self.make_level_select_menu()
+
+        else:
+            self.frame.lower()
+
+    def menu_back(self):
+        del self.set_menu_data_cache[-1]
+        if len(self.set_menu_data_cache) == 0:
+            self.set_menu_data_cache.append(None)
+        self.set_menu(self.prev_menu.pop(-1), False, data = self.set_menu_data_cache.pop(-1))
+
+##### Functions starting with make_ are used to create a menu
 
     def make_start_screen(self):
         image = Image.open('Sprites/Title.png').resize((300, 150), resample=Image.Resampling.BOX)
@@ -443,6 +513,8 @@ class Menus:
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   ).place(relx=0.5, y=100+i*80, height=70, anchor=tk.N)
 
+#### All following functions are functions used by widgets in the menu system
+
     def cheat_add_coins(self):
         self.menu_funcs["game_object"].shop_data["Coins"]+=100
     def cheat_widget_input(self,variable,cheat_info,info_type):
@@ -576,49 +648,6 @@ class Menus:
         with open('Data/control_map.json', 'w') as f:
             json.dump(self.control_map, f)
         self.set_menu("Settings",False)
-
-    def set_menu(self, menu, add_to_prev_menu=True,data=None):
-        for widget in self.frame.winfo_children():
-            widget.destroy()
-        if add_to_prev_menu:
-            self.prev_menu.append(self.active_menu)
-            self.set_menu_data_cache.append(data)
-        self.active_menu = menu
-        if self.active_menu != "Game":
-            if self.active_menu == "Pause_Screen":
-                self.make_pause_menu(data)
-            elif self.active_menu == "Shop_Menu":
-                self.make_shop_menu(data)
-            elif self.active_menu == "Death_Screen":
-                self.make_death_screen(data)
-            elif self.active_menu == "Score_Entry_Menu":
-                self.make_score_entry_menu(data)
-            elif self.active_menu == "Save_Game_Menu":
-                self.make_save_gamestate_menu(data)
-            elif self.active_menu == "CheatCode_Menu":
-                self.make_cheatcode_menu(data)
-            else:
-                self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2",
-                                     highlightthickness=0)
-                if self.active_menu == "Start_Screen":
-                    self.make_start_screen()
-                elif self.active_menu == "Settings":
-                    self.make_settings_menu()
-                elif self.active_menu == "Load_Gamestate_Menu":
-                    self.make_load_gamestate_menu()
-                elif self.active_menu == "Leaderboard_Menu":
-                    self.make_leaderboard_menu(data)
-                elif self.active_menu == "Level_Select":
-                    self.make_level_select_menu()
-
-        else:
-            self.frame.lower()
-
-    def menu_back(self):
-        del self.set_menu_data_cache[-1]
-        if len(self.set_menu_data_cache) == 0:
-            self.set_menu_data_cache.append(None)
-        self.set_menu(self.prev_menu.pop(-1), False, data = self.set_menu_data_cache.pop(-1))
 
     def start_game(self):
         self.set_menu("Game")

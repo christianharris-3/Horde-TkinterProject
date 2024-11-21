@@ -2,10 +2,10 @@ import math, random
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 from src.entity import Entity
-from src.Utiles import Coords, Vec
-from src.Projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade, KB_Obj
-from src.Particles import Force_Push_Effect
-from src.TileMap import Tile
+from src.utiles import Coords, Vec
+from src.projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade, KB_Obj
+from src.particles import Force_Push_Effect
+from src.tilemap import Tile
 
 
 class WeaponData:
@@ -25,6 +25,9 @@ class WeaponData:
 
 
 class Player(Entity):
+    """
+    The Player object inherites from entity in
+    """
     def __init__(self, x, y, control_map, cheat_info, screen_width, screen_height):
         super().__init__(x, y)
         self.team = 'Player'
