@@ -180,7 +180,7 @@ class Menus:
                 else:
                     col = '#484'
                     state = 'disabled'
-                tk.Button(self.frame, text=f'Buy: {WeaponData.data[weapon]["Price"]}', command=func.func,
+                tk.Button(self.frame, text=f'Buy:{WeaponData.data[weapon]["Price"]}', command=func.func,
                           font=(self.font, 14), bg=col, relief=tk.GROOVE, bd=4, activebackground="green4",state=state,
                           disabledforeground='#333'
                           ).place(x=x_pos,y=195,width=100,height=50,anchor=tk.N)
