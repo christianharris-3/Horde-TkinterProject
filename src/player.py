@@ -158,7 +158,7 @@ class Player(Entity):
 
         # Draw arrow to shop if a closest shop exists
         if inbetween_waves and self.closest_shop.team and not self.closest_shop.can_be_opened:
-            draw_arrow(self.closest_shop.x+0.5,self.closest_shop.y+0.5,image,'#275384')
+            draw_arrow(self.closest_shop.x+0.5,self.closest_shop.y+0.5,image,'#77dd77')
 
         return image, Vec(self.x, self.y)
 
