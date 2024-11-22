@@ -159,6 +159,11 @@ class Rect:
         return self.__str__()
 
 class Hitbox:
+    """
+    abstract hitbox class, inherited by all hitboxes types below
+    handles collision between all different hitbox types
+    all hitbox types can be checked if they collide with all other types
+    """
     box_types = {1: 'Rect',
                  2: 'Circle',
                  3: 'Point',
@@ -229,6 +234,9 @@ class Hitbox:
 
 
 class RectHitbox(Hitbox):
+    """
+    Rect hitbox acts as a rectangle
+    """
     box_type = 1
     function_map = {1: Hitbox._collide_rect_rect,
                     2: Hitbox._collide_rect_circle,
@@ -318,6 +326,9 @@ class CircleHitbox(Hitbox):
 
 
 class PointHitbox(Hitbox):
+    """
+    Point hitbox acts as a point, point cant collide with point
+    """
     box_type = 3
     function_map = {1: lambda point, rect: Hitbox._collide_rect_point(rect, point),
                     2: lambda point, circle: Hitbox._collide_circle_point(circle, point),
@@ -338,6 +349,9 @@ class PointHitbox(Hitbox):
 
 
 class ListHitbox:
+    """
+    List hitbox acts as a number of Rect, Circle and point hitboxes in one object
+    """
     box_type = 4
     function_map = {1: lambda list_, rect: Hitbox._collide_hitbox_list(rect, list_),
                     2: lambda list_, circle: Hitbox._collide_hitbox_list(circle, list_),
