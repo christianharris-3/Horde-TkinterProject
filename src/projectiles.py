@@ -1,6 +1,6 @@
 import math, random
 import tkinter as tk
-from src.utiles import ListHitbox, Vec, CircleHitbox
+from src.utiles import ListHitbox, Vec, CircleHitbox, resourcepath
 from src.particles import Particle, Bullet_Hit_Particle, Explosion, Grenade_Fragment
 from PIL import Image, ImageTk
 
@@ -123,7 +123,7 @@ class Grenade:
         self.range = 3
         self.knockback = 1
 
-        self.grenade_image_base = Image.open('Sprites/Grenade.png').convert("RGBA").resize((18, 18),
+        self.grenade_image_base = Image.open(resourcepath('Sprites/Grenade.png')).convert("RGBA").resize((18, 18),
                                                                                            resample=Image.Resampling.BOX)
 
     def physics(self, delta_time):

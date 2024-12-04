@@ -1,4 +1,4 @@
-import math, datetime
+import math, datetime, os, sys
 
 class Vec:
     """
@@ -427,3 +427,10 @@ def get_difficulty_data(difficulty=1):
             'Zombie_Speed': 1 * difficulty,
             'Coin_Multiplier': round(1/max([difficulty,0.01])),
             'Natural Healing': False}
+
+def resourcepath(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)

@@ -1,6 +1,6 @@
 import json
 import tkinter as tk
-from src.utiles import Vec, RectHitbox, CircleHitbox, Coords
+from src.utiles import Vec, RectHitbox, CircleHitbox, Coords, resourcepath
 from PIL import Image, ImageTk
 
 class TileData:
@@ -20,7 +20,7 @@ class TileData:
     @staticmethod
     def image_load():
         for t in TileData.data:
-            image = Image.open(TileData.data[t]["File"]).resize((Coords.scale_factor,Coords.scale_factor),
+            image = Image.open(resourcepath(TileData.data[t]["File"])).resize((Coords.scale_factor,Coords.scale_factor),
                                                                 resample=Image.Resampling.BOX)
             TileData.data[t]["Image"] = ImageTk.PhotoImage(image)
 
@@ -82,7 +82,7 @@ class Tilemap:
 
         TileData.image_load()
 
-        self.load_map(f"Data/Maps/{levelname.removesuffix('.json').split('/')[-1]}.json")
+        self.load_map(resourcepath(f"Data/Maps/{levelname.removesuffix('.json').split('/')[-1]}.json"))
         self.load_collision_hash()
 
     def load_map(self,level_path):

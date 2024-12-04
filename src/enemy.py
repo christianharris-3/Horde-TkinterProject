@@ -2,7 +2,7 @@ import random
 import math
 from PIL import Image, ImageDraw
 from src.entity import Entity
-from src.utiles import Coords, Vec
+from src.utiles import Coords, Vec, resourcepath
 
 
 class Enemy(Entity):
@@ -16,7 +16,7 @@ class Enemy(Entity):
         self.team = 'Enemy'
         self.facing_left = True
 
-        self.image_base = Image.open(image_path).resize(
+        self.image_base = Image.open(resourcepath(image_path)).resize(
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True),
             resample=Image.Resampling.BOX)
 

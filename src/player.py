@@ -2,7 +2,7 @@ import math, random
 import tkinter as tk
 from PIL import Image, ImageTk, ImageDraw
 from src.entity import Entity
-from src.utiles import Coords, Vec
+from src.utiles import Coords, Vec, resourcepath
 from src.projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade, KB_Obj
 from src.particles import Force_Push_Effect
 from src.tilemap import Tile
@@ -56,12 +56,12 @@ class Player(Entity):
         self.weapon_image_base = None
         self.set_weapon(self.active_weapon)
 
-        self.image_base = Image.open('Sprites/Player.png').convert("RGBA").resize(
+        self.image_base = Image.open(resourcepath('Sprites/Player.png')).convert("RGBA").resize(
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True), resample=Image.Resampling.BOX)
 
-        self.grenade_image_base = ImageTk.PhotoImage(Image.open('Sprites/Grenade.png'
+        self.grenade_image_base = ImageTk.PhotoImage(Image.open(resourcepath('Sprites/Grenade.png')
                                              ).convert("RGBA").resize((54,54),resample=Image.Resampling.BOX))
-        self.push_image_base = ImageTk.PhotoImage(Image.open('Sprites/Force_Push.png'
+        self.push_image_base = ImageTk.PhotoImage(Image.open(resourcepath('Sprites/Force_Push.png')
                                                   ).convert("RGBA").resize((54, 54),resample=Image.Resampling.BOX))
 
         self.hurt_image = 0
@@ -87,7 +87,7 @@ class Player(Entity):
         self.reloading = True
         self.reload_timer = self.weapon_data["Reload_Time"]
 
-        self.weapon_image_base = Image.open(self.weapon_data["File"]).convert("RGBA")
+        self.weapon_image_base = Image.open(resourcepath(self.weapon_data["File"])).convert("RGBA")
         ratio = self.weapon_image_base.height / self.weapon_image_base.width
         self.weapon_image_base = self.weapon_image_base.resize(
             (Coords.world_to_pixel_coords((self.radius, self.radius * ratio)) * self.weapon_data["Render_Size"]).tuple(

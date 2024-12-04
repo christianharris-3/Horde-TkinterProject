@@ -6,7 +6,7 @@ import tkinter as tk
 from PIL import ImageTk, Image, ImageDraw, ImageFont
 from src.player import Player
 from src.tilemap import Tilemap
-from src.utiles import Coords, Vec, RectHitbox, get_difficulty_data
+from src.utiles import Coords, Vec, RectHitbox, get_difficulty_data, resourcepath
 from src.projectiles import Grenade
 from src.particles import Text_Particle
 from src.save_load import Save, Load
@@ -66,7 +66,7 @@ class Game:
         self.particles = []
 
         self.coin_image = ImageTk.PhotoImage(
-            image=Image.open('Sprites/Coin.png').convert("RGBA").resize((60, 60),
+            image=Image.open(resourcepath('Sprites/Coin.png')).convert("RGBA").resize((60, 60),
                                                                 resample=Image.Resampling.BOX))
         self.shop_data = {'Owned_Guns': ['Pistol'],
                           'Temp_Upgrades': {'Heal': -1, 'Shield': 0, 'Grenade': 0, 'Force Push': 0},
@@ -126,7 +126,7 @@ class Game:
         else:
             # fruit names source
             # https://www.goodgoodgood.co/articles/list-of-fruits
-            with open('Data/fruit_names.json', 'r') as f:
+            with open(resourcepath('Data/fruit_names.json'), 'r') as f:
                 fruit = random.choice(json.load(f))
             self.gamefile = fruit
 

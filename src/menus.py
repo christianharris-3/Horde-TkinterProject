@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 from src.player import WeaponData
-from src.utiles import get_now
+from src.utiles import get_now, resourcepath
 
 
 class funcer:
@@ -125,7 +125,7 @@ class Menus:
 ##### Functions starting with make_ are used to create a menu
 
     def make_start_screen(self):
-        image = Image.open('Sprites/Title.png').resize((300, 150), resample=Image.Resampling.BOX)
+        image = Image.open(resourcepath('Sprites/Title.png')).resize((300, 150), resample=Image.Resampling.BOX)
         self.title_image = ImageTk.PhotoImage(image)
         title = tk.Canvas(self.frame, width=300, height=150, bg="darkolivegreen2", bd=0, highlightthickness=0)
         title.create_image(0, 0, image=self.title_image, anchor=tk.NW)
@@ -231,7 +231,7 @@ class Menus:
         ## Weapon Shop
         for i,weapon in enumerate(WeaponData.data):
             x_pos = i*120+70
-            img = Image.open(WeaponData.data[weapon]["File"]).convert("RGBA")
+            img = Image.open(resourcepath(WeaponData.data[weapon]["File"])).convert("RGBA")
             img_height = 60
             img = img.resize((int(img_height*img.width/img.height),img_height),resample=Image.Resampling.BOX)
             self.image_storer.append(ImageTk.PhotoImage(img))
@@ -358,9 +358,11 @@ class Menus:
                  ).place(relx=0.5,y=5,anchor=tk.N)
 
         gamestates = []
-        path = "Data/Game Saves/"
+        path = "Data\\Game Saves\\"
+        if not os.path.exists(path):
+            os.makedirs(path)
         for filename in os.listdir(path):
-            with open("Data/Game Saves/"+filename,'r') as f:
+            with open(path+filename,'r') as f:
                 gamestates.append(json.load(f))
         gamestates.sort(reverse=True,key=lambda x: x["save_timestamp"]["unix_time"])
 

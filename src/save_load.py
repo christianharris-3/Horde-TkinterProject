@@ -7,7 +7,7 @@ from src.player import Player
 from src.tilemap import Tilemap
 from src.projectiles import Bullet, SMG_Bullet, Shotgun_Shell, LMG_Bullet, Grenade
 from src.particles import Blood_Splat, Blood_Particle, Bullet_Hit_Particle, Grenade_Fragment, Explosion, Force_Push_Effect, Text_Particle
-from src.utiles import Vec, get_now, get_difficulty_data
+from src.utiles import Vec, get_now, get_difficulty_data, resourcepath
 
 
 class Save:
@@ -57,7 +57,9 @@ class Save:
                 'save_timestamp':{'date':get_now()[0], 'time':get_now()[1], 'unix_time':time.time()},
                 'cheat_info':cheat_info,'level':{'path':tilemap.level_path,'title':tilemap.level_title},
                 'score_add_timer':score_add_timer}
-        with open(f'Data/Game Saves/{filename}.json','w') as f:
+        if not os.path.exists('Data/Game Saves'):
+            os.makedirs('Data/Games Save')
+        with open(f'Data\\Game Saves\\{filename}.json','w') as f:
             json.dump(data,f)
 
     @staticmethod
@@ -104,10 +106,9 @@ class Load:
     --- import methods and attributes ---
     function : load     The main and only method used externally to this class, used to load a gamestate
     """
-
     @staticmethod
     def load(filename,control_map, screen_width, screen_height):
-        filepath = f'Data/Game Saves/{filename}.json'
+        filepath = f'Data\\Game Saves\\{filename}.json'
         if os.path.isfile(filepath):
             with open(filepath,'r') as f:
                 data = json.load(f)

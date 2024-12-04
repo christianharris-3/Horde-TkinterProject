@@ -7,6 +7,7 @@ from PIL import ImageTk
 import src.tkinter_controller as TC
 from src.game import Game
 from src.menus import Menus
+from src.utiles import resourcepath
 
 class Main:
     """
@@ -24,7 +25,7 @@ class Main:
         self.window = tk.Tk()
         self.window.geometry(f'{self.window_width}x{self.window_height}')
         self.window.title("Horde")
-        self.icon = ImageTk.PhotoImage(file="Sprites/Player.png")
+        self.icon = ImageTk.PhotoImage(file=resourcepath("Sprites\\Player.png"))
         self.window.wm_iconphoto(False, self.icon)
         self.input = TC.Input(self.window)
 
@@ -56,7 +57,7 @@ class Main:
 
         self.window.bind('<Tab>',self.boss_key)
         self.boss_key_active = False
-        self.boss_key_image = ImageTk.PhotoImage(file='Sprites/Boss Key.png')
+        self.boss_key_image = ImageTk.PhotoImage(file=resourcepath('Sprites/Boss Key.png'))
         self.boss_key_label = None
 
         # this thing messes up everything so hard for no reason
@@ -167,12 +168,12 @@ class Main:
                 self.game.player.buttons_down.remove(self.control_map["Shop"]["Key"])
 
     def load_control_map(self):
-        if os.path.exists('Data/control_map.json'):
-            with open('Data/control_map.json','r',encoding='utf-8') as f:
+        if os.path.exists(resourcepath('Data/control_map.json')):
+            with open(resourcepath('Data/control_map.json'),'r',encoding='utf-8') as f:
                 self.control_map = json.load(f)
         else:
             self.control_map = copy.deepcopy(self.control_map_defaults)
-            with open('Data/control_map.json','w',encoding='utf-8') as f:
+            with open(resourcepath('Data/control_map.json'),'w',encoding='utf-8') as f:
                 json.dump(self.control_map,f)
 
 
