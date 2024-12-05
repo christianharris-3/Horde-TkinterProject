@@ -8,6 +8,7 @@ import src.tkinter_controller as TC
 from src.game import Game
 from src.menus import Menus
 from src.utiles import resourcepath
+from src.sound_effects import SFX
 
 class Main:
     """
@@ -140,6 +141,8 @@ class Main:
             if self.game_paused:
                 self.menus.set_menu("Pause_Screen",data=self.game.gamefile)
             else:
+                if self.menus.active_menu == 'Shop_Menu':
+                    SFX.close_shop()
                 self.menus.set_menu("Game")
 
     def boss_key(self,_):

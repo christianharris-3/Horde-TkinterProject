@@ -2,6 +2,7 @@ import random, math
 from src.utiles import CircleHitbox, Vec, RectHitbox
 from src.particles import Blood_Particle, Blood_Splat
 from src.projectiles import KB_Obj
+from src.sound_effects import SFX
 
 
 class Entity:
@@ -126,6 +127,8 @@ class Entity:
     def take_damage(self, damage):
         self.health -= damage
         self.damage_taken += damage
+        SFX.take_damage(self.zombie_type)
 
     def get_dead(self):
         return self.health <= 0
+

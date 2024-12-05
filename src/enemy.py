@@ -11,12 +11,12 @@ class Enemy(Entity):
      - enemy rendering, sprite and health bar
      - enemy ai
     """
-    def __init__(self, x, y, image_path):
+    def __init__(self, x, y, zombie_type):
         super().__init__(x, y)
         self.team = 'Enemy'
         self.facing_left = True
-
-        self.image_base = Image.open(resourcepath(image_path)).resize(
+        self.image_path = 'Sprites\\'+zombie_type+'.png'
+        self.image_base = Image.open(resourcepath(self.image_path)).resize(
             Coords.world_to_pixel_coords((self.radius * 2, self.radius * 2)).tuple(True),
             resample=Image.Resampling.BOX)
 
@@ -87,9 +87,9 @@ class Enemy(Entity):
 
 class SlowZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
-        self.image_path = 'Sprites/Slow_Zombie.png'
+        self.zombie_type = 'Slow_Zombie'
         self.radius = 0.4
-        super().__init__(x, y, self.image_path)
+        super().__init__(x, y, self.zombie_type)
         self.max_health = 5
         self.health = self.max_health
         self.radius = 0.4
@@ -100,9 +100,9 @@ class SlowZombie(Enemy):
 
 class FastZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
-        self.image_path = 'Sprites/Fast_Zombie.png'
+        self.zombie_type = 'Fast_Zombie'
         self.radius = 0.35
-        super().__init__(x, y, self.image_path)
+        super().__init__(x, y, self.zombie_type)
         self.max_health = 4
         self.health = self.max_health
         self.radius = 0.35
@@ -114,9 +114,9 @@ class FastZombie(Enemy):
 
 class BigZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
-        self.image_path = 'Sprites/Big_Zombie.png'
+        self.zombie_type = 'Big_Zombie'
         self.radius = 0.48
-        super().__init__(x, y, self.image_path)
+        super().__init__(x, y, self.zombie_type)
         self.max_health = 16
         self.health = self.max_health
         self.radius = 0.48
@@ -128,9 +128,9 @@ class BigZombie(Enemy):
 
 class DemonZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
-        self.image_path = 'Sprites/Demon_Zombie.png'
+        self.zombie_type = 'Demon_Zombie'
         self.radius = 0.3
-        super().__init__(x, y, self.image_path)
+        super().__init__(x, y, self.zombie_type)
         self.max_health = 3
         self.health = self.max_health
         self.radius = 0.3
@@ -142,9 +142,9 @@ class DemonZombie(Enemy):
 
 class ChonkZombie(Enemy):
     def __init__(self, x, y, difficulty_data):
-        self.image_path = 'Sprites/Chonk_Zombie.png'
+        self.zombie_type = 'Chonk_Zombie'
         self.radius = 0.6
-        super().__init__(x, y, self.image_path)
+        super().__init__(x, y, self.zombie_type)
         self.max_health = 32
         self.health = self.max_health
         self.radius = 0.6

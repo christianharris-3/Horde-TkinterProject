@@ -10,6 +10,7 @@ from src.utiles import Coords, Vec, RectHitbox, get_difficulty_data, resourcepat
 from src.projectiles import Grenade
 from src.particles import Text_Particle
 from src.save_load import Save, Load
+from src.sound_effects import SFX
 
 
 
@@ -197,6 +198,7 @@ class Game:
             self.game_stats["Damage Taken"] = self.player.damage_taken
             if self.player.get_dead():
                 self.player_dead = True
+                SFX.player_dead()
                 for e in self.enemies:
                     e.passive_ai_wait_timer = random.random() * 5 + 2
                 return True, False
@@ -209,6 +211,7 @@ class Game:
             if enem.get_dead():
                 rem.append(enem)
         for r in rem:
+            SFX.zombie_dead(r.zombie_type)
             self.zombies_killed_in_wave += 1
             self.game_stats['Zombie Kills'] += 1
             self.shop_data["Coins"] += r.coin_value*self.difficulty_data["Coin_Multiplier"]
@@ -242,6 +245,7 @@ class Game:
             if proj.get_dead(self.tilemap.collision_hash):
                 if isinstance(proj,Grenade):
                     new_particles, damage_dealt = proj.explode(entities)
+                    SFX.explosion()
                     self.particles += new_particles
                     self.game_stats["Damage Dealt"] += damage_dealt
                 rem.append(proj)

@@ -5,6 +5,7 @@ from src.entity import Entity
 from src.utiles import Coords, Vec, resourcepath
 from src.projectiles import Bullet, SMG_Bullet, LMG_Bullet, Shotgun_Shell, Grenade, KB_Obj
 from src.particles import Force_Push_Effect
+from src.sound_effects import SFX
 from src.tilemap import Tile
 
 
@@ -38,6 +39,7 @@ class Player(Entity):
     def __init__(self, x, y, control_map, cheat_info, screen_width, screen_height):
         super().__init__(x, y)
         self.team = 'Player'
+        self.zombie_type = 'Player'
         self.radius = 0.45
         self.move_acceleration = 0.01
         self.max_health = 20
@@ -76,6 +78,7 @@ class Player(Entity):
         self.auto_fire_cooldown = 0
         self.reload_timer = 0
         self.recent_health_timer = 0
+        self.player_footstep_timer = 0
 
         self.buttons_down = []
 
@@ -245,6 +248,9 @@ class Player(Entity):
         elif self.get_pressed(inp, "Down"):
             self.target_move[1] += 1
 
+        # Walk sound effect
+
+
         # Reload
         if self.get_pressed(inp, "Reload"):
             self.reload()
@@ -252,6 +258,7 @@ class Player(Entity):
         # Shop
         open_shop = False
         if self.get_pressed(inp, "Shop") and self.can_open_shop:
+            SFX.open_shop()
             open_shop = True
 
         # Abilities
@@ -292,6 +299,7 @@ class Player(Entity):
 
     def shoot(self):
         if self.ammo_left > 0 and not self.reloading:
+            SFX.player_shoot(self.active_weapon)
             if not self.cheat_info['infinite ammo']:
                 self.ammo_left -= 1
             if self.ammo_left == 0:
@@ -305,9 +313,11 @@ class Player(Entity):
                 projectiles[-1].damage*=self.cheat_info['damage multiplier']
             return projectiles
         else:
+            SFX.player_cant_shoot(self.active_weapon)
             return []
 
     def force_push(self,enemies):
+        SFX.force_push()
         push_range = 6
         knockback = 1
         for e in enemies:
@@ -321,11 +331,13 @@ class Player(Entity):
         return [Force_Push_Effect(self.x,self.y,1)]
 
     def reload(self):
+        SFX.reload(self.active_weapon)
         self.reloading = True
         self.reload_timer = self.weapon_data["Reload_Time"]
 
     def take_damage(self, damage):
         if self.i_frames <= 0 and not self.cheat_info['immortal']:
+            SFX.take_damage('Player')
             self.damage_taken += damage
             if self.shield>damage:
                 self.shield-=damage
