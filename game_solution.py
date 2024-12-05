@@ -83,7 +83,7 @@ class Main:
             if player_died:
                 self.menus.set_menu("Death_Screen", data=self.game.game_stats)
             elif open_shop:
-                self.game_paused = True
+                self.set_game_paused(True)
                 self.menus.set_menu("Shop_Menu", data=self.game.shop_data)
         else:
             ## Code to shut shop with same key that opens it
@@ -101,7 +101,7 @@ class Main:
             else:
                 self.pause_button_down = False
             if self.input.get_cheatcode_active():
-                self.game_paused = True
+                self.set_game_paused(True)
                 self.menus.set_menu('CheatCode_Menu', data=self.game.cheat_info)
         return done
 
@@ -137,13 +137,17 @@ class Main:
         if not self.pause_button_down:
             self.target_fps[0] = int(60*self.game.cheat_info["speed of time"])
             self.pause_button_down = True
-            self.game_paused = not self.game_paused
+            self.set_game_paused(not self.game_paused)
             if self.game_paused:
                 self.menus.set_menu("Pause_Screen",data=self.game.gamefile)
             else:
                 if self.menus.active_menu == 'Shop_Menu':
                     SFX.close_shop()
                 self.menus.set_menu("Game")
+
+    def set_game_paused(self,game_paused):
+        self.game_paused = game_paused
+        SFX.set_paused(self.game_paused)
 
     def boss_key(self,_):
         self.boss_key_active = not self.boss_key_active

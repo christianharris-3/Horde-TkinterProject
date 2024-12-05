@@ -4,6 +4,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from src.player import WeaponData
 from src.utiles import get_now, resourcepath
+from src.sound_effects import SFX
 
 
 class funcer:
@@ -19,8 +20,8 @@ class funcer:
     for i in range(10):
         tk.Button(root,text=str(i),command=lambda: example_function(i)).pack()
     """
-    def __init__(self, func, **args):
-        self.func = lambda: func(**args)
+    def __init__(self,button_function, func, **args):
+        self.func = lambda: button_function(lambda: func(**args))
 
 # tkinter color list for reference
 # https://www.plus2net.com/python/tkinter-colors.php
@@ -122,6 +123,10 @@ class Menus:
             self.set_menu_data_cache.append(None)
         self.set_menu(self.prev_menu.pop(-1), False, data = self.set_menu_data_cache.pop(-1))
 
+    def button_function(self,command,button_typ=None):
+        SFX.menu_button_click(button_typ)
+        command()
+
 ##### Functions starting with make_ are used to create a menu
 
     def make_start_screen(self):
@@ -131,28 +136,28 @@ class Menus:
         title.create_image(0, 0, image=self.title_image, anchor=tk.NW)
         title.place(relx=0.5, rely=0.5, y=-180, anchor=tk.S)
 
-        tk.Button(self.frame, text='Start', command=lambda:self.set_menu("Level_Select"),
+        tk.Button(self.frame, text='Start', command=lambda:self.button_function(lambda:self.set_menu("Level_Select")),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, rely=0.5, y=-100, width=141, height=78, anchor=tk.CENTER)
 
-        tk.Button(self.frame, text='Load Save', command=lambda: self.set_menu("Load_Gamestate_Menu"),
+        tk.Button(self.frame, text='Load Save', command=lambda:self.button_function(lambda: self.set_menu("Load_Gamestate_Menu")),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, rely=0.5, width=185, height=84, anchor=tk.CENTER)
 
-        tk.Button(self.frame, text='LeaderBoard', command=lambda: self.set_menu("Leaderboard_Menu"),
+        tk.Button(self.frame, text='LeaderBoard', command=lambda:self.button_function(lambda: self.set_menu("Leaderboard_Menu")),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, rely=0.5, y=100, width=220, height=84, anchor=tk.CENTER)
 
-        tk.Button(self.frame, text='Settings', command=lambda: self.set_menu("Settings"),
+        tk.Button(self.frame, text='Settings', command=lambda:self.button_function(lambda: self.set_menu("Settings")),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, rely=0.5, y=200, width=178, height=84, anchor=tk.CENTER)
 
-        tk.Button(self.frame, text='Quit', command=self.window.destroy,
+        tk.Button(self.frame, text='Quit', command=lambda:self.button_function(self.window.destroy),
                   font=(self.font, 20), bg="red", relief=tk.GROOVE, bd=4, activebackground="red4",
                   ).place(relx=0.5, rely=0.5, y=300, width=100, height=84, anchor=tk.CENTER)
 
     def make_settings_menu(self):
-        tk.Button(self.frame, text='Back', command=self.menu_back,
+        tk.Button(self.frame, text='Back', command=lambda:self.button_function(self.menu_back),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, anchor=tk.NW)
 
@@ -177,10 +182,10 @@ class Menus:
             key = tk.Button(self.frame, text=txt, font=(self.font, 15), bg=swap_col,
                             relief=tk.GROOVE, bd=4, activebackground="green4")
             key.place(relx=0.53, x=-10, y=130 + 65 * i, height=50, width=246, anchor=tk.E)
-            func = funcer(self.start_key_listener, action=action, button=key)
+            func = funcer(self.button_function,self.start_key_listener, action=action, button=key)
             key.configure(command=func.func)
 
-            func = funcer(self.reset_keybind, action=action)
+            func = funcer(self.button_function,self.reset_keybind, action=action)
             reset_color = 'green'
             if self.control_map[action]['Key'] != self.control_map_defaults[action]['Key']:
                 reset_color = 'green3'
@@ -195,20 +200,20 @@ class Menus:
         self.frame.lift()
         self.frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
-        tk.Button(self.frame, text="Resume", command=self.menu_funcs['pause'],
+        tk.Button(self.frame, text="Resume", command=lambda: self.button_function(self.menu_funcs['pause']),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, y=20, anchor=tk.N, width=207, height=63)
-        tk.Button(self.frame, text='Settings', command=lambda: self.set_menu("Settings"),
+        tk.Button(self.frame, text='Settings', command=lambda: self.button_function(lambda: self.set_menu("Settings")),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, y=100, anchor=tk.N, width=168, height=63)
-        tk.Button(self.frame, text='Save', command=lambda: self.set_menu("Save_Game_Menu",data=gamefile),
+        tk.Button(self.frame, text='Save', command=lambda: self.button_function(lambda: self.set_menu("Save_Game_Menu",data=gamefile)),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, y=180, anchor=tk.N, width=142, height=63)
-        tk.Button(self.frame, text='Exit To Main Menu', command=self.menu_funcs['end_game'],
+        tk.Button(self.frame, text='Exit To Main Menu', command=lambda: self.button_function(self.menu_funcs['end_game']),
                   font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, y=260, anchor=tk.N, width=220, height=63)
         if save_and_quit:
-            tk.Button(self.frame, text='Save and Exit', command=self.save_and_quit,
+            tk.Button(self.frame, text='Save and Exit', command=lambda: self.button_function(self.save_and_quit),
                       font=(self.font, 15), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                       ).place(relx=0.5, y=340, anchor=tk.N, width=194, height=63)
 
@@ -223,7 +228,7 @@ class Menus:
         tk.Label(self.frame,text='Shop',font=(self.font, 24, "bold"),bg="darkolivegreen2"
                  ).place(relx=0.5,anchor=tk.N)
         tk.Button(self.frame, text='Done', font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4,
-                  activebackground="green4", command=self.menu_funcs['pause'],
+                  activebackground="green4", command=lambda: self.button_function(self.menu_funcs['pause']),
                   ).place(relx=1,x=-10, y=10, anchor=tk.NE, height=50, width=100)
         tk.Label(self.frame,text=f'Coins: {shop_data["Coins"]}',font=(self.font, 20),bg="darkolivegreen2"
                  ).place(x=10,y=10, anchor=tk.NW)
@@ -242,7 +247,7 @@ class Menus:
             tk.Label(self.frame, text=weapon, image=self.image_storer[-1],compound="top",highlightbackground="darkgreen", highlightthickness=3,
                       bg="darkolivegreen2",width=100,height=151,font=label_font,anchor=tk.N,pady=10).place(x=x_pos,y=70,anchor=tk.N)
             if not(weapon in shop_data['Owned_Guns']):
-                func = funcer(self.buy_weapon, player_func=player.set_weapon, new_weapon=weapon, shop_data=shop_data,
+                func = funcer(self.button_function ,self.buy_weapon, player_func=player.set_weapon, new_weapon=weapon, shop_data=shop_data,
                               price=WeaponData.data[weapon]["Price"])
                 if WeaponData.data[weapon]["Price"] <= shop_data["Coins"]:
                     col = 'green'
@@ -255,7 +260,7 @@ class Menus:
                           disabledforeground='#333'
                           ).place(x=x_pos,y=195,width=100,height=50,anchor=tk.N)
             else:
-                func = funcer(self.set_weapon,player_func=player.set_weapon,new_weapon=weapon,shop_data=shop_data)
+                func = funcer(self.button_function, self.set_weapon,player_func=player.set_weapon,new_weapon=weapon,shop_data=shop_data)
                 tk.Button(self.frame, text='Equip', command=func.func,
                           font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                           ).place(x=x_pos, y=195, width=100, height=50, anchor=tk.N)
@@ -270,7 +275,7 @@ class Menus:
             tk.Label(self.frame, text=upgrade['Name'],highlightbackground="darkgreen", highlightthickness=3,
                       bg="darkolivegreen2",font=(self.font,14),anchor=tk.N,pady=0
                      ).place(x=x_pos,y=260,width=112,height=96,anchor=tk.N)
-            func = funcer(upgrade['Func'],price=upgrade["Price"],shop_data=shop_data,counter=upgrade["Counter"])
+            func = funcer(self.button_function, upgrade['Func'],price=upgrade["Price"],shop_data=shop_data,counter=upgrade["Counter"])
             txt = f'Buy:{upgrade["Price"]}'
             if upgrade["Price"]<=shop_data["Coins"]:
                 col = 'green'
@@ -303,11 +308,11 @@ class Menus:
             tk.Label(self.frame,text=f'{dat}: {stat}',font=(self.font,15), bg="darkolivegreen2",
                  ).place(x=20, y=175+i*40, anchor=tk.NW)
 
-        tk.Button(self.frame, text='Save', command=lambda: self.set_menu('Score_Entry_Menu',data=game_stats),
+        tk.Button(self.frame, text='Save', command=lambda: self.button_function(lambda: self.set_menu('Score_Entry_Menu',data=game_stats)),
                   font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.7,y=460,width=140,height=50,anchor=tk.N)
 
-        tk.Button(self.frame, text='Main Menu', command= self.menu_funcs["end_game"],
+        tk.Button(self.frame, text='Main Menu', command=lambda: self.button_function(self.menu_funcs["end_game"]),
                   font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.3, y=460, width=140, height=50, anchor=tk.N)
 
@@ -325,7 +330,7 @@ class Menus:
         tk.Label(self.frame, text='Enter Name:' ,bg="darkolivegreen2", font=('arial', 15),
                  ).place(relx=0.5,x=-50, y=90,  anchor=tk.E)
 
-        tk.Button(self.frame, text='Save', command=lambda: self.save_score(game_stats,name_entry),
+        tk.Button(self.frame, text='Save', command=lambda: self.button_function(lambda: self.save_score(game_stats,name_entry)),
                   font=(self.font, 16), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5,y=120,width=140,height=50,anchor=tk.N)
 
@@ -345,12 +350,12 @@ class Menus:
         tk.Label(self.frame, text='Save Name:' ,bg="darkolivegreen2", font=('arial', 15),
                  ).place(relx=0.5,x=-50, y=90,  anchor=tk.E)
 
-        tk.Button(self.frame, text='Save', command=lambda: self.save_game(self.menu_funcs["game_object"],name_entry),
+        tk.Button(self.frame, text='Save', command=lambda: self.button_function(lambda: self.save_game(self.menu_funcs["game_object"],name_entry)),
                   font=(self.font, 16), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5,y=120,width=140,height=50,anchor=tk.N)
 
     def make_load_gamestate_menu(self):
-        tk.Button(self.frame, text='Back', command=self.menu_back,
+        tk.Button(self.frame, text='Back', command=lambda: self.button_function(self.menu_back),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, height=70, anchor=tk.NW)
 
@@ -381,11 +386,11 @@ class Menus:
                                                     state["game_stats"]["Wave Reached"]])
         table.place(relx=0.5,x=-80,y=90,anchor=tk.N)
 
-        tk.Button(self.frame, text='Load', command=lambda: self.load_gamestate(table),
+        tk.Button(self.frame, text='Load', command=lambda: self.button_function(lambda: self.load_gamestate(table)),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4"
                   ).place(relx=0.5, x=500, y=140, anchor=tk.CENTER, width=104, height=84)
 
-        tk.Button(self.frame, text='Delete', command=lambda: self.delete_gamestate(table),
+        tk.Button(self.frame, text='Delete', command=lambda: self.button_function(lambda: self.delete_gamestate(table)),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4",
                   ).place(relx=0.5, x=500, y=240, anchor=tk.CENTER, width=122, height=84)
 
@@ -395,7 +400,7 @@ class Menus:
         self.leaderboard_filter = filter_
 
         # back button and title
-        tk.Button(self.frame, text='Back', command=self.menu_back,
+        tk.Button(self.frame, text='Back', command=lambda: self.button_function(self.menu_back),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, height=70, anchor=tk.NW)
         tk.Label(self.frame, text='Leaderboard', font=(self.font, 30, "bold"), bg="darkolivegreen2",
@@ -417,7 +422,7 @@ class Menus:
             col = 'green'
             if o == filter_:
                 col = 'green3'
-            func = funcer(self.set_menu,menu='Leaderboard_Menu',add_to_prev_menu=False,data=o)
+            func = funcer(self.button_function, self.set_menu,menu='Leaderboard_Menu',add_to_prev_menu=False,data=o)
             tk.Button(self.frame, text=o, command=func.func,
                       font=(self.font, 14), bg=col, relief=tk.GROOVE, bd=4,
                       activebackground="green4",
@@ -462,7 +467,7 @@ class Menus:
                  ).place(relx=0.5,y=5,anchor=tk.N)
 
         ## Give money button
-        tk.Button(self.frame, text='+100\nCoins', command=self.cheat_add_coins,
+        tk.Button(self.frame, text='+100\nCoins', command=lambda: self.button_function(self.cheat_add_coins),
                   font=(self.font, 14), bg="green", relief=tk.GROOVE, bd=4,
                   activebackground="green4",
                   ).place(x=240, y=90, height=80, width=100, anchor=tk.NW)
@@ -475,7 +480,7 @@ class Menus:
             toggle = tk.Checkbutton(self.frame,text=t, font=(self.font, 15), bg="darkolivegreen2",
                                     variable=self.cheatcode_tkvars[i])
             toggle.place(x=20,y=60+i*50,anchor=tk.NW)
-            func = funcer(self.cheat_widget_input,variable=self.cheatcode_tkvars[i],
+            func = funcer(self.button_function,self.cheat_widget_input,variable=self.cheatcode_tkvars[i],
                           cheat_info=cheat_info,info_type=t.lower())
             toggle.configure(command=func.func)
             if cheat_info[t.lower()]:
@@ -499,7 +504,7 @@ class Menus:
             slider.set(self.cheat_info[info["key"]])
 
     def make_level_select_menu(self):
-        tk.Button(self.frame, text='Back', command=self.menu_back,
+        tk.Button(self.frame, text='Back', command=lambda: self.button_function(self.menu_back),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, height=70, anchor=tk.NW)
         tk.Label(self.frame, text='Level Select', font=(self.font, 30, "bold"), bg="darkolivegreen2",
@@ -510,7 +515,7 @@ class Menus:
                   {'Title': 'Level 3: Hard', 'file': 'Level 3'}]
 
         for i,level in enumerate(levels):
-            func = funcer(self.menu_funcs['start_game'],level=level['file'])
+            func = funcer(self.button_function, self.menu_funcs['start_game'],level=level['file'])
             tk.Button(self.frame, text=level['Title'], command=func.func,
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   ).place(relx=0.5, y=100+i*80, height=70, anchor=tk.N)

@@ -89,6 +89,7 @@ class Player(Entity):
         self.ammo_left = self.weapon_data["Clip_Size"]
         self.reloading = True
         self.reload_timer = self.weapon_data["Reload_Time"]
+        SFX.reload(self.active_weapon)
 
         self.weapon_image_base = Image.open(resourcepath(self.weapon_data["File"])).convert("RGBA")
         ratio = self.weapon_image_base.height / self.weapon_image_base.width
@@ -282,22 +283,24 @@ class Player(Entity):
         if self.reload_timer <= 0 and self.reloading:
             self.reloading = False
             self.ammo_left = self.weapon_data["Clip_Size"]
-        out = self.get_pressed(inp, "Shoot")
-        if out and self.auto_fire_cooldown < 0:
-            new_projectiles = self.shoot()
+
+        shoot_pressed = self.control_map['Shoot']['Key'] in self.buttons_down
+        if self.get_pressed(inp, "Shoot") and self.auto_fire_cooldown < 0:
+            just_pressed_shoot = shoot_pressed != (self.control_map['Shoot']['Key'] in self.buttons_down)
+            new_projectiles = self.shoot(just_pressed_shoot)
             self.auto_fire_cooldown = self.weapon_data["Shoot_CD"]
 
         self.angle = math.atan2(mpos[1] - self.y, mpos[0] - self.x)
         return new_projectiles, new_particles, open_shop
 
     def get_pressed(self, inp, key):
-        if inp.get_pressed(self.control_map[key]['Key']) and (self.control_map[key]['Key'] not in self.buttons_down):
-            if not self.control_map[key]['continuous']:
+        if inp.get_pressed(self.control_map[key]['Key']) and ((self.control_map[key]['Key'] not in self.buttons_down) or self.control_map[key]['continuous']):
+            if not (self.control_map[key]['Key'] in self.buttons_down):
                 self.buttons_down.append(self.control_map[key]['Key'])
             return True
         return False
 
-    def shoot(self):
+    def shoot(self,just_pressed_shoot=False):
         if self.ammo_left > 0 and not self.reloading:
             SFX.player_shoot(self.active_weapon)
             if not self.cheat_info['infinite ammo']:
@@ -313,7 +316,8 @@ class Player(Entity):
                 projectiles[-1].damage*=self.cheat_info['damage multiplier']
             return projectiles
         else:
-            SFX.player_cant_shoot(self.active_weapon)
+            if just_pressed_shoot:
+                SFX.player_cant_shoot(self.active_weapon)
             return []
 
     def force_push(self,enemies):
