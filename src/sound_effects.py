@@ -6,11 +6,11 @@ pygame.mixer.init()
 class SFX:
     sound_data = {'not_pausable_sounds':['open_shop','close_shop','menu_click']}
 
-    base_sound_map = {'shotgun_fire': {},
-                      'shotgun_reload':{'file': 'shotgun_reload.wav'},
-                      'LMG_fire': {},
+    base_sound_map = {'shotgun_fire': {'file': 'shotgun_fire.wav'},
+                      'shotgun_reload':{'file': 'shotgun reload.wav'},
+                      'LMG_fire': {'file': 'LMG_fire.wav','volume':0.4},
                       'LMG_reload': {'file': 'LMG_reload.wav'},
-                      'SMG_fire': {},
+                      'SMG_fire': {'file': 'SMG_fire.wav','volume':0.4},
                       'cant_shoot': {'file': 'cant_shoot.wav'},
                       'shoot': {},
                       'player_move': {},
@@ -41,12 +41,13 @@ class SFX:
                        'menu_click': [{'file': 'bs/menu_sound.wav'},{'file':'bs/menu_sound2.wav'}],
                        }
 
-    use_eight_bit_sounds = True
-    use_improved_sounds = True
+    use_eight_bit_sounds = False
+    use_improved_sounds = False
 
     paused = False
     paused_queue = []
-    game_sound = [pygame.mixer.Channel(a) for a in range(1,8)]
+    pygame.mixer.set_num_channels(20)
+    game_sound = [pygame.mixer.Channel(a) for a in range(1,20)]
     game_sound_index = 0
     paused_sound = pygame.mixer.Channel(0)
 
