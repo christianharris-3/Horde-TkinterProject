@@ -16,13 +16,13 @@ class SFX:
                       'player_move': {},
                       'player_hurt': {},
                       'enemy_hurt': {},
-                      'menu_click': {},
+                      'menu_click': {'file': 'menu_press.wav', 'volume':0.4},
                       'throw_grenade': {},
                       'explosion': {},
                       'force_push': {},
                       'open_shop': {},
                       'close_shop': {},
-                      'enemy_die': {},
+                      'enemy_die': [{'file':'enemy_death.wav'},{'file':'enemy_death2.wav'},{'file':'enemy_death3.wav'}],
                       'player_die': {}}
 
     eight_bit_sounds = {'explosion': {'file':'8bit/explosion.wav'},
