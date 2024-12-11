@@ -250,7 +250,8 @@ class Player(Entity):
             self.target_move[1] += 1
 
         # Walk sound effect
-
+        if self.target_move.length()>0:
+            SFX.player_move()
 
         # Reload
         if self.get_pressed(inp, "Reload"):

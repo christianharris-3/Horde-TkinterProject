@@ -1,10 +1,12 @@
-import pygame, random
+import pygame, random, time
 from src.utiles import resourcepath
 
 pygame.mixer.init()
 
 class SFX:
-    sound_data = {'not_pausable_sounds':['open_shop','close_shop','menu_click']}
+    sound_data = {'not_pausable_sounds':['open_shop','close_shop','menu_click'],
+                  'sound_cooldown':{'player_move':0.2}}
+    sound_cooldown_tracker = {}
 
     base_sound_map = {'shotgun_fire': {'file': 'shotgun_fire.wav'},
                       'shotgun_reload':{'file': 'shotgun reload.wav'},
@@ -15,7 +17,8 @@ class SFX:
                       'pistol_fire':{'file': 'pistol_fire.wav'},
                       'pistol_reload':{'file': 'pistol_reload.wav'},
                       'cant_shoot': {'file': 'cant_shoot.wav'},
-                      'player_move': {},
+                      'player_move_1': {'file': 'player_move3.wav'},
+                      'player_move_2': {'file': 'player_move4.wav'},
                       'player_hurt': [{'file':'player_hurt1.wav'},{'file':'player_hurt2.wav'},{'file':'player_hurt3.wav'},{'file':'player_hurt4.wav'}],
                       'player_die': {'file':'player_die.wav'},
                       'enemy_hurt': [{'file': 'zombie_hurt1.wav'}, {'file': 'zombie_hurt2.wav'}, {'file': 'zombie_hurt3.wav'}],
@@ -56,6 +59,8 @@ class SFX:
 
     volume = 1
 
+    walk_toggle = False
+
     for sound_map in [base_sound_map,eight_bit_sounds,improved_sounds]:
         for sound in sound_map:
             if isinstance(sound_map[sound],dict):
@@ -92,15 +97,33 @@ class SFX:
         if 'file' not in info:
             print(f'no sound for {name}')
         else:
+            # Manage sound cooldown
+            if not SFX.get_cooldown(name):
+                return
+
+            # Set sounds volume
             vol = SFX.volume
             if 'volume' in info:
                 vol = info['volume'] * SFX.volume
             info['sound'].set_volume(vol)
+
+            # Play sound using different sound channels for pausable sounds that can play ontop of each other
             if name in SFX.sound_data['not_pausable_sounds']:
                 SFX.paused_sound.play(info['sound'])
             else:
                 SFX.game_sound[SFX.game_sound_index].play(info['sound'])
                 SFX.game_sound_index = (SFX.game_sound_index+1)%len(SFX.game_sound)
+
+    @staticmethod
+    def get_cooldown(name):
+        if name in SFX.sound_data['sound_cooldown']:
+            if name in SFX.sound_cooldown_tracker:
+                if time.perf_counter() > SFX.sound_cooldown_tracker[name] + SFX.sound_data['sound_cooldown'][name]:
+                    SFX.sound_cooldown_tracker.pop(name)
+                return False
+            else:
+                SFX.sound_cooldown_tracker[name] = time.perf_counter()
+        return True
 
     @staticmethod
     def set_paused(paused):
@@ -129,7 +152,13 @@ class SFX:
 
     @staticmethod
     def player_move():
-        SFX.play_sound('player_move')
+        if not SFX.get_cooldown('player_move'):
+            return
+        SFX.walk_toggle = not SFX.walk_toggle
+        if SFX.walk_toggle:
+            SFX.play_sound('player_move_1')
+        else:
+            SFX.play_sound('player_move_2')
 
     @staticmethod
     def menu_button_click(button_typ):
@@ -176,5 +205,4 @@ class SFX:
 
     @staticmethod
     def zombie_dead(zombie):
-        # SFX.play_sound('explosion')
         SFX.play_sound('enemy_die')
