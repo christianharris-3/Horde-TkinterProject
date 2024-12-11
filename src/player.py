@@ -268,6 +268,7 @@ class Player(Entity):
         if self.get_pressed(inp, "Grenade") and (shop_data["Temp_Upgrades"]["Grenade"]>0 or self.cheat_info['infinite abilities']):
             new_projectiles = [Grenade(self.x,self.y,*mpos.tuple(),self.team)]
             new_projectiles[-1].damage*=self.cheat_info['damage multiplier']
+            SFX.throw_grenade()
             if not self.cheat_info['infinite abilities']:
                 shop_data["Temp_Upgrades"]["Grenade"]-=1
             game_stats["Grenades Thrown"]+=1

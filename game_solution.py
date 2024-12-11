@@ -177,11 +177,14 @@ class Main:
     def load_control_map(self):
         if os.path.exists(resourcepath('Data/control_map.json')):
             with open(resourcepath('Data/control_map.json'),'r',encoding='utf-8') as f:
-                self.control_map = json.load(f)
+                data = json.load(f)
+            self.control_map = data['control_map']
+            SFX.volume = float(data['volume'])
         else:
             self.control_map = copy.deepcopy(self.control_map_defaults)
+            data = {'control_map':self.control_map,'volume':1}
             with open(resourcepath('Data/control_map.json'),'w',encoding='utf-8') as f:
-                json.dump(self.control_map,f)
+                json.dump(data,f)
 
 
 if __name__ == "__main__":

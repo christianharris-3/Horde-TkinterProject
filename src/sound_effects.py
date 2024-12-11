@@ -11,19 +11,22 @@ class SFX:
                       'LMG_fire': {'file': 'LMG_fire.wav','volume':0.4},
                       'LMG_reload': {'file': 'LMG_reload.wav'},
                       'SMG_fire': {'file': 'SMG_fire.wav','volume':0.4},
+                      'SMG_reload':{'file': 'SMG_reload.wav'},
+                      'pistol_fire':{'file': 'pistol_fire.wav'},
+                      'pistol_reload':{'file': 'pistol_reload.wav'},
                       'cant_shoot': {'file': 'cant_shoot.wav'},
-                      'shoot': {},
                       'player_move': {},
-                      'player_hurt': {},
-                      'enemy_hurt': {},
+                      'player_hurt': [{'file':'player_hurt1.wav'},{'file':'player_hurt2.wav'},{'file':'player_hurt3.wav'},{'file':'player_hurt4.wav'}],
+                      'player_die': {'file':'player_die.wav'},
+                      'enemy_hurt': [{'file': 'zombie_hurt1.wav'}, {'file': 'zombie_hurt2.wav'}, {'file': 'zombie_hurt3.wav'}],
                       'menu_click': {'file': 'menu_press.wav', 'volume':0.4},
-                      'throw_grenade': {},
-                      'explosion': {},
+                      'throw_grenade': {'file': 'throw_grenade.wav', 'volume':0.5},
+                      'explosion': {'file': 'explosion.wav'},
                       'force_push': {},
                       'open_shop': {},
                       'close_shop': {},
                       'enemy_die': [{'file':'enemy_death.wav'},{'file':'enemy_death2.wav'},{'file':'enemy_death3.wav'}],
-                      'player_die': {}}
+                      }
 
     eight_bit_sounds = {'explosion': {'file':'8bit/explosion.wav'},
                         'shotgun_fire': {'file': '8bit/shotgun_fire.wav'},
@@ -51,6 +54,8 @@ class SFX:
     game_sound_index = 0
     paused_sound = pygame.mixer.Channel(0)
 
+    volume = 1
+
     for sound_map in [base_sound_map,eight_bit_sounds,improved_sounds]:
         for sound in sound_map:
             if isinstance(sound_map[sound],dict):
@@ -59,8 +64,6 @@ class SFX:
                 if 'file' in info:
                     path = resourcepath('sfx\\' + info['file'])
                     info['sound'] = pygame.mixer.Sound(path)
-                    if 'volume' in info:
-                        info['sound'].set_volume(info['volume'])
                     # if sound_map is improved_sounds:
                         # info['sound'].set_volume(0.01)
 
@@ -89,6 +92,10 @@ class SFX:
         if 'file' not in info:
             print(f'no sound for {name}')
         else:
+            vol = SFX.volume
+            if 'volume' in info:
+                vol = info['volume'] * SFX.volume
+            info['sound'].set_volume(vol)
             if name in SFX.sound_data['not_pausable_sounds']:
                 SFX.paused_sound.play(info['sound'])
             else:
@@ -110,14 +117,11 @@ class SFX:
 
     @staticmethod
     def player_shoot(weapon):
-        if weapon == 'Shotgun':
-            SFX.play_sound('shotgun_fire')
-        elif weapon == 'LMG':
-            SFX.play_sound('LMG_fire')
-        elif weapon == 'SMG':
-            SFX.play_sound('SMG_fire')
-        else:
-            SFX.play_sound('shoot')
+        match weapon:
+            case 'LMG': SFX.play_sound('LMG_fire')
+            case 'SMG': SFX.play_sound('SMG_fire')
+            case 'Pistol': SFX.play_sound('pistol_fire')
+            case 'Shotgun': SFX.play_sound('shotgun_fire')
 
     @staticmethod
     def player_cant_shoot(weapon):
@@ -144,16 +148,19 @@ class SFX:
 
     @staticmethod
     def reload(weapon):
-        if weapon == 'LMG':
-            SFX.play_sound('LMG_reload')
-        elif weapon == 'Shotgun':
-            SFX.play_sound('shotgun_reload')
-        else:
-            SFX.play_sound('reload')
+        match weapon:
+            case 'LMG': SFX.play_sound('LMG_reload')
+            case 'SMG': SFX.play_sound('SMG_reload')
+            case 'Pistol': SFX.play_sound('pistol_reload')
+            case 'Shotgun': SFX.play_sound('shotgun_reload')
 
     @staticmethod
     def force_push():
         SFX.play_sound('force_push')
+
+    @staticmethod
+    def throw_grenade():
+        SFX.play_sound('throw_grenade')
 
     @staticmethod
     def open_shop():

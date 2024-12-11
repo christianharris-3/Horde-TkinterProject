@@ -68,17 +68,18 @@ class Menus:
         self.cheatcode_tkvars = []
 
         # style for tables
-        style = ttk.Style()
-        style.theme_use("clam")
-        style.configure('Treeview.Heading', font=(self.font, 18), background='#060', relief="flat",
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.style.configure('Treeview.Heading', font=(self.font, 18), background='#060', relief="flat",
                         borderwidth=0, fieldbackground='#060')
-        style.map('Treeview.Heading', background=[('selected', '#060')],
+        self.style.map('Treeview.Heading', background=[('selected', '#060')],
                   foreground=[('selected', '#grey9')])
-        style.configure('Treeview', font=(self.font, 16), rowheight=35, background="green",
+        self.style.configure('Treeview', font=(self.font, 16), rowheight=35, background="green",
                         fieldbackground='darkolivegreen2',
                         relief='flat', borderwidth=0, bd=0, highlightthickness=0)
-        style.map('Treeview', background=[('selected', 'green4')],
+        self.style.map('Treeview', background=[('selected', 'green4')],
                   foreground=[('selected', 'gray6')])
+        self.style.configure('TScale', background='green', sliderwidth=40)
 
     def set_menu(self, menu, add_to_prev_menu=True,data=None):
         for widget in self.frame.winfo_children():
@@ -157,6 +158,7 @@ class Menus:
                   ).place(relx=0.5, rely=0.5, y=300, width=100, height=84, anchor=tk.CENTER)
 
     def make_settings_menu(self):
+        self.style.theme_use("default")
         tk.Button(self.frame, text='Back', command=lambda:self.button_function(self.menu_back),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, anchor=tk.NW)
@@ -164,6 +166,11 @@ class Menus:
         tk.Label(self.frame, text="Edit Keybinds", bg="darkolivegreen2", font=(self.font, 40, "bold")
                  ).place(relx=0.5, y=50, anchor=tk.CENTER)
 
+        # Volume slider
+        tk.Label(self.frame, text='Volume', bg="darkolivegreen2", font=(self.font, 25, "bold")
+                 ).place(x=180,y=185,anchor=tk.N)
+        ttk.Scale(self.frame, to=1, orient="horizontal",length=180,command=self.set_volume,value=SFX.volume,# resolution=0.0078125,
+                 ).place(x=180,y=250,anchor=tk.N)
 
         ## Detects 2 controls with same input
         used = []
@@ -355,6 +362,7 @@ class Menus:
                   ).place(relx=0.5,y=120,width=140,height=50,anchor=tk.N)
 
     def make_load_gamestate_menu(self):
+        self.style.theme_use("clam")
         tk.Button(self.frame, text='Back', command=lambda: self.button_function(self.menu_back),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
                   pady=0).place(x=10, y=10, height=70, anchor=tk.NW)
@@ -395,6 +403,7 @@ class Menus:
                   ).place(relx=0.5, x=500, y=240, anchor=tk.CENTER, width=122, height=84)
 
     def make_leaderboard_menu(self,filter_):
+        self.style.theme_use("clam")
         if not filter_:
             filter_ = 'All'
         self.leaderboard_filter = filter_
@@ -652,9 +661,16 @@ class Menus:
 
     def reset_keybind(self, action):
         self.control_map[action]["Key"] = self.control_map_defaults[action]["Key"]
-        with open('Data/control_map.json', 'w') as f:
-            json.dump(self.control_map, f)
+        self.save_settings()
         self.set_menu("Settings",False)
+
+    def set_volume(self,val):
+        SFX.volume = float(val)
+        self.save_settings()
+
+    def save_settings(self):
+        with open('Data/control_map.json', 'w') as f:
+            json.dump({'control_map':self.control_map,'volume':SFX.volume}, f)
 
     def start_game(self):
         self.set_menu("Game")
