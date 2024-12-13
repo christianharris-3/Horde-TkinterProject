@@ -120,6 +120,8 @@ class Main:
         self.game_active = False
         self.game.screen.destroy()
         self.game = -1
+        self.menus.menu_funcs.pop('game_object')
+        self.menus.menu_funcs.pop('save_game')
         self.menus.set_menu('Start_Screen')
         self.menus.prev_menu = []
 

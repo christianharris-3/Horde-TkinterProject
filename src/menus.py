@@ -88,6 +88,8 @@ class Menus:
             self.prev_menu.append(self.active_menu)
             self.set_menu_data_cache.append(data)
         self.active_menu = menu
+        if 'game_object' in self.menu_funcs:
+            self.menu_funcs['game_object'].screen.pack(fill=tk.BOTH, expand=True)
         if self.active_menu != "Game":
             if self.active_menu == "Pause_Screen":
                 self.make_pause_menu(data)
@@ -160,6 +162,8 @@ class Menus:
                   ).place(relx=0.5, rely=0.5, y=300, width=100, height=84, anchor=tk.CENTER)
 
     def make_settings_menu(self):
+        if 'game_object' in self.menu_funcs:
+            self.menu_funcs['game_object'].screen.pack_forget()
         self.style.theme_use("default")
         tk.Button(self.frame, text='Back', command=lambda:self.button_function(self.menu_back),
                   font=(self.font, 20), bg="green", relief=tk.GROOVE, bd=4, activebackground="green4", padx=5,
