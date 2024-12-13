@@ -17,17 +17,17 @@ class SFX:
                       'pistol_fire':{'file': 'pistol_fire.wav'},
                       'pistol_reload':{'file': 'pistol_reload.wav'},
                       'cant_shoot': {'file': 'cant_shoot.wav'},
-                      'player_move_1': {'file': 'player_move3.wav'},
-                      'player_move_2': {'file': 'player_move4.wav'},
+                      'player_move_1': {'file': 'player_move3.wav', 'volume':0.4},
+                      'player_move_2': {'file': 'player_move4.wav', 'volume':0.4},
                       'player_hurt': [{'file':'player_hurt1.wav'},{'file':'player_hurt2.wav'},{'file':'player_hurt3.wav'},{'file':'player_hurt4.wav'}],
                       'player_die': {'file':'player_die.wav'},
                       'enemy_hurt': [{'file': 'zombie_hurt1.wav'}, {'file': 'zombie_hurt2.wav'}, {'file': 'zombie_hurt3.wav'}],
                       'menu_click': {'file': 'menu_press.wav', 'volume':0.4},
                       'throw_grenade': {'file': 'throw_grenade.wav', 'volume':0.5},
                       'explosion': {'file': 'explosion.wav'},
-                      'force_push': {},
-                      'open_shop': {},
-                      'close_shop': {},
+                      'force_push': {'file': 'force_push.wav'},
+                      'open_shop': {'file': 'menu_press.wav', 'volume':0.4},
+                      'close_shop': {'file': 'menu_press.wav', 'volume':0.4},
                       'enemy_die': [{'file':'enemy_death.wav'},{'file':'enemy_death2.wav'},{'file':'enemy_death3.wav'}],
                       }
 
@@ -61,7 +61,7 @@ class SFX:
 
     walk_toggle = False
 
-    for sound_map in [base_sound_map,eight_bit_sounds,improved_sounds]:
+    for sound_map in [base_sound_map]+[eight_bit_sounds]*use_eight_bit_sounds+[improved_sounds]*use_improved_sounds:
         for sound in sound_map:
             if isinstance(sound_map[sound],dict):
                 sound_map[sound] = [sound_map[sound]]

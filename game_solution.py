@@ -2,6 +2,7 @@ import copy
 import os
 import json
 import webbrowser
+import time
 import tkinter as tk
 from PIL import ImageTk
 import src.tkinter_controller as TC
@@ -61,9 +62,6 @@ class Main:
         self.boss_key_image = ImageTk.PhotoImage(file=resourcepath('Sprites/Boss Key.png'))
         self.boss_key_label = None
 
-        # this thing messes up everything so hard for no reason
-        # self.window.bind('<Configure>', self.window_resize)
-        # self.window_resize_timestamp = time.perf_counter()
 
 
     def game_loop(self, delta_time):
@@ -106,15 +104,6 @@ class Main:
         return done
 
 
-    # def window_resize(self,event):
-    #     if self.window_resize_timestamp+0.1 < time.perf_counter():
-    #         self.window_resize_timestamp = time.perf_counter()
-    #         self.window_width = event.width
-    #         self.window_height = event.height
-    #         self.menus.window_resize(self.window_width, self.window_height)
-    #         if self.game_active:
-    #             self.game.window_resize(self.window_width,self.window_height)
-
     def start_game(self,gamefile=None,level='Level 3'):
         self.game_paused = False
         self.game_active = True
@@ -123,6 +112,7 @@ class Main:
         self.target_fps[0] = int(60 * self.game.cheat_info["speed of time"])
         self.menus.menu_funcs["save_game"] = self.game.save_game
         self.menus.menu_funcs["game_object"] = self.game
+        self.menus.set_menu('Game')
         TC.game_looper(self.game_loop, self.window, self.target_fps)
 
 

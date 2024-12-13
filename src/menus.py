@@ -102,8 +102,9 @@ class Menus:
             elif self.active_menu == "CheatCode_Menu":
                 self.make_cheatcode_menu(data)
             else:
-                self.frame.configure(width=self.window_width, height=self.window_height, bg="darkolivegreen2",
+                self.frame.configure(width=self.window.winfo_width(), height=self.window.winfo_height(), bg="darkolivegreen2",
                                      highlightthickness=0)
+                self.frame.pack(fill=tk.BOTH,expand=True)
                 if self.active_menu == "Start_Screen":
                     self.make_start_screen()
                 elif self.active_menu == "Settings":
@@ -116,7 +117,8 @@ class Menus:
                     self.make_level_select_menu()
 
         else:
-            self.frame.lower()
+            self.frame.place_forget()
+            self.frame.pack_forget()
 
     def menu_back(self):
         del self.set_menu_data_cache[-1]
@@ -426,7 +428,7 @@ class Menus:
         # filter select
         options = ['All','Level 1','Level 2','Level 3']
         tk.Label(self.frame,text='Filter:',font=(self.font, 20),bg='darkolivegreen2',
-                 ).place(x=80,y=125, anchor=tk.W)
+                 ).place(relx=0.5,x=-520,y=125, anchor=tk.W)
         for i,o in enumerate(options):
             col = 'green'
             if o == filter_:
@@ -435,7 +437,7 @@ class Menus:
             tk.Button(self.frame, text=o, command=func.func,
                       font=(self.font, 14), bg=col, relief=tk.GROOVE, bd=4,
                       activebackground="green4",
-                      ).place(x=180+i*150, y=125, height=50, width=120, anchor=tk.W)
+                      ).place(relx=0.5,x=i*150-420, y=125, height=50, width=120, anchor=tk.W)
 
 
         # Leaderboard table

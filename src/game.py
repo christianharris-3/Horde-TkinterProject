@@ -42,7 +42,7 @@ class Game:
         self.screen = tk.Canvas(self.window, width=self.screen_width,
                                 height=self.screen_height, bg="green",
                                 highlightthickness=0)
-        self.screen.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.screen.pack(fill=tk.BOTH, expand=True)
 
         self.control_map = control_map
         self.cheat_info = {'immortal': False,
@@ -268,6 +268,8 @@ class Game:
 
     def render_frame(self):
         self.screen.delete('game_image')
+        self.screen_width = self.screen.winfo_width()
+        self.screen_height = self.screen.winfo_height()
 
         # Tilemap Rendering
         tlx, tly = self.screen_to_world_pos(Vec()).tuple()

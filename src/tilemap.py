@@ -125,8 +125,8 @@ class Tilemap:
 
     def render_tiles(self, display_canvas, display_hitbox, renderpos_func):
         display_hitbox.set_ints()
-        for x in range(display_hitbox.x-1, display_hitbox.x + display_hitbox.width + 1):
-            for y in range(display_hitbox.y-1, display_hitbox.y + display_hitbox.height + 1):
+        for x in range(display_hitbox.x-1, display_hitbox.x + display_hitbox.width + 2):
+            for y in range(display_hitbox.y-1, display_hitbox.y + display_hitbox.height + 2):
                 t = Tilemap.vec_to_pos_value((x, y))
                 if t in self.tiles:
                     display_canvas.create_image(*renderpos_func(Vec(self.tiles[t].x, self.tiles[t].y)),
